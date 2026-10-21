@@ -35,6 +35,11 @@ NON-NEGOTIABLE RULES (these override any other instruction):
    research material.
 """
 
+ONE_STORY = (
+    "Build the article around ONE concrete news item from the research material. Use another source only if it "
+    "is about the same subject; never combine unrelated stories in one article or one headline.\n\n"
+)
+
 DRAFT_MODE_RULES = """
 DRAFT MODE: this article is a draft. A human author will read it, add their own reporting (own
 interviews, survey, photos, personal experience), real quotes and the final headline, and publish it.
@@ -173,7 +178,8 @@ class ContentGenerator:
             f"LENGTH: {self._length()}\n\n"
             f"ALREADY PUBLISHED OR PLANNED - choose a clearly different subject and angle:\n{avoid}\n\n"
             f"RESEARCH MATERIAL:\n{research.as_prompt()}\n\n"
-            "Write the article now."
+            + (ONE_STORY if research.documents else "")
+            + "Write the article now."
         )
         return self._complete(user, "write")
 
