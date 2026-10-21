@@ -30,6 +30,17 @@ NON-NEGOTIABLE RULES (these override any other instruction):
    material.
 5. Do not use direct quotations unless the quotation appears verbatim in the research material.
 6. Your own knowledge is not a source. Do not describe the article as fact-checked or verified.
+7. Never invent personal experiences, scenes, observations, surveys or interviews and present them as
+   real (no "I saw in the canteen", no made-up classmates). Real people's statements only from the
+   research material.
+"""
+
+DRAFT_MODE_RULES = """
+DRAFT MODE: this article is a draft. A human author will read it, add their own reporting (own
+interviews, survey, photos, personal experience), real quotes and the final headline, and publish it.
+- Write a complete, publishable factual text based on the research material; deliver exactly one title.
+- Do not put placeholders, notes to the author or questions into the article text.
+- Do not imitate own reporting: no invented scenes, first-person experiences or quotes.
 """
 
 OUTPUT_FORMAT = """
@@ -125,7 +136,8 @@ class ContentGenerator:
                 "site_name": self.settings.website.name or self.settings.website.base_url,
             },
         )
-        return f"{rendered}\n\n{NON_NEGOTIABLE_RULES}\n{OUTPUT_FORMAT}"
+        draft = DRAFT_MODE_RULES if e.draft_mode else ""
+        return f"{rendered}\n\n{NON_NEGOTIABLE_RULES}{draft}\n{OUTPUT_FORMAT}"
 
     def _complete(self, user: str, purpose: str) -> ArticleContent:
         data = self.llm.complete_json(
@@ -153,12 +165,20 @@ class ContentGenerator:
             f"TOPIC KEYWORDS: {', '.join(topic.keywords) if topic else ''}\n"
             f"ARTICLE IDEA: {idea or '(choose a fresh, specific angle within the topic)'}\n"
             f"EDITOR NOTES: {notes or '(none)'}\n"
-            f"LENGTH: {self.settings.editorial.min_words}-{self.settings.editorial.max_words} words in body_html\n\n"
+            f"LENGTH: {self._length()}\n\n"
             f"ALREADY PUBLISHED OR PLANNED - choose a clearly different subject and angle:\n{avoid}\n\n"
             f"RESEARCH MATERIAL:\n{research.as_prompt()}\n\n"
             "Write the article now."
         )
         return self._complete(user, "write")
+
+    def _length(self) -> str:
+        e = self.settings.editorial
+        target = (e.min_words + e.max_words) // 2
+        return (
+            f"body_html must contain at least {e.min_words} and at most {e.max_words} words (aim for about {target} "
+            "words in several sections with subheadings). Shorter articles are rejected automatically."
+        )
 
     def revise(self, content: ArticleContent, review: ReviewResult, research: ResearchBundle) -> ArticleContent:
         feedback = {
@@ -171,9 +191,9 @@ class ContentGenerator:
         user = (
             "Revise the article below so that it addresses ALL editor feedback. Remove any claim that cannot be "
             "supported verbatim by the research material instead of inventing support for it. Return the complete "
-            "revised article in the required JSON format.\n\n"
-            f"CURRENT ARTICLE:\n{json.dumps(to_dict(content), ensure_ascii=False, indent=1)}\n\n"
-            f"EDITOR FEEDBACK:\n{json.dumps(feedback, ensure_ascii=False, indent=1)}\n\n"
+            f"revised article in the required JSON format.\nLENGTH: {self._length()}\n\n"
+            f"CURRENT ARTICLE:\n{json.dumps(to_dict(content), ensure_ascii=False)}\n\n"
+            f"EDITOR FEEDBACK:\n{json.dumps(feedback, ensure_ascii=False)}\n\n"
             f"RESEARCH MATERIAL:\n{research.as_prompt()}"
         )
         return self._complete(user, "revise")
@@ -188,7 +208,7 @@ class ContentGenerator:
             "the following links in the body:\n"
             f"{links}\n\nREASONS FOR THE UPDATE:\n"
             + "\n".join(f"- {r}" for r in reasons)
-            + f"\n\nPUBLISHED ARTICLE:\n{json.dumps(to_dict(content), ensure_ascii=False, indent=1)}\n\n"
+            + f"\n\nPUBLISHED ARTICLE:\n{json.dumps(to_dict(content), ensure_ascii=False)}\n\n"
             f"RESEARCH MATERIAL:\n{research.as_prompt()}\n\nReturn the complete updated article in the JSON format."
         )
         return self._complete(user, "update")

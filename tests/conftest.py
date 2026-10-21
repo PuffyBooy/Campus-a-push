@@ -8,7 +8,7 @@ import pytest
 
 from typo3_publisher import retry as retry_module
 from typo3_publisher import verifier as verifier_module
-from typo3_publisher.config import Settings, load_selectors, load_settings
+from typo3_publisher.config import Settings, SlotSettings, load_selectors, load_settings
 from typo3_publisher.models import Article, ArticleContent, ImageInfo
 from typo3_publisher.state_manager import StateStore
 
@@ -48,6 +48,8 @@ def _isolate(monkeypatch):
 def config_dir(tmp_path) -> Path:
     target = tmp_path / "config"
     shutil.copytree(REPO / "config", target)
+    # Tests use a fixed topic set, independent of the site's editorial plan in config/topics.yaml.
+    shutil.copy(REPO / "tests" / "fixtures" / "topics.yaml", target / "topics.yaml")
     return target
 
 
@@ -57,6 +59,11 @@ def settings(config_dir) -> Settings:
     s.website.base_url = "https://example.org"
     s.website.verification.initial_delay_seconds = 0
     s.website.verification.attempts = 2
+    # Fixed values the tests rely on, independent of the live configuration.
+    s.research.enabled = False  # no network access in tests
+    s.publishing.slots = [SlotSettings(times=["08:00", "12:00", "17:00"])]
+    s.editorial.min_words, s.editorial.max_words = 600, 1200
+    s.editorial.draft_mode = False
     return s
 
 

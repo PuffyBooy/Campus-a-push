@@ -17,7 +17,7 @@ import json
 import re
 from collections.abc import Iterable
 
-from .config import Settings
+from .config import Settings, read_text
 from .content_generator import ContentGenerator
 from .html_utils import extract_links, html_to_text, jaccard, normalise, title_similarity, word_count
 from .llm import LLMClient
@@ -41,6 +41,18 @@ not supported by the research material, any invented quotation or source, defama
 content, and any violation of the editorial instructions' topics to avoid.
 """
 
+DRAFT_MODE_REVIEW = """
+DRAFT MODE: the article is a draft for a human author, who adds own reporting (own interviews, survey,
+photos, personal experience), real quotes from people they talked to and the final headline variants
+before publishing. Therefore:
+- Do NOT report missing own reporting, missing interview quotes, missing own photos or a single headline
+  (instead of several proposals) as critical issues, and do not lower scores for them.
+- List each of these gaps as a short, concrete to-do for the author in "author_todos" (in the article's
+  language), e.g. which person to ask for a quote or what to observe for an own scene.
+- Invented facts, invented quotes and invented first-person experiences or scenes stay critical issues.
+Add to the JSON: "author_todos": ["..."]
+"""
+
 _QUOTE_RE = re.compile(r"[\"„“«»](?P<q>[^\"„“”«»]{20,400})[\"“”«»]")
 _PERCENT_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s?(?:%|prozent|percent|per cent)", re.I)
 
@@ -50,7 +62,8 @@ class EditorialReviewer:
         self.settings = settings
         self.llm = llm
         self.rubric = rubric
-        self.editorial_prompt = editorial_prompt
+        checklist = settings.editorial.review_checklist_file
+        self.editorial_prompt = read_text(settings, checklist) if checklist else editorial_prompt
 
     # ------------------------------------------------------------------ deterministic checks
     def automated_checks(
@@ -164,9 +177,11 @@ class EditorialReviewer:
     # ------------------------------------------------------------------ LLM review
     def system_prompt(self) -> str:
         criteria = ", ".join(f'"{c}": 0-10' for c in self.settings.editorial.criteria_weights)
+        draft = DRAFT_MODE_REVIEW if self.settings.editorial.draft_mode else ""
         return (
             f"{self.rubric}\n\nEDITORIAL INSTRUCTIONS GIVEN TO THE WRITER:\n<<<\n{self.editorial_prompt}\n>>>\n"
             + REVIEW_FORMAT.replace("{CRITERIA}", "{" + criteria + "}")
+            + draft
         )
 
     def weighted_score(self, scores: dict[str, float]) -> float:
@@ -187,7 +202,7 @@ class EditorialReviewer:
         automated = self.automated_checks(content, research, existing, allowed_links, self_id)
         user = (
             f"ARTICLE TO REVIEW (iteration {iteration}):\n"
-            f"{json.dumps(to_dict(content), ensure_ascii=False, indent=1)}\n\n"
+            f"{json.dumps(to_dict(content), ensure_ascii=False)}\n\n"
             f"RESEARCH MATERIAL AVAILABLE TO THE WRITER:\n{research.as_prompt()}\n\n"
             "AUTOMATED CHECK RESULTS (already verified mechanically):\n"
             + ("\n".join(f"- [{i.severity}] {i.message}" for i in automated) or "- none")
@@ -231,6 +246,7 @@ class EditorialReviewer:
             feedback=feedback,
             summary=str(data.get("summary", "")),
             model=self.settings.llm.editor_model,
+            author_todos=[str(t) for t in (data.get("author_todos") or []) if str(t).strip()][:10],
         )
         log.info(
             "review iteration %d: score=%.2f passed=%s critical=%d automated=%d",
@@ -247,7 +263,7 @@ class EditorialReviewer:
             f"The article below was published {age_days} days ago. Decide whether it needs an update "
             "(outdated information, weak structure, SEO problems, broken promises in the headline). Respond with JSON "
             '{"needs_update": true|false, "reasons": ["..."], "score": 0-10}.\n\n'
-            f"ARTICLE:\n{json.dumps(to_dict(content), ensure_ascii=False, indent=1)}\n\n"
+            f"ARTICLE:\n{json.dumps(to_dict(content), ensure_ascii=False)}\n\n"
             f"CURRENT RESEARCH MATERIAL:\n{research.as_prompt()}"
         )
         data = self.llm.complete_json(

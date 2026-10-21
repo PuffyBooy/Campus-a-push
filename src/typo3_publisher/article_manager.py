@@ -101,6 +101,7 @@ class RunSummary:
             lines.append(f"- Published **{p['title']}** → {p.get('url', '')}")
         for d in self.drafts:
             lines.append(f"- Saved as draft **{d['title']}** → {d.get('url', '')} (review and publish it yourself)")
+            lines += [f"  - To do: {t}" for t in d.get("todos", [])]
         for u in self.updated:
             lines.append(f"- Updated **{u['title']}** → {u.get('url', '')}")
         for f in self.failures:
@@ -299,6 +300,7 @@ class ArticleManager:
                     f"dry run: filled the TYPO3 form for '{article.content.title}' without saving "
                     f"({len(shots)} diagnostic file(s))"
                 )
+                summary.notes += [f"To do: {t}" for t in (article.reviews[-1].author_todos if article.reviews else [])]
             except Exception as exc:
                 self._fail(summary, None, "dry-run preview", exc)
             return False
@@ -335,13 +337,15 @@ class ArticleManager:
         """campus_frontend: the article is a draft on the website. Nothing public to verify."""
         assert article.content is not None
         url = article.publication.verification.get("draft_saved_url", "")
+        todos = article.reviews[-1].author_todos if article.reviews else []
         article.status = ArticleStatus.DRAFT_SAVED
         self.checkpoint(article, "Saved as draft on the website")
-        summary.drafts.append({"id": article.id, "title": article.content.title, "url": url})
+        summary.drafts.append({"id": article.id, "title": article.content.title, "url": url, "todos": todos})
         self.notifier.notify(
             "draft_saved",
             article.content.title,
-            "Saved as draft (marked as AI-assisted). Review, edit and publish it yourself on the website.",
+            "Saved as draft (marked as AI-assisted). Review, edit and publish it yourself on the website."
+            + "".join(f"\n- {t}" for t in todos),
         )
         return True
 

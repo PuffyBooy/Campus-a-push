@@ -63,6 +63,12 @@ llm:
 editorial:
   prompt_file: config/editorial_prompt.md
   review_rubric_file: config/review_rubric.md
+  # The editor gets this short checklist instead of the full writer prompt (saves ~3000 tokens per review,
+  # needed for Groq's free tier of 8000 tokens per minute). Empty = full editorial_prompt.md.
+  review_checklist_file: config/review_checklist.md
+  # Draft mode: you complete each draft (own reporting, real quotes, final headline) before publishing.
+  # Missing own reporting then becomes a to-do in the run summary instead of a reason to reject.
+  draft_mode: true
   quality_threshold: 8.0    # weighted score (0-10) required for approval
   min_criterion_score: 6.0  # every single criterion must reach this
   min_factual_score: 7.0
@@ -77,8 +83,8 @@ editorial:
     originality: 1.0
     clarity: 1.0
     instruction_adherence: 1.5
-  min_words: 600
-  max_words: 1200
+  min_words: 700             # editorial_prompt.md: at least ~7000 characters
+  max_words: 1300
   word_count_tolerance: 0.1
   max_title_length: 90
   meta_description_min: 110
@@ -90,11 +96,25 @@ editorial:
   recent_titles_context: 40
 
 research:
-  enabled: false            # enable for factual/news articles; facts then come only from these sources
-  approved_domains: []      # e.g. [heise.de, europa.eu, statistik.at]
-  feeds: []                 # RSS/Atom feeds on approved domains
-  max_sources: 5
-  max_chars_per_source: 6000
+  enabled: true             # facts come only from articles fetched from these sources
+  approved_domains: [orf.at, derstandard.at, diepresse.com, kurier.at, statistik.at]
+  feeds:                    # RSS/Atom feeds on approved domains; items are matched to the topic keywords
+    - https://rss.orf.at/news.xml
+    - https://rss.orf.at/oesterreich.xml
+    - https://rss.orf.at/wien.xml
+    - https://rss.orf.at/science.xml
+    - https://rss.orf.at/help.xml
+    - https://www.derstandard.at/rss/inland
+    - https://www.derstandard.at/rss/wissenschaft
+    - https://www.derstandard.at/rss/wirtschaft
+    - https://www.derstandard.at/rss/kultur
+    - https://www.derstandard.at/rss/web
+    - https://www.diepresse.com/rss
+    - https://kurier.at/xml/rss
+  # Kept small on purpose: every source is sent to the writer and the editor, and Groq's free tier allows
+  # only 8000 tokens per minute per request. Raise both with a paid plan.
+  max_sources: 2
+  max_chars_per_source: 2200
   min_keyword_matches: 1
   timeout_seconds: 20
 
@@ -130,9 +150,9 @@ publishing:
   enabled: false            # MASTER SWITCH. Enable only after discovery + a verified test publication.
   auto_publish: true        # false: approved articles wait for a manual "publish-approved" run
   timezone: Europe/Vienna
-  slots:
+  slots:                    # one draft per weekday; the weekly quotas in topics.yaml cap the total
     - days: [mon, tue, wed, thu, fri]
-      times: ["08:00", "12:00", "17:00"]
+      times: ["12:00"]
   slot_grace_minutes: 150   # how late a delayed GitHub run may still serve a slot
   catch_up: latest_only     # latest_only: serve only the most recent missed slot | none
   max_articles_per_run: 1
@@ -182,7 +202,12 @@ campus:
   site_id: ""               # set via WEBSITE_ID (secret or variable), e.g. campus-a-college
   base_url: ""              # empty: WEBSITE_BASE_URL, else the known address of site_id
   default_resort: Panorama  # Kultur | Panorama | Politik | Sport | Wirtschaft | Wissenschaft
-  resort_by_topic: {}       # e.g. {"Artificial Intelligence": Wissenschaft}
+  resort_by_topic:          # topic (topics.yaml) -> Ressort of the form
+    Politik: Politik
+    Wirtschaft: Wirtschaft
+    Wissenschaft: Wissenschaft
+    Panorama: Panorama
+    Kultur: Kultur
   default_region: Österreich
   region_by_topic: {}
   max_tags: 5               # the site allows 5

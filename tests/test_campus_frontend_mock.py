@@ -249,11 +249,18 @@ def test_scheduled_run_saves_a_draft(campus_env, mock_campus, tmp_path, monkeypa
     settings, selectors = campus_env
     settings.publishing.enabled = True
     settings.publishing.allow_test_content = True  # scripted FakeLLM content, mock site only
+    settings.editorial.draft_mode = True
     monkeypatch.setattr("typo3_publisher.main.load_selectors", lambda s: selectors)
+    todo = "Eine Lehrkraft zum Umstieg auf Passkeys befragen"
 
     def llm(purpose, system, user):
         if purpose == "review":
-            return {"scores": dict.fromkeys(settings.editorial.criteria_weights, 9.0), "critical_issues": []}
+            assert "DRAFT MODE" in system
+            return {
+                "scores": dict.fromkeys(settings.editorial.criteria_weights, 9.0),
+                "critical_issues": [],
+                "author_todos": [todo],
+            }
         return to_dict(make_content(title="Passkeys im Studium: so klappt der Umstieg", seed=1))
 
     class OneImage:
@@ -285,11 +292,12 @@ def test_scheduled_run_saves_a_draft(campus_env, mock_campus, tmp_path, monkeypa
     [article] = store.list_articles()
     assert article.status == ArticleStatus.DRAFT_SAVED
     assert summary.drafts == [
-        {"id": article.id, "title": article.content.title, "url": f"{mock_campus.base_url}/profil"}
+        {"id": article.id, "title": article.content.title, "url": f"{mock_campus.base_url}/profil", "todos": [todo]}
     ]
     assert store.get_slot(summary.slot)["status"] == "published"
     assert [n["event"] for n in notifier.sent] == ["draft_saved"]
-    assert "Saved as draft" in summary.markdown()
+    assert todo in notifier.sent[0]["text"]
+    assert "Saved as draft" in summary.markdown() and f"To do: {todo}" in summary.markdown()
     assert len(mock_campus.state.articles) == 1
 
     # The saved draft is not sent again by the next run.

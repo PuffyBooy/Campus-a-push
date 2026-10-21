@@ -152,6 +152,11 @@ class LLMSettings:
 class EditorialSettings:
     prompt_file: str = "config/editorial_prompt.md"
     review_rubric_file: str = "config/review_rubric.md"
+    # Optional shorter instructions for the editor instead of the full writer prompt (saves tokens).
+    review_checklist_file: str = ""
+    # Draft mode: a human author completes the article (own reporting, real quotes, final headline)
+    # before publishing. Missing own reporting is then a to-do for the author, not a reason to reject.
+    draft_mode: bool = False
     quality_threshold: float = 8.0
     min_criterion_score: float = 6.0
     min_factual_score: float = 7.0
