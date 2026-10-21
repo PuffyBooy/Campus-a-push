@@ -1,0 +1,29 @@
+# Topics and weekly quotas. The planner picks the topic with the largest unmet weekly quota
+# (weighted by priority), skipping topics whose quota for the current ISO week (Europe/Vienna)
+# is already fulfilled.
+topics:
+  - name: Technology
+    priority: high
+    articles_per_week: 3
+    description: Practical explanations of technologies that matter to students and staff.
+    keywords: [software, hardware, internet, cloud, security]
+    categories: []
+  - name: Artificial Intelligence
+    priority: high
+    articles_per_week: 2
+    description: How AI tools work, their limits, and responsible use in study and work.
+    keywords: [ai, machine learning, ki, llm]
+    categories: []
+  - name: Digital Trends
+    priority: medium
+    articles_per_week: 2
+    description: Evergreen analysis of digital habits and trends, without speculation presented as fact.
+    keywords: [digital, trend, social media, apps]
+    categories: []
+
+# Optional backlog of future article ideas, used before the topic rotation (each once).
+# Ideas can also be added at runtime: python -m typo3_publisher add-idea "..." --topic "..."
+backlog: []
+#  - title: "Passkeys statt Passwörter: wie die neue Anmeldung funktioniert"
+#    topic: Technology
+#    notes: "Erklärend, ohne Marktzahlen."

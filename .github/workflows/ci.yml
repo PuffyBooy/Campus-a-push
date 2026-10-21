@@ -1,0 +1,23 @@
+name: CI
+
+on:
+  push:
+    branches-ignore: [bot-state]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bot
+      - name: Lint
+        run: |
+          ruff check .
+          ruff format --check .
+      - name: Tests (unit + Chromium against the mock TYPO3 backend)
+        run: pytest -q

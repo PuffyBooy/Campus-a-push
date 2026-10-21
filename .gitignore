@@ -1,0 +1,14 @@
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+.env
+.pytest_cache/
+.ruff_cache/
+# Runtime output. Diagnostics may contain authenticated screenshots: never commit them.
+artifacts/
+# Worktree of the state branch used in GitHub Actions
+.bot-state/
+# Browser session files (contain authentication cookies)
+*.storage-state.json
+storage_state*.json

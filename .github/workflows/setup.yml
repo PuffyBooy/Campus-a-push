@@ -1,0 +1,60 @@
+name: TYPO3 setup (login test / discovery)
+
+on:
+  workflow_dispatch:
+    inputs:
+      action:
+        type: choice
+        default: check-login
+        options: [check-login, discover, discover-test-save, discover-test-save-and-upload]
+
+concurrency:
+  group: typo3-publisher-state
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      TYPO3_BACKEND_URL: ${{ secrets.TYPO3_BACKEND_URL }}
+      TYPO3_USERNAME: ${{ secrets.TYPO3_USERNAME }}
+      TYPO3_PASSWORD: ${{ secrets.TYPO3_PASSWORD }}
+      TYPO3_STORAGE_STATE: ${{ secrets.TYPO3_STORAGE_STATE }}
+      WEBSITE_BASE_URL: ${{ secrets.WEBSITE_BASE_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bot
+      - name: Run
+        env:
+          ACTION: ${{ inputs.action }}
+        run: |
+          case "$ACTION" in
+            check-login) python -m typo3_publisher check-login ;;
+            discover) python -m typo3_publisher discover ;;
+            discover-test-save) python -m typo3_publisher discover --test-save ;;
+            discover-test-save-and-upload) python -m typo3_publisher discover --test-save --test-upload ;;
+          esac
+      - name: Report and selector proposal (no screenshots)
+        if: always()
+        run: |
+          for f in artifacts/discovery/*/report.md; do [ -f "$f" ] && cat "$f" >> "$GITHUB_STEP_SUMMARY"; done
+          [ -f config/typo3_selectors.discovered.yaml ] && { echo '```yaml'; cat config/typo3_selectors.discovered.yaml; echo '```'; } >> "$GITHUB_STEP_SUMMARY" || true
+      - name: Encrypt screenshots (only if DIAGNOSTICS_PASSPHRASE is set)
+        if: always()
+        env:
+          PASSPHRASE: ${{ secrets.DIAGNOSTICS_PASSPHRASE }}
+        run: |
+          [ -z "$PASSPHRASE" ] && { echo "Screenshots are not uploaded without DIAGNOSTICS_PASSPHRASE."; exit 0; }
+          tar czf setup.tgz artifacts || exit 0
+          openssl enc -aes-256-cbc -pbkdf2 -salt -in setup.tgz -out setup.tgz.enc -pass env:PASSPHRASE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: setup-diagnostics-encrypted
+          path: setup.tgz.enc
+          if-no-files-found: ignore
+          retention-days: 3

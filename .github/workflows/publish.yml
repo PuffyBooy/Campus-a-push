@@ -1,0 +1,123 @@
+name: Publish
+
+# GitHub cron runs in UTC and may start late. The workflow therefore wakes up twice per hour
+# around all slot times (winter AND summer time); the bot decides in Europe/Vienna local time
+# whether a slot is due and claims it in the state branch, so a slot is served at most once.
+# Regenerate the hours after changing publishing.slots:  python -m typo3_publisher print-cron
+on:
+  schedule:
+    - cron: "7,37 6,7,8,10,11,12,15,16,17 * * *"
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: What to do
+        type: choice
+        default: full
+        options: [full, scheduled, publish-approved, prepare, generate-only, review-only]
+      dry_run:
+        description: Dry run (fill the TYPO3 form but never save; state changes are discarded)
+        type: boolean
+        default: true
+      idea:
+        description: Optional article idea
+        default: ""
+      topic:
+        description: Optional topic (as in config/topics.yaml)
+        default: ""
+      article_id:
+        description: Optional article id (publish-approved / review-only)
+        default: ""
+
+# One bot run at a time across all workflows that touch the state branch.
+concurrency:
+  group: typo3-publisher-state
+  cancel-in-progress: false
+
+permissions:
+  contents: write   # push to the bot-state branch
+  issues: write     # failure notifications
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    env:
+      BOT_STATE_BACKEND: git_branch
+      BOT_LOG_FORMAT: json
+      # Repository variables (Settings → Secrets and variables → Actions → Variables):
+      # BOT_PAUSED=true stops all publishing without a code change.
+      BOT_PAUSED: ${{ vars.BOT_PAUSED }}
+      BOT_PUBLISHING_ENABLED: ${{ vars.BOT_PUBLISHING_ENABLED }}
+      TYPO3_BACKEND_URL: ${{ secrets.TYPO3_BACKEND_URL }}
+      TYPO3_USERNAME: ${{ secrets.TYPO3_USERNAME }}
+      TYPO3_PASSWORD: ${{ secrets.TYPO3_PASSWORD }}
+      TYPO3_STORAGE_STATE: ${{ secrets.TYPO3_STORAGE_STATE }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
+      WEBSITE_BASE_URL: ${{ secrets.WEBSITE_BASE_URL }}
+      NOTIFY_WEBHOOK_URL: ${{ secrets.NOTIFY_WEBHOOK_URL }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - uses: ./.github/actions/setup-bot
+
+      - name: Run bot
+        id: bot
+        env:
+          MODE: ${{ github.event_name == 'schedule' && 'scheduled' || inputs.mode }}
+          DRY_RUN: ${{ github.event_name != 'schedule' && inputs.dry_run && '--dry-run' || '' }}
+          IDEA: ${{ inputs.idea }}
+          TOPIC: ${{ inputs.topic }}
+          ARTICLE_ID: ${{ inputs.article_id }}
+        run: |
+          set +e
+          python -m typo3_publisher run --mode "$MODE" $DRY_RUN --idea "$IDEA" --topic "$TOPIC" --article-id "$ARTICLE_ID"
+          code=$?
+          echo "exit_code=$code" >> "$GITHUB_OUTPUT"
+          case $code in
+            0) ;;
+            4) echo "::warning::State is locked by another run; skipped." ; code=0 ;;
+            3) echo "::error::Human action needed (MFA/CAPTCHA or manual reconciliation) - see the run summary." ;;
+            2) echo "::error::Configuration error - see the log." ;;
+            *) echo "::error::Run failed - see the run summary." ;;
+          esac
+          exit $code
+
+      - name: Encrypt diagnostics (only if DIAGNOSTICS_PASSPHRASE is set)
+        if: failure()
+        env:
+          PASSPHRASE: ${{ secrets.DIAGNOSTICS_PASSPHRASE }}
+        run: |
+          if [ -z "$PASSPHRASE" ] || [ ! -d artifacts/diagnostics ]; then
+            echo "No encrypted diagnostics: screenshots of the authenticated backend are never uploaded unencrypted."
+            exit 0
+          fi
+          tar czf diagnostics.tgz artifacts/diagnostics
+          openssl enc -aes-256-cbc -pbkdf2 -salt -in diagnostics.tgz -out diagnostics.tgz.enc -pass env:PASSPHRASE
+          rm diagnostics.tgz
+
+      - name: Upload encrypted diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: diagnostics-encrypted
+          path: diagnostics.tgz.enc
+          if-no-files-found: ignore
+          retention-days: 7
+
+      - name: Open or update failure issue
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = 'TYPO3 publisher: run failed';
+            const url = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const body = `Run ${url} failed (exit code ${{ steps.bot.outputs.exit_code || 'n/a' }}).\n\nSee the run summary for details. Generated articles are preserved in the \`bot-state\` branch and will be retried without duplicates.`;
+            const { data: issues } = await github.rest.issues.listForRepo({ ...context.repo, state: 'open', labels: 'bot-failure' });
+            const existing = issues.find(i => i.title === title);
+            if (existing) {
+              await github.rest.issues.createComment({ ...context.repo, issue_number: existing.number, body });
+            } else {
+              await github.rest.issues.create({ ...context.repo, title, body, labels: ['bot-failure'] });
+            }

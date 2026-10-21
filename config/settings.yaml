@@ -1,0 +1,156 @@
+# Central configuration of the TYPO3 publishing bot.
+# Secrets (passwords, API keys) are NEVER stored here - they come from GitHub Actions secrets.
+# Environment overrides: TYPO3_BACKEND_URL, WEBSITE_BASE_URL, BOT_PUBLISHING_ENABLED, BOT_PAUSED,
+# BOT_UPDATES_ENABLED, BOT_STATE_BACKEND, CHROMIUM_EXECUTABLE, BOT_HEADLESS.
+
+website:
+  base_url: ""              # set via the WEBSITE_BASE_URL secret
+  name: ""                  # used as {{site_name}} in the editorial prompt
+  language: de              # language of the articles
+  public_url:
+    # How to find the public article URL after publishing:
+    #   pattern               build it from the slug (path_segment) read back from TYPO3
+    #   listing               search the news list page for a link with the article title
+    #   pattern_then_listing  try both
+    #   backend_view          use the URL of the backend "View" button
+    strategy: pattern_then_listing
+    pattern: "{base_url}/news/{slug}"
+    listing_url: "{base_url}/news"
+  verification:
+    attempts: 6
+    initial_delay_seconds: 10
+    backoff_factor: 2.0
+    max_delay_seconds: 120
+    timeout_seconds: 30
+    min_title_similarity: 0.85
+    min_content_overlap: 0.5
+
+typo3:
+  backend_url: ""           # set via the TYPO3_BACKEND_URL secret, e.g. https://www.example.org/typo3
+  profile: news             # news (EXT:news) | content_element (page + text/media element)
+  selectors_file: config/typo3_selectors.yaml
+  storage_state_env: TYPO3_STORAGE_STATE
+  browser:
+    headless: true
+    executable_path: ""     # optional; CHROMIUM_EXECUTABLE overrides
+    navigation_timeout_ms: 45000
+    action_timeout_ms: 15000
+    upload_timeout_ms: 120000
+    slow_mo_ms: 0
+    viewport_width: 1600
+    viewport_height: 1000
+    locale: de-AT
+
+llm:
+  provider: openai
+  writer_model: gpt-4.1
+  editor_model: gpt-4.1
+  writer_temperature: 0.7
+  editor_temperature: 0.2   # set to null for models that do not accept a temperature
+  max_output_tokens: 8000
+  timeout_seconds: 180
+
+editorial:
+  prompt_file: config/editorial_prompt.md
+  review_rubric_file: config/review_rubric.md
+  quality_threshold: 8.0    # weighted score (0-10) required for approval
+  min_criterion_score: 6.0  # every single criterion must reach this
+  min_factual_score: 7.0
+  max_revision_cycles: 3
+  criteria_weights:
+    factual_accuracy: 3.0
+    readability: 1.0
+    structure: 1.0
+    grammar: 1.0
+    seo: 1.0
+    relevance: 1.5
+    originality: 1.0
+    clarity: 1.0
+    instruction_adherence: 1.5
+  min_words: 600
+  max_words: 1200
+  word_count_tolerance: 0.1
+  max_title_length: 90
+  meta_description_min: 110
+  meta_description_max: 165
+  forbidden_terms: []
+  require_sources_for_factual: true
+  duplicate_title_similarity: 0.82
+  duplicate_content_similarity: 0.45
+  recent_titles_context: 40
+
+research:
+  enabled: false            # enable for factual/news articles; facts then come only from these sources
+  approved_domains: []      # e.g. [heise.de, europa.eu, statistik.at]
+  feeds: []                 # RSS/Atom feeds on approved domains
+  max_sources: 5
+  max_chars_per_source: 6000
+  min_keyword_matches: 1
+  timeout_seconds: 20
+
+images:
+  provider: pixabay
+  required: true            # true: never publish without a suitable image
+  search_language: en
+  min_width: 1200
+  min_aspect_ratio: 1.3
+  min_relevance: 0.34
+  per_page: 50
+  max_queries: 4
+  safesearch: true
+  exclude_people: true      # avoid identifiable persons (Pixabay Content License restrictions)
+  alt_template: "{tags}"
+  download_dir: artifacts/images
+  max_file_mb: 15
+  attribution:
+    enabled: true
+    template: "Bild: {user} auf Pixabay"
+    target: caption         # caption (image description field) | body | both
+
+publishing:
+  enabled: false            # MASTER SWITCH. Enable only after discovery + a verified test publication.
+  auto_publish: true        # false: approved articles wait for a manual "publish-approved" run
+  timezone: Europe/Vienna
+  slots:
+    - days: [mon, tue, wed, thu, fri]
+      times: ["08:00", "12:00", "17:00"]
+  slot_grace_minutes: 150   # how late a delayed GitHub run may still serve a slot
+  catch_up: latest_only     # latest_only: serve only the most recent missed slot | none
+  max_articles_per_run: 1
+  max_publish_attempts: 3
+  max_generation_attempts: 2
+  prefer_approved_backlog: true
+  default_categories: []
+  categories_by_topic: {}   # e.g. {"Artificial Intelligence": ["KI"]}
+  allow_test_content: false # never set to true for the live site
+
+updates:
+  enabled: false            # post-publication updates only run when explicitly enabled
+  min_age_days: 30
+  max_updates_per_run: 1
+  update_if_score_below: 7.5
+  preserve_links: true
+  max_versions_kept: 20
+
+state:
+  backend: local            # GitHub Actions sets BOT_STATE_BACKEND=git_branch
+  local_dir: data
+  git_branch: bot-state
+  git_dir: .bot-state
+  git_remote: origin
+  lock_ttl_minutes: 120
+
+retries:
+  llm: {attempts: 4, base_delay_seconds: 2, max_delay_seconds: 30}
+  http: {attempts: 3, base_delay_seconds: 2, max_delay_seconds: 30}
+  browser: {attempts: 2, base_delay_seconds: 5, max_delay_seconds: 30}
+  git: {attempts: 5, base_delay_seconds: 2, max_delay_seconds: 30}
+
+diagnostics:
+  directory: artifacts/diagnostics
+  screenshots: true
+  html_dumps: true
+
+notifications:
+  webhook_env: NOTIFY_WEBHOOK_URL
+  notify_on: [failure, rejected, published]

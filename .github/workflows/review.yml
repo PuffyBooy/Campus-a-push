@@ -1,0 +1,54 @@
+name: Generate and review
+
+# LLM-only work (no TYPO3 access): build a backlog of reviewed articles that the publish
+# workflow (mode publish-approved, or scheduled with prefer_approved_backlog) can publish later.
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        type: choice
+        default: prepare
+        options: [prepare, generate-only, review-only]
+      idea:
+        default: ""
+      topic:
+        default: ""
+      count:
+        description: Number of drafts (generate-only)
+        default: "1"
+      article_id:
+        description: Review a single draft (review-only)
+        default: ""
+  # schedule:
+  #   - cron: "23 4 * * 1"   # Mondays: prepare articles for the week
+
+concurrency:
+  group: typo3-publisher-state
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      BOT_STATE_BACKEND: git_branch
+      BOT_LOG_FORMAT: json
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      WEBSITE_BASE_URL: ${{ secrets.WEBSITE_BASE_URL }}
+      NOTIFY_WEBHOOK_URL: ${{ secrets.NOTIFY_WEBHOOK_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-bot
+        with:
+          browser: "false"
+      - name: Run
+        env:
+          MODE: ${{ inputs.mode || 'prepare' }}
+          IDEA: ${{ inputs.idea }}
+          TOPIC: ${{ inputs.topic }}
+          COUNT: ${{ inputs.count || '1' }}
+          ARTICLE_ID: ${{ inputs.article_id }}
+        run: python -m typo3_publisher run --mode "$MODE" --idea "$IDEA" --topic "$TOPIC" --count "$COUNT" --article-id "$ARTICLE_ID"

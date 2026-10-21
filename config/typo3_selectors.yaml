@@ -1,0 +1,160 @@
+# Site-specific TYPO3 backend selectors.
+#
+# STATUS: NOT VERIFIED against your installation. These are defaults derived from the
+# TYPO3 core backend markup (v10-v13, FormEngine) and EXT:news. Run discovery mode
+# (`python -m typo3_publisher discover`) to test them against your backend; it writes a
+# report and a proposal file (config/typo3_selectors.discovered.yaml) and only marks
+# selectors as verified when they actually matched on your site.
+#
+# Locator syntax (each entry may be a single locator or a list = fallback chain, tried in order):
+#   "css selector"                      plain CSS
+#   {css: "..."}                        CSS
+#   {role: button, name: "Save"}        ARIA role + accessible name (regex if name starts with "re:")
+#   {label: "Title"}                    form field by its <label>
+#   {text: "Media"}                     visible text
+#   {placeholder: "..."} / {test_id: "..."} / {xpath: "..."}
+# FormEngine fields are addressed by their TCA column name (`name:`); the bot builds robust
+# attribute selectors (data[<table>][<uid>][<column>]) from that. Use `locator:` to override.
+
+version: 1
+verified: false
+verified_at: null
+verified_fields: {}
+
+login:
+  username:
+    - {css: "#t3-username"}
+    - {css: "input[name='username']"}
+  password:
+    - {css: "#t3-password"}
+    - {css: "input[name='p_field']"}
+    - {css: "input[type='password']"}
+  submit:
+    - {css: "#t3-login-submit"}
+    - {css: "button[name='commandLI']"}
+    - {role: button, name: "re:^(Login|Anmelden|Log in)$"}
+  # Any of these present after submitting = logged in to the backend.
+  success:
+    - "typo3-backend-module-router"
+    - ".t3js-scaffold"
+    - ".scaffold"
+    - "#typo3-cms-backend-backend-toolbaritems-usertoolbaritem"
+    - ".t3js-topbar-button-modulemenu"
+  error:
+    - "#t3-login-error"
+    - ".alert-danger"
+    - ".callout-danger"
+  mfa:
+    - "#t3-mfa"
+    - "form[action*='mfa']"
+    - "input[name='totp']"
+    - "input[name='recovery-code']"
+  captcha:
+    - "iframe[src*='recaptcha']"
+    - "iframe[src*='hcaptcha']"
+    - ".g-recaptcha"
+    - ".h-captcha"
+    - ".cf-turnstile"
+    - ".frc-captcha"
+    - "img[src*='captcha' i]"
+
+frames:
+  # Backend module content is rendered in this iframe (TYPO3 v9+).
+  module:
+    - "iframe[name='list_frame']"
+    - "#typo3-contentIframe"
+    - "typo3-iframe-module iframe"
+
+buttons:
+  save:
+    - {css: "button[name='_savedok']"}
+    - {css: "button[name='_savedok_x']"}
+    - {role: button, name: "re:^(Save|Speichern)$"}
+  close:
+    - {css: ".t3js-editform-close"}
+    - {role: button, name: "re:^(Close|Schließen)$"}
+  delete:
+    - {css: ".t3js-editform-delete-record"}
+    - {role: button, name: "re:^(Delete|Löschen)$"}
+  view:
+    - {css: ".t3js-editform-view"}
+    - {css: "a[data-dispatch-action='TYPO3.WindowManager.localOpen']"}
+  upload:
+    - {css: ".t3js-drag-uploader-trigger"}
+    - {role: button, name: "re:(Select & upload files|Dateien auswählen & hochladen|Upload)"}
+  modal_confirm:
+    - {css: ".modal.show button.btn-danger"}
+    - {css: ".modal.show button.btn-primary"}
+    - {css: ".modal.show button.btn-warning"}
+
+notifications:
+  error:
+    - ".alert-danger"
+    - "typo3-notification-message[notification-severity='2']"
+    - ".has-error"
+  validation_error: ".has-error, .t3js-formengine-validation-marker.has-error"
+
+# --------------------------------------------------------------------------- EXT:news profile
+news:
+  table: tx_news_domain_model_news
+  # REQUIRED: uid of the sysfolder/page that stores news records ("Storage page").
+  storage_pid: 0
+  navigation:
+    # direct_url: open /typo3/record/edit?edit[<table>][<pid>]=new (the same URL the
+    #             "Create new record" link opens). Fallback: ui_steps.
+    strategy: direct_url
+    ui_steps:
+      - {action: click, frame: top, target: [{css: "[data-modulemenu-identifier='web_list']"}, {css: "#web_list"}, {role: link, name: "re:^(List|Liste)$"}]}
+      - {action: click, frame: top, target: [{role: treeitem, name: "{storage_page_title}"}, {text: "{storage_page_title}"}]}
+      - {action: click, frame: module, target: [{css: "a[title='Create new record']"}, {role: link, name: "re:(Create new record|Neuen Datensatz anlegen)"}]}
+      - {action: click, frame: module, target: [{role: link, name: "re:^(News|Nachricht|News article)$"}, {text: "News"}]}
+  storage_page_title: ""
+  fields:
+    title: {name: title, kind: text, required: true}
+    teaser: {name: teaser, kind: textarea}
+    bodytext: {name: bodytext, kind: rte, required: true}
+    slug: {name: path_segment, kind: text}
+    meta_description: {name: description, kind: textarea}
+    keywords: {name: keywords, kind: textarea}
+    seo_title: {name: alternative_title, kind: text}
+    datetime: {name: datetime, kind: datetime, fill_if_empty: true, format: "%H:%M %d-%m-%Y"}
+    categories: {name: categories, kind: categories}
+    media: {name: fal_media, kind: fal, required: true}
+    hidden: {name: hidden, kind: visibility}
+  image_reference:
+    table: sys_file_reference
+    alternative: alternative
+    title: title
+    description: description
+    # tx_news: "Show in views" / showinpreview checkbox on the media relation
+    checkboxes: {showinpreview: true}
+  rte_mode: api   # api (CKEditor setData) | type (keyboard input of plain text paragraphs)
+
+# --------------------------------------------------------------------------- page + content element profile
+content_element:
+  page_table: pages
+  content_table: tt_content
+  # REQUIRED: uid of the page under which article pages are created.
+  parent_pid: 0
+  content_defaults: "defVals[tt_content][CType]=textmedia&defVals[tt_content][colPos]=0"
+  page_fields:
+    title: {name: title, kind: text, required: true}
+    slug: {name: slug, kind: text}
+    seo_title: {name: seo_title, kind: text}
+    meta_description: {name: description, kind: textarea}
+    keywords: {name: keywords, kind: textarea}
+    teaser: {name: abstract, kind: textarea}
+    categories: {name: categories, kind: categories}
+    hidden: {name: hidden, kind: visibility}
+  content_fields:
+    header: {name: header, kind: text, required: true}
+    bodytext: {name: bodytext, kind: rte, required: true}
+    media: {name: assets, kind: fal, required: true}
+    hidden: {name: hidden, kind: visibility}
+  image_reference:
+    table: sys_file_reference
+    alternative: alternative
+    title: title
+    description: description
+    checkboxes: {}
+  rte_mode: api

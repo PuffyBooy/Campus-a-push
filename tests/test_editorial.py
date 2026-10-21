@@ -1,0 +1,205 @@
+"""Content generation, deterministic editorial checks and the review/revision loop."""
+
+import pytest
+
+from tests.conftest import make_article, make_content
+from typo3_publisher.content_generator import ContentGenerator, content_from_llm, render_template
+from typo3_publisher.editorial_reviewer import EditorialLoop, EditorialReviewer
+from typo3_publisher.llm import FakeLLM, LLMError, parse_json_object
+from typo3_publisher.models import ArticleStatus, Claim, Source
+from typo3_publisher.research import ResearchBundle, ResearchDocument, parse_feed
+from typo3_publisher.serialization import to_dict
+
+SOURCE_URL = "https://www.statistik.at/news/1"
+SOURCE_TEXT = (
+    "Im Jahr 2025 nutzten 87 Prozent der Studierenden in Österreich täglich ein Smartphone für das "
+    "Studium, wie eine Erhebung unter 4000 Personen ergab. Die Nutzung stieg damit deutlich an."
+)
+
+
+def research() -> ResearchBundle:
+    return ResearchBundle([ResearchDocument(Source(title="Erhebung", url=SOURCE_URL), SOURCE_TEXT)])
+
+
+def codes(issues):
+    return {i.code for i in issues}
+
+
+# ------------------------------------------------------------------ writer
+
+
+def test_template_placeholders():
+    assert (
+        render_template("{{language}} {{ min_words }} {{unknown}}", {"language": "de", "min_words": 5})
+        == "de 5 {{unknown}}"
+    )
+
+
+def test_content_from_llm_sanitises_and_slugifies():
+    data = to_dict(make_content(title="Größer & schneller: Ein Überblick"))
+    data["slug"] = ""
+    data["body_html"] = '<p onclick="x()">Hi <script>alert(1)</script><a href="javascript:x">l</a></p><img src=x>'
+    c = content_from_llm(data)
+    assert c.slug == "groesser-schneller-ein-ueberblick"
+    assert "script" not in c.body_html and "onclick" not in c.body_html and "<img" not in c.body_html
+    assert c.body_html == "<p>Hi l</p>"
+    with pytest.raises(LLMError):
+        content_from_llm({"teaser": "x", "body_html": "<p>x</p>"})
+
+
+def test_parse_json_object_variants():
+    assert parse_json_object('```json\n{"a": 1}\n```') == {"a": 1}
+    assert parse_json_object('Sure! {"a": 2} hope that helps') == {"a": 2}
+    with pytest.raises(LLMError):
+        parse_json_object("no json")
+
+
+def test_generator_prompt_contains_rules_research_and_avoid_list(settings):
+    llm = FakeLLM()
+    gen = ContentGenerator(settings, llm, "Write in {{language}} for {{site_name}}.")
+    content = gen.generate(None, "Technology", "Passkeys", "", research(), ["Old title"])
+    call = llm.calls[0]
+    assert "Write in de" in call["system"] and "NON-NEGOTIABLE" in call["system"]
+    assert SOURCE_URL in call["user"] and "Old title" in call["user"]
+    assert content.title.startswith("[TEST]")
+
+
+# ------------------------------------------------------------------ automated checks
+
+
+@pytest.fixture
+def reviewer(settings):
+    return EditorialReviewer(settings, FakeLLM(), "rubric", "instructions")
+
+
+def test_clean_evergreen_article_has_no_blocking_issues(reviewer):
+    issues = reviewer.automated_checks(make_content(), ResearchBundle())
+    assert not [i for i in issues if i.severity in {"critical", "major"}], issues
+
+
+def test_invented_source_link_quote_and_statistic_are_critical(reviewer):
+    c = make_content()
+    c.sources = [Source(title="Fake", url="https://made-up.example/study")]
+    c.body_html += (
+        '<p>Laut <a href="https://made-up.example/study">Studie</a> sind es 42 Prozent. '
+        'Ein Experte sagte: "Das ist die wichtigste Entwicklung des ganzen Jahrzehnts für alle."</p>'
+    )
+    found = codes(reviewer.automated_checks(c, ResearchBundle()))
+    assert {"unknown_source", "unknown_link", "unsupported_quote", "unsupported_statistic"} <= found
+
+
+def test_claim_evidence_must_appear_verbatim(reviewer):
+    good = make_content(article_type="factual", sources=[Source(title="Erhebung", url=SOURCE_URL)])
+    good.claims = [
+        Claim(
+            "87 % nutzen täglich ein Smartphone",
+            SOURCE_URL,
+            "nutzten 87 Prozent der Studierenden in Österreich täglich ein Smartphone",
+        )
+    ]
+    good.body_html += "<p>87 Prozent der Studierenden nutzen täglich ein Smartphone.</p>"
+    assert not codes(reviewer.automated_checks(good, research())) & {
+        "evidence_not_found",
+        "unsupported_statistic",
+        "unsupported_claim",
+    }
+    bad = make_content(article_type="factual", sources=[Source(title="Erhebung", url=SOURCE_URL)])
+    bad.claims = [Claim("90 % nutzen", SOURCE_URL, "nutzten 90 Prozent der Studierenden in Österreich täglich")]
+    bad.body_html += "<p>90 Prozent der Studierenden.</p>"
+    found = codes(reviewer.automated_checks(bad, research()))
+    assert {"evidence_not_found", "unsupported_statistic"} <= found
+
+
+def test_factual_article_without_research_is_critical(reviewer):
+    assert "factual_without_sources" in codes(
+        reviewer.automated_checks(make_content(article_type="factual"), ResearchBundle())
+    )
+
+
+def test_duplicates_and_forbidden_terms(reviewer, settings):
+    settings.editorial.forbidden_terms = ["Kryptowährung"]
+    existing = [make_article("old", content=make_content(title="Passkeys einfach erklärt!"))]
+    c = make_content(teaser="Alles über Kryptowährung.")
+    found = codes(reviewer.automated_checks(c, ResearchBundle(), existing))
+    assert {"duplicate_title", "forbidden_term"} <= found
+    other = make_content(title="Ein völlig anderes Thema")
+    assert "duplicate_content" in codes(reviewer.automated_checks(other, ResearchBundle(), existing))
+
+
+def test_word_count_limits(reviewer):
+    assert "word_count" in codes(reviewer.automated_checks(make_content(words=100), ResearchBundle()))
+
+
+# ------------------------------------------------------------------ review loop
+
+
+def scripted(scores_per_review, settings, critical_on=()):
+    """FakeLLM whose n-th review gives every criterion ``scores_per_review[n]``."""
+    review_no = iter(range(100))
+
+    def respond(purpose, system, user):
+        if purpose == "review":
+            n = next(review_no)
+            crit = [{"category": "factual", "description": "unsupported"}] if n in critical_on else []
+            return {
+                "scores": dict.fromkeys(settings.editorial.criteria_weights, scores_per_review[n]),
+                "critical_issues": crit,
+                "feedback": [{"area": "seo", "issue": "x", "suggestion": "y"}],
+            }
+        return to_dict(make_content(title=f"Revision {len(user)}"))
+
+    return FakeLLM(respond)
+
+
+def build_loop(settings, llm):
+    gen = ContentGenerator(settings, llm, "prompt")
+    return EditorialLoop(settings, gen, EditorialReviewer(settings, llm, "rubric", "prompt"))
+
+
+def test_loop_revises_until_threshold(settings):
+    llm = scripted([6, 7, 9], settings)
+    article = make_article()
+    build_loop(settings, llm).run(article, ResearchBundle(), [])
+    assert article.status == ArticleStatus.APPROVED
+    assert [r.passed for r in article.reviews] == [False, False, True]
+    assert len(article.revisions) == 2
+    revise_calls = [c for c in llm.calls if c["purpose"] == "revise"]
+    assert len(revise_calls) == 2 and '"suggestion": "y"' in revise_calls[0]["user"]
+
+
+def test_loop_rejects_after_max_cycles(settings):
+    settings.editorial.max_revision_cycles = 2
+    article = make_article()
+    build_loop(settings, scripted([5, 5, 5, 5], settings)).run(article, ResearchBundle(), [])
+    assert article.status == ArticleStatus.REJECTED
+    assert len(article.reviews) == 3
+    assert any("below threshold" in r for r in article.rejected_reasons)
+
+
+def test_critical_issue_blocks_even_with_high_scores(settings):
+    settings.editorial.max_revision_cycles = 0
+    article = make_article()
+    build_loop(settings, scripted([10], settings, critical_on={0})).run(article, ResearchBundle(), [])
+    assert article.status == ArticleStatus.REJECTED
+    assert any("unsupported" in r for r in article.rejected_reasons)
+
+
+def test_weighted_score(settings, reviewer):
+    scores = dict.fromkeys(settings.editorial.criteria_weights, 8.0)
+    scores["factual_accuracy"] = 4.0
+    weights = settings.editorial.criteria_weights
+    expected = round((sum(weights.values()) * 8 - weights["factual_accuracy"] * 4) / sum(weights.values()), 2)
+    assert reviewer.weighted_score(scores) == expected
+
+
+def test_parse_rss_and_atom():
+    rss = (
+        "<rss><channel><item><title>A</title><link>https://a.example/1</link><description>&lt;p&gt;x&lt;/p&gt;"
+        "</description></item></channel></rss>"
+    )
+    atom = (
+        '<feed xmlns="http://www.w3.org/2005/Atom"><entry><title>B</title>'
+        '<link href="https://b.example/2"/><summary>y</summary></entry></feed>'
+    )
+    assert parse_feed(rss)[0]["url"] == "https://a.example/1"
+    assert parse_feed(atom)[0]["url"] == "https://b.example/2"

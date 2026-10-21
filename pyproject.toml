@@ -1,0 +1,50 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "typo3-publisher"
+version = "0.1.0"
+description = "Autonomous AI publishing bot that operates a TYPO3 backend through browser automation"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "playwright>=1.45",
+    "openai>=1.40",
+    "PyYAML>=6.0",
+    "requests>=2.31",
+    "tzdata>=2024.1",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8", "ruff>=0.5"]
+
+[project.scripts]
+typo3-publisher = "typo3_publisher.main:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src", "."]
+markers = [
+    "browser: drives a real Chromium against the local mock TYPO3 backend",
+    "live: runs against the real TYPO3 backend (opt-in, see tests/integration)",
+]
+addopts = "-ra"
+
+[tool.ruff]
+line-length = 120
+target-version = "py312"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "RUF"]
+ignore = ["RUF001", "RUF002", "RUF003", "RUF012", "SIM105", "SIM905", "UP047"]
+
+[tool.ruff.lint.per-file-ignores]
+# embedded JavaScript and prompt text
+"src/typo3_publisher/discovery.py" = ["E501"]
+"src/typo3_publisher/content_generator.py" = ["E501"]
+"tests/mock_typo3/*" = ["E501"]
