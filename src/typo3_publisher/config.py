@@ -143,6 +143,9 @@ class LLMSettings:
     editor_temperature: float | None = 0.2
     max_output_tokens: int = 8000
     timeout_seconds: float = 180.0
+    # On HTTP 429 the bot waits as long as the provider asks, up to this many times / seconds per wait.
+    rate_limit_retries: int = 8
+    rate_limit_max_wait_seconds: float = 120.0
 
 
 @dataclass
