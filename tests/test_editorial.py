@@ -306,3 +306,13 @@ def test_revision_too_large_for_the_provider_rejects_only_this_article(settings)
     article = loop.run(make_article(), research(), [])
     assert article.status == ArticleStatus.REJECTED
     assert any("per-minute token limit" in r for r in article.rejected_reasons)
+
+
+def test_writer_builds_on_one_story_when_research_is_available(settings):
+    llm = FakeLLM()
+    gen = ContentGenerator(settings, llm, "prompt")
+    gen.generate(None, "Politik", "", "", research(), [])
+    gen.generate(None, "Politik", "", "", ResearchBundle(), [])
+    with_sources, without = llm.calls
+    assert "ONE concrete news item" in with_sources["user"]
+    assert "ONE concrete news item" not in without["user"]

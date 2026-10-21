@@ -84,8 +84,10 @@ editorial:
     originality: 1.0
     clarity: 1.0
     instruction_adherence: 1.5
-  min_words: 700             # editorial_prompt.md: at least ~7000 characters
-  max_words: 1300
+  # Draft length. editorial_prompt.md asks for ~7000 characters in the finished text; your own reporting
+  # (quotes, survey, scene) adds to the draft. With only two sources the model reaches ~600-900 words.
+  min_words: 550
+  max_words: 1100
   word_count_tolerance: 0.1
   max_title_length: 90
   meta_description_min: 110
