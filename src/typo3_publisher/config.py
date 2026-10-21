@@ -152,6 +152,8 @@ class LLMSettings:
     rate_limit_retries: int = 8
     rate_limit_max_wait_seconds: float = 120.0
     rate_limit_default_wait_seconds: float = 20.0  # when the provider names no wait time
+    # After this many 429 answers in a row, switch to the next of fallback_models (if any).
+    rate_limit_switch_after: int = 3
 
 
 @dataclass
