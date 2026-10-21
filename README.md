@@ -17,6 +17,49 @@ like a human editor.
 
 ---
 
+## campus a college: Entwürfe statt Veröffentlichung (Profil `campus_frontend`)
+
+Für campus a college braucht der Bot **kein TYPO3-Backend und kein TYPO3-Login**. Er meldet sich wie
+du auf der Website an (`/login`, E-Mail und Passwort), öffnet „Beitrag publizieren“ und füllt die
+vier Schritte aus: Kategorie, Titel/Vorspann/Story, Artikelfoto mit Bildbeschreibung, Bildtext und
+Copyright, dann Ressort, Region und Tags. Danach klickt er **nur „Als Entwurf speichern“**:
+
+- Er klickt **nie** „Veröffentlichen“. Eine Sperre im Browser bricht jedes Absenden ab, das kein
+  Entwurf ist.
+- Jeder Entwurf ist als **KI-unterstützt markiert** (`isModifiedByAi=1`, dieselbe Markierung, die
+  „Hugo“ setzt).
+- **Du** liest jeden Entwurf, prüfst Fakten und Bild, überarbeitest ihn und veröffentlichst ihn selbst.
+
+**Einrichten** (Settings → Secrets and variables → Actions):
+
+| Name | Art | Wert |
+|---|---|---|
+| `WEBSITE_ID` | Secret oder Variable | `campus-a-college` (die Website-ID aus dem Formular) |
+| `TYPO3_USERNAME` | Secret | E-Mail deines campus-a-Accounts |
+| `TYPO3_PASSWORD` | Secret | Passwort deines campus-a-Accounts |
+| `GROQ_API_KEY`, `PIXABAY_API_KEY` | Secret | wie unten beschrieben |
+| `WEBSITE_BASE_URL` | Secret, optional | leer lassen = `https://www.campus-a-college.at` |
+| `BOT_PUBLISHING_ENABLED` | Variable | `true`, sobald die Probeläufe passen (Hauptschalter, auch für Entwürfe) |
+
+`TYPO3_BACKEND_URL` wird für dieses Profil nicht gebraucht.
+
+**Testen, bevor etwas gespeichert wird:**
+
+1. Actions → *Setup* → `check-login`: prüft die Anmeldung.
+2. Actions → *Setup* → `discover`: öffnet das Formular, prüft die Website-ID und alle Felder.
+   Es wird nichts gesendet.
+3. Actions → *Publish* → `full` mit *Dry run*: schreibt einen Artikel und füllt das Formular
+   komplett aus, speichert aber nicht.
+4. Erst danach `BOT_PUBLISHING_ENABLED=true` setzen. Ab dann speichert jeder Lauf höchstens einen
+   Entwurf (`publishing.slots` in `config/settings.yaml`).
+
+Ressort, Region und Tags stellst du im Abschnitt `campus:` von `config/settings.yaml` ein. Die
+Selektoren stehen unter `campus_frontend:` in `config/typo3_selectors.yaml`.
+
+Bildbestätigungen: Das Formular verlangt zwei Bestätigungen zum Bild. Der Bot setzt sie nur bei
+Pixabay-Bildern (freie Lizenz) mit aktivem Personenfilter (`images.exclude_people: true`). Sonst
+speichert er nichts.
+
 ## Contents
 
 1. [How it works](#how-it-works)

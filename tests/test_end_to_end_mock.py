@@ -101,6 +101,7 @@ def test_cli_dry_run_fills_form_but_saves_nothing(browser_env, mock_typo3, confi
     settings, _selectors = browser_env
     text = (config_dir / "settings.yaml").read_text()
     text = text.replace("  required: true", "  required: false")  # no Pixabay key in this test
+    text = text.replace("  profile: campus_frontend", "  profile: news")
     (config_dir / "settings.yaml").write_text(text)
     sel = (config_dir / "typo3_selectors.yaml").read_text().replace("storage_pid: 0", "storage_pid: 5")
     (config_dir / "typo3_selectors.yaml").write_text(sel)

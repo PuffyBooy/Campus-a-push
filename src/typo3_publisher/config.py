@@ -71,10 +71,53 @@ class BrowserSettings:
 @dataclass
 class Typo3Settings:
     backend_url: str = ""
-    profile: str = "news"  # news | content_element
+    profile: str = "news"  # news | content_element | campus_frontend
     selectors_file: str = "config/typo3_selectors.yaml"
     storage_state_env: str = "TYPO3_STORAGE_STATE"
     browser: BrowserSettings = field(default_factory=BrowserSettings)
+
+
+# Known site identifiers (the hidden #currentSiteIdentifier field of the campus a article form).
+CAMPUS_SITES = {"campus-a-college": "https://www.campus-a-college.at"}
+
+
+@dataclass
+class CampusSettings:
+    """Profile ``campus_frontend``: the public author pages of campus a (no TYPO3 backend).
+
+    The bot only ever saves articles as drafts ("Als Entwurf speichern") and marks them as
+    AI-assisted; the author reviews and publishes them on the website.
+    """
+
+    site_id: str = ""  # WEBSITE_ID overrides, e.g. campus-a-college
+    base_url: str = ""  # empty: website.base_url, else the known URL of site_id
+    login_path: str = "/login"
+    create_path: str = "/artikel/create"
+    profile_path: str = "/profil"
+    opinion_types: list[str] = field(default_factory=lambda: ["opinion"])  # article_type -> "Meinung"
+    default_resort: str = "Panorama"
+    resort_by_topic: dict[str, str] = field(default_factory=dict)
+    default_region: str = "Österreich"
+    region_by_topic: dict[str, str] = field(default_factory=dict)
+    max_tags: int = 5
+    create_missing_tags: bool = True
+    # The two image confirmations of the form. Ticked only when true AND the image is from
+    # Pixabay (free licence) with people excluded - otherwise the draft is saved without image.
+    confirm_image_rights: bool = True
+    # Third-party hosts not needed to fill in the form (consent banner, ads, statistics).
+    block_hosts: list[str] = field(
+        default_factory=lambda: [
+            "consent.cookiebot.com",
+            "consentcdn.cookiebot.com",
+            "stats.campus-a.at",
+            "securepubads.g.doubleclick.net",
+            "www.googletagmanager.com",
+            "pagead2.googlesyndication.com",
+        ]
+    )
+
+    def resolved_base_url(self, website_base_url: str) -> str:
+        return (self.base_url or website_base_url or CAMPUS_SITES.get(self.site_id, "")).rstrip("/")
 
 
 @dataclass
@@ -296,7 +339,7 @@ class DiagnosticsSettings:
 @dataclass
 class NotificationSettings:
     webhook_env: str = "NOTIFY_WEBHOOK_URL"
-    notify_on: list[str] = field(default_factory=lambda: ["failure", "rejected", "published"])
+    notify_on: list[str] = field(default_factory=lambda: ["failure", "rejected", "published", "draft_saved"])
 
 
 @dataclass
@@ -313,6 +356,7 @@ class Settings:
     retries: RetrySettings = field(default_factory=RetrySettings)
     diagnostics: DiagnosticsSettings = field(default_factory=DiagnosticsSettings)
     notifications: NotificationSettings = field(default_factory=NotificationSettings)
+    campus: CampusSettings = field(default_factory=CampusSettings)
     # Not read from YAML: repository root used to resolve relative paths.
     base_dir: Path = field(default_factory=Path.cwd)
 
@@ -382,6 +426,8 @@ def apply_env_overrides(settings: Settings) -> Settings:
         settings.typo3.backend_url = url
     if url := os.environ.get("WEBSITE_BASE_URL"):
         settings.website.base_url = url
+    if site_id := os.environ.get("WEBSITE_ID"):
+        settings.campus.site_id = site_id.strip()
     if (enabled := _env_bool("BOT_PUBLISHING_ENABLED")) is not None:
         settings.publishing.enabled = enabled
     if (paused := _env_bool("BOT_PAUSED")) is not None and paused:
@@ -398,8 +444,8 @@ def apply_env_overrides(settings: Settings) -> Settings:
 
 
 def validate(settings: Settings) -> None:
-    if settings.typo3.profile not in {"news", "content_element"}:
-        raise ConfigError("typo3.profile must be 'news' or 'content_element'")
+    if settings.typo3.profile not in {"news", "content_element", "campus_frontend"}:
+        raise ConfigError("typo3.profile must be 'news', 'content_element' or 'campus_frontend'")
     if settings.state.backend not in {"local", "git_branch"}:
         raise ConfigError("state.backend must be 'local' or 'git_branch'")
     if settings.images.attribution.target not in {"caption", "body", "both"}:
@@ -445,7 +491,8 @@ def load_topics(config_dir: Path | str = "config") -> TopicsFile:
 
 def load_selectors(settings: Settings) -> dict[str, Any]:
     data = _read_yaml(settings.path(settings.typo3.selectors_file))
-    for key in ("login", "frames", "buttons", settings.typo3.profile):
+    backend = () if settings.typo3.profile == "campus_frontend" else ("login", "frames", "buttons")
+    for key in (*backend, settings.typo3.profile):
         if key not in data:
             raise ConfigError(f"{settings.typo3.selectors_file}: missing section '{key}'")
     return data
@@ -475,6 +522,8 @@ SECRET_NAMES = (
     "TYPO3_STORAGE_STATE",
     "DIAGNOSTICS_PASSPHRASE",
 )
+
+# Profile campus_frontend: TYPO3_USERNAME is the e-mail address of the campus a account.
 
 
 class Secrets:

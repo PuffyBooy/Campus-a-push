@@ -15,7 +15,7 @@ on:
         default: full
         options: [full, scheduled, publish-approved, prepare, generate-only, review-only]
       dry_run:
-        description: Dry run (fill the TYPO3 form but never save; state changes are discarded)
+        description: Dry run (fill the form but never save; state changes are discarded)
         type: boolean
         default: true
       idea:
@@ -56,6 +56,8 @@ jobs:
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
       WEBSITE_BASE_URL: ${{ secrets.WEBSITE_BASE_URL }}
+      # Website id of the campus a article form (profile campus_frontend), e.g. campus-a-college.
+      WEBSITE_ID: ${{ secrets.WEBSITE_ID || vars.WEBSITE_ID }}
       NOTIFY_WEBHOOK_URL: ${{ secrets.NOTIFY_WEBHOOK_URL }}
     steps:
       - uses: actions/checkout@v4

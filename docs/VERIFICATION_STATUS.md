@@ -52,3 +52,20 @@ Last updated with the initial implementation. Three levels:
 6. Only then set `BOT_PUBLISHING_ENABLED=true`
 
 Update this table as items are confirmed on the real site.
+
+## Profile `campus_frontend` (campus a author pages)
+
+| Capability | Implemented | Verified (mock) | Verified (saved real page, offline) | Verified (live) |
+|---|---|---|---|---|
+| Login with e-mail/password, success/failure detection | ✅ | ✅ | ✅ selectors match the saved `/login` and profile pages | ❌ run `check-login` |
+| CAPTCHA detection (no bypass) | ✅ | ✅ | n/a | ❌ |
+| Website id check (`#currentSiteIdentifier` = `WEBSITE_ID`) | ✅ | ✅ | ✅ | ❌ run `discover` |
+| Steps 1-4 of "Beitrag publizieren" incl. the site's own validation | ✅ | ✅ | ✅ original Alpine/JustValidate/Quill/Cropper/tags scripts | ❌ dry run |
+| Story via Quill (headings, paragraphs, links) | ✅ | ✅ (Quill stub) | ✅ real Quill | ❌ |
+| Image upload, crop, Bildbeschreibung/Bildtext/Copyright, confirmations | ✅ | ✅ | ✅ real Cropper.js | ❌ |
+| Ressort / Region / Tags (existing or new) | ✅ | ✅ | ✅ real tag widget | ❌ |
+| Only "Als Entwurf speichern", `isModifiedByAi=1`, request guard against anything else | ✅ | ✅ | ✅ (sent form inspected) | ❌ first live draft |
+| Resume after crash without a second draft (profile lookup) | ✅ | ✅ | ❌ | ❌ depends on drafts being listed on `/profil` |
+
+"Saved real page, offline" means: the uploaded `/artikel/create` HTML with its original scripts,
+served locally; the form submission was intercepted and inspected, nothing reached the website.

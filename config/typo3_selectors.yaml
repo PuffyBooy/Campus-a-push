@@ -161,3 +161,64 @@ content_element:
       description: "{caption} {copyright}"
     checkboxes: {}
   rte_mode: api
+
+# ---------------------------------------------------------------------------------------------
+# Profile campus_frontend: the author pages of campus a (no TYPO3 backend, no TYPO3 login).
+# Taken from the saved pages /login and /artikel/create (hiroki_campus "articlecreate" form,
+# Alpine.js, JustValidate, Quill, Cropper.js). Check them with:  python -m typo3_publisher discover
+campus_frontend:
+  login:
+    username: ["#user", "input[name='user']"]
+    password: ["#pass", "input[name='pass']"]
+    submit:
+      - {css: "form:has(#pass) button[type='submit']"}
+      - {role: button, name: "re:^\\s*Anmeldung\\s*$"}
+    # Present only when logged in (user menu / logout link in the header).
+    success: ["#user-menu-button", "a[href*='logintype=logout']"]
+    error: ["#contentSection .alert", ".tx-sgaccount [role='alert']", ".tx-sgaccount .typo3-messages", ".alert-danger"]
+    captcha:
+      - "iframe[src*='recaptcha']"
+      - "iframe[src*='hcaptcha']"
+      - ".g-recaptcha"
+      - ".h-captcha"
+      - ".cf-turnstile"
+      - ".frc-captcha"
+  # Cookie banner (normally not shown: the consent script is blocked, see campus.block_hosts).
+  consent_decline:
+    - "#CybotCookiebotDialogBodyButtonDecline"
+    - "#CybotCookiebotDialogBodyLevelButtonLevelOptinDeclineAll"
+  form:
+    root: "#article-form"
+    site_id: "#currentSiteIdentifier"
+    role: "#role"
+    # Visible only on the respective step of the four-step form.
+    steps:
+      1: "#news-category-radio-group-1"
+      2: "#title"
+      3: "#file_input"
+      4: "#datetime"
+    next_button: {css: "#article-form button.btnPrimary:has-text('Weiter')"}
+    errors: ".just-validate-error-label"
+    category_radio: "#news-category-radio-group-{value}"   # 1 Fakten, 2 Meinung
+    title: "#title"
+    teaser: "#teaser"
+    story: "#story-editor"
+    ai_flag: "#isModifiedByAi"
+    meta_description: "#metadata_description"
+    image_input: "#falMedia"
+    image_flag: "#hasFalMediaFlagInput"
+    image_alt: "#falMediaTitle"          # Bildbeschreibung (Barrierefreiheit)
+    image_caption: "#falMediaDescription" # Bildtext
+    image_copyright: "#falMediaCopyright"
+    consent_rights: "#falMediaConsentFirst"
+    consent_people: "#falMediaConsentSecond"
+    date: "#datetime"
+    resort: "#resort"
+    region: "#region"
+    tags_select: "#tags-select"
+    tags_open: "#tags-select + div"
+    tags_search: "#tags-select-search"
+    tags_listbox: "#tags-select-listbox"
+    seo_title: "#alternative_title"
+    # The ONLY submit button the bot clicks. "Veröffentlichen" is never used.
+    draft_button: {css: "#article-form button[type='submit']:has-text('Als Entwurf speichern')"}
