@@ -80,6 +80,7 @@ class RunSummary:
     approved: list[str] = field(default_factory=list)
     rejected: list[str] = field(default_factory=list)
     published: list[dict[str, Any]] = field(default_factory=list)
+    drafts: list[dict[str, Any]] = field(default_factory=list)  # campus_frontend: saved, not published
     updated: list[dict[str, Any]] = field(default_factory=list)
     failures: list[dict[str, Any]] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
@@ -98,6 +99,8 @@ class RunSummary:
                 lines.append(f"- {label}: {', '.join(items)}")
         for p in self.published:
             lines.append(f"- Published **{p['title']}** → {p.get('url', '')}")
+        for d in self.drafts:
+            lines.append(f"- Saved as draft **{d['title']}** → {d.get('url', '')} (review and publish it yourself)")
         for u in self.updated:
             lines.append(f"- Updated **{u['title']}** → {u.get('url', '')}")
         for f in self.failures:
@@ -324,7 +327,23 @@ class ArticleManager:
             article.status = ArticleStatus.PUBLISH_FAILED
             self._fail(summary, article, "typo3", exc)
             return False
+        if pub.stage == PublicationStage.DRAFT_SAVED:
+            return self._draft_saved(article, summary)
         return self._verify(article, summary)
+
+    def _draft_saved(self, article: Article, summary: RunSummary) -> bool:
+        """campus_frontend: the article is a draft on the website. Nothing public to verify."""
+        assert article.content is not None
+        url = article.publication.verification.get("draft_saved_url", "")
+        article.status = ArticleStatus.DRAFT_SAVED
+        self.checkpoint(article, "Saved as draft on the website")
+        summary.drafts.append({"id": article.id, "title": article.content.title, "url": url})
+        self.notifier.notify(
+            "draft_saved",
+            article.content.title,
+            "Saved as draft (marked as AI-assisted). Review, edit and publish it yourself on the website.",
+        )
+        return True
 
     def _verify(self, article: Article, summary: RunSummary, quiet: bool = False) -> bool:
         assert article.content is not None
@@ -453,12 +472,12 @@ class ArticleManager:
         summary.slot = key
         self.store.set_slot(key, status="claimed", run_id=self.run_id)
         self.sync.commit(f"Claim slot {key}")
-        published_before = len(summary.published)
+        published_before, drafts_before = len(summary.published), len(summary.drafts)
         try:
             self.run_full(summary, now)
         finally:
-            done = len(summary.published) > published_before
-            ids = [x["id"] for x in summary.published[published_before:]]
+            ids = [x["id"] for x in summary.published[published_before:] + summary.drafts[drafts_before:]]
+            done = bool(ids)
             self.store.set_slot(
                 key, status="published" if done else "attempted", run_id=self.run_id, article_ids=ids, finished_at=iso()
             )

@@ -15,6 +15,7 @@ from typo3_publisher.state_manager import StateStore
 REPO = Path(__file__).resolve().parent.parent
 
 ENV_VARS = [
+    "WEBSITE_ID",
     "TYPO3_BACKEND_URL",
     "WEBSITE_BASE_URL",
     "BOT_PUBLISHING_ENABLED",
@@ -171,6 +172,7 @@ def mock_typo3():
 @pytest.fixture
 def browser_env(settings, mock_typo3, chromium_executable, monkeypatch):
     """Settings + selectors + secrets pointing at the mock backend."""
+    settings.typo3.profile = "news"
     monkeypatch.setenv("TYPO3_USERNAME", mock_typo3.state.username)
     monkeypatch.setenv("TYPO3_PASSWORD", mock_typo3.state.password)
     settings.typo3.backend_url = f"{mock_typo3.base_url}/typo3"
@@ -184,3 +186,28 @@ def browser_env(settings, mock_typo3, chromium_executable, monkeypatch):
     selectors["news"]["storage_pid"] = 5
     selectors["content_element"]["parent_pid"] = 7
     return settings, selectors
+
+
+@pytest.fixture
+def mock_campus():
+    from tests.mock_campus.server import MockCampus
+
+    with MockCampus() as mock:
+        yield mock
+
+
+@pytest.fixture
+def campus_env(settings, mock_campus, chromium_executable, monkeypatch):
+    """Settings + selectors + secrets pointing at the mock campus a author pages."""
+    monkeypatch.setenv("TYPO3_USERNAME", mock_campus.state.username)
+    monkeypatch.setenv("TYPO3_PASSWORD", mock_campus.state.password)
+    settings.typo3.profile = "campus_frontend"
+    settings.campus.site_id = "campus-a-college"
+    settings.website.base_url = mock_campus.base_url
+    settings.campus.block_hosts = []
+    settings.typo3.browser.executable_path = chromium_executable or ""
+    settings.typo3.browser.navigation_timeout_ms = 10000
+    settings.typo3.browser.action_timeout_ms = 5000
+    settings.typo3.browser.upload_timeout_ms = 10000
+    settings.diagnostics.directory = str(settings.base_dir / "artifacts" / "diagnostics")
+    return settings, load_selectors(settings)

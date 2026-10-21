@@ -1,11 +1,11 @@
 # Central configuration of the TYPO3 publishing bot.
 # Secrets (passwords, API keys) are NEVER stored here - they come from GitHub Actions secrets.
-# Environment overrides: TYPO3_BACKEND_URL, WEBSITE_BASE_URL, BOT_PUBLISHING_ENABLED, BOT_PAUSED,
+# Environment overrides: WEBSITE_ID, TYPO3_BACKEND_URL, WEBSITE_BASE_URL, BOT_PUBLISHING_ENABLED, BOT_PAUSED,
 # BOT_UPDATES_ENABLED, BOT_STATE_BACKEND, CHROMIUM_EXECUTABLE, BOT_HEADLESS.
 
 website:
   base_url: ""              # set via the WEBSITE_BASE_URL secret
-  name: ""                  # used as {{site_name}} in the editorial prompt
+  name: "campus a college"  # used as {{site_name}} in the editorial prompt
   language: de              # language of the articles
   public_url:
     # How to find the public article URL after publishing:
@@ -27,7 +27,9 @@ website:
 
 typo3:
   backend_url: ""           # set via the TYPO3_BACKEND_URL secret, e.g. https://www.example.org/typo3
-  profile: news             # news (EXT:news) | content_element (page + text/media element)
+  # campus_frontend: campus a author pages, saves drafts only (see the campus section below)
+  # news (EXT:news) | content_element (page + text/media element): TYPO3 backend
+  profile: campus_frontend
   selectors_file: config/typo3_selectors.yaml
   storage_state_env: TYPO3_STORAGE_STATE
   browser:
@@ -76,7 +78,7 @@ editorial:
   word_count_tolerance: 0.1
   max_title_length: 90
   meta_description_min: 110
-  meta_description_max: 165
+  meta_description_max: 155  # campus a form limit
   forbidden_terms: []
   require_sources_for_factual: true
   duplicate_title_similarity: 0.82
@@ -166,4 +168,20 @@ diagnostics:
 
 notifications:
   webhook_env: NOTIFY_WEBHOOK_URL
-  notify_on: [failure, rejected, published]
+  notify_on: [failure, rejected, published, draft_saved]
+
+# Profile campus_frontend (typo3.profile). Logs in with the author account (TYPO3_USERNAME = e-mail,
+# TYPO3_PASSWORD) on the website itself - no TYPO3 backend. Approved articles are saved with
+# "Als Entwurf speichern" and marked as AI-assisted; the bot never clicks "Veröffentlichen".
+# You review, edit and publish each draft yourself on the website.
+campus:
+  site_id: ""               # set via WEBSITE_ID (secret or variable), e.g. campus-a-college
+  base_url: ""              # empty: WEBSITE_BASE_URL, else the known address of site_id
+  default_resort: Panorama  # Kultur | Panorama | Politik | Sport | Wirtschaft | Wissenschaft
+  resort_by_topic: {}       # e.g. {"Artificial Intelligence": Wissenschaft}
+  default_region: Österreich
+  region_by_topic: {}
+  max_tags: 5               # the site allows 5
+  create_missing_tags: true # create a tag when no existing tag has the same name
+  # Tick the two image confirmations only for Pixabay images without people (images.exclude_people).
+  confirm_image_rights: true

@@ -52,6 +52,7 @@ class ArticleStatus(StrEnum):
     PUBLISHED = "published"
     PUBLISH_FAILED = "publish_failed"
     UPDATING = "updating"
+    DRAFT_SAVED = "draft_saved"  # campus_frontend: saved as a draft on the website, the author publishes it
 
 
 class PublicationStage(StrEnum):
@@ -61,6 +62,7 @@ class PublicationStage(StrEnum):
     NONE = "none"
     STARTED = "started"  # about to click "save" on a NEW record
     SAVED = "saved"  # TYPO3 record exists, uid known
+    DRAFT_SAVED = "draft_saved"  # campus_frontend: draft submitted, never published by the bot
     PUBLISHED = "published"  # visibility enabled and saved
     VERIFIED = "verified"  # public page confirmed
 

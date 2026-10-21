@@ -1,4 +1,4 @@
-name: TYPO3 setup (login test / discovery)
+name: Setup (login test / discovery / campus a form check)
 
 on:
   workflow_dispatch:
@@ -25,6 +25,8 @@ jobs:
       TYPO3_PASSWORD: ${{ secrets.TYPO3_PASSWORD }}
       TYPO3_STORAGE_STATE: ${{ secrets.TYPO3_STORAGE_STATE }}
       WEBSITE_BASE_URL: ${{ secrets.WEBSITE_BASE_URL }}
+      # Website id of the campus a article form (profile campus_frontend), e.g. campus-a-college.
+      WEBSITE_ID: ${{ secrets.WEBSITE_ID || vars.WEBSITE_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: ./.github/actions/setup-bot

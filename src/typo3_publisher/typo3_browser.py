@@ -1223,7 +1223,11 @@ class ContentElementPublisher:
         return [str(p) for p in self.browser.diagnostics.capture(self.browser.page, "dry-run-filled-form")]
 
 
-def create_publisher(browser: Typo3Browser) -> NewsPublisher | ContentElementPublisher:
+def create_publisher(browser: Any) -> Any:
+    if browser.settings.typo3.profile == "campus_frontend":
+        from .campus_frontend import CampusDraftPublisher
+
+        return CampusDraftPublisher(browser)
     if browser.settings.typo3.profile == "content_element":
         return ContentElementPublisher(browser)
     return NewsPublisher(browser)

@@ -91,10 +91,21 @@ class LazyLLM:
         return self.fake or self.settings.llm.provider == "fake"
 
 
+def site_browser(settings: Settings, selectors: dict[str, Any], secrets: Secrets, diagnostics: Any) -> Any:
+    """The TYPO3 backend browser, or the campus a author pages for profile campus_frontend."""
+    if settings.typo3.profile == "campus_frontend":
+        from .campus_frontend import CampusBrowser
+
+        return CampusBrowser(settings, selectors, secrets, diagnostics)
+    from .typo3_browser import Typo3Browser
+
+    return Typo3Browser(settings, selectors, secrets, diagnostics)
+
+
 def browser_session_factory(settings: Settings, secrets: Secrets, run_id: str):
     from playwright.sync_api import Error as PlaywrightError
 
-    from .typo3_browser import Diagnostics, LoginError, Typo3Browser, create_publisher
+    from .typo3_browser import Diagnostics, LoginError, create_publisher
 
     @contextlib.contextmanager
     def factory() -> Iterator[Any]:
@@ -105,14 +116,14 @@ def browser_session_factory(settings: Settings, secrets: Secrets, run_id: str):
             settings.diagnostics.screenshots,
             settings.diagnostics.html_dumps,
         )
-        with Typo3Browser(settings, selectors, secrets, diagnostics) as browser:
+        with site_browser(settings, selectors, secrets, diagnostics) as browser:
             # Only transient browser/network errors are retried: repeating rejected logins could lock the account.
             retry_call(
                 browser.login,
                 settings.retries.browser,
                 retry_on=(PlaywrightError,),
                 give_up_on=(LoginError,),
-                description="TYPO3 login",
+                description="login",
             )
             yield create_publisher(browser)
 
@@ -229,7 +240,7 @@ def cmd_run(settings: Settings, args: argparse.Namespace) -> int:
 
 
 def _browser(settings: Settings, label: str, headed: bool):
-    from .typo3_browser import Diagnostics, Typo3Browser
+    from .typo3_browser import Diagnostics
 
     if headed:
         settings.typo3.browser.headless = False
@@ -239,7 +250,7 @@ def _browser(settings: Settings, label: str, headed: bool):
         settings.diagnostics.screenshots,
         settings.diagnostics.html_dumps,
     )
-    return Typo3Browser(settings, load_selectors(settings), Secrets(), diagnostics)
+    return site_browser(settings, load_selectors(settings), Secrets(), diagnostics)
 
 
 def cmd_check_login(settings: Settings, args: argparse.Namespace) -> int:
@@ -254,11 +265,13 @@ def cmd_check_login(settings: Settings, args: argparse.Namespace) -> int:
         except LoginError as exc:
             print(f"LOGIN FAILED: {exc}")
             return 1
-        print(f"LOGIN OK via {how} (verified by backend markup after login)")
+        print(f"LOGIN OK via {how} (verified by the page markup after login)")
         return 0
 
 
 def cmd_discover(settings: Settings, args: argparse.Namespace) -> int:
+    if settings.typo3.profile == "campus_frontend":
+        return _check_campus_form(settings, args)
     from .discovery import Discovery
 
     out = settings.path("artifacts/discovery") / make_run_id()
@@ -273,8 +286,49 @@ def cmd_discover(settings: Settings, args: argparse.Namespace) -> int:
     return 0 if report.all_required_verified and not report.manual_assistance else 1
 
 
+def _check_campus_form(settings: Settings, args: argparse.Namespace) -> int:
+    """campus_frontend: log in, open the article form and check every field the bot uses (sends nothing)."""
+    from .typo3_browser import AuthChallengeError, LoginError
+
+    with _browser(settings, "campus-check", args.headed) as browser:
+        try:
+            report = browser.check_form()
+        except AuthChallengeError as exc:
+            print(f"LOGIN BLOCKED ({exc.kind}): {exc}")
+            return 3
+        except LoginError as exc:
+            print(f"LOGIN FAILED: {exc}")
+            return 1
+    lines = [
+        "### campus a article form",
+        "",
+        f"- Login: {report['login']}",
+        f"- Website id of the form: `{report['site_id']}` (WEBSITE_ID matches)",
+        f"- Role: `{report['role']}`",
+        "",
+        "| Field | Found |",
+        "|---|---|",
+        *[f"| {key} | {'yes' if found else '**NO**'} |" for key, found in report["fields"].items()],
+        "",
+    ]
+    for key, opt in report["options"].items():
+        state = "found" if opt["found"] else f"**not found** (available: {', '.join(opt['available'])})"
+        lines.append(f"- {key} `{opt['default']}`: {state}")
+    lines.append("")
+    lines.append(("All fields found." if report["ok"] else "Some fields are missing.") + " Nothing was sent.")
+    md = "\n".join(lines) + "\n"
+    out = settings.path("artifacts/discovery") / make_run_id()
+    out.mkdir(parents=True, exist_ok=True)
+    (out / "report.md").write_text(md, encoding="utf-8")
+    print(md)
+    return 0 if report["ok"] else 1
+
+
 def cmd_auth_export(settings: Settings, args: argparse.Namespace) -> int:
     """Interactive: a human logs in (incl. MFA) in a visible browser; the session is exported."""
+    if settings.typo3.profile == "campus_frontend":
+        print("auth-export is only needed for TYPO3 backends with MFA; campus_frontend logs in with e-mail/password.")
+        return 2
     settings.typo3.browser.headless = False
     with _browser(settings, "auth-export", headed=True) as browser:
         assert browser.page is not None and browser.context is not None
@@ -403,8 +457,8 @@ def build_parser() -> argparse.ArgumentParser:
     run.set_defaults(func=cmd_run)
 
     for name, func, helptext in (
-        ("check-login", cmd_check_login, "test TYPO3 login"),
-        ("discover", cmd_discover, "inspect and verify the TYPO3 backend"),
+        ("check-login", cmd_check_login, "test the login"),
+        ("discover", cmd_discover, "inspect and verify the TYPO3 backend / the campus a article form"),
     ):
         p = sub.add_parser(name, help=helptext)
         p.add_argument("--headed", action="store_true", help="show the browser window")
