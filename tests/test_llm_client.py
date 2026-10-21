@@ -175,3 +175,30 @@ def test_reasoning_effort_is_sent_and_dropped_for_models_without_it():
     assert call(client) == {"ok": 2}
     assert "reasoning_effort" not in fake.requests[1]
     assert fake.requests[1]["response_format"] == {"type": "json_object"}
+
+
+def test_mistral_uses_its_endpoint_key_and_max_tokens():
+    settings = LLMSettings(provider="mistral")
+    assert api_key_env(settings) == "MISTRAL_API_KEY"
+    client = create_llm(settings, RETRY, "m" * 32)
+    assert str(client._client.base_url).startswith("https://api.mistral.ai/v1")
+    client, fake = client_with(answer('{"ok": 1}'), provider="mistral")
+    assert call(client) == {"ok": 1}
+    assert "max_tokens" in fake.requests[0] and "max_completion_tokens" not in fake.requests[0]
+
+
+def test_unknown_parameter_422_is_retried_without_it():
+    err = openai.UnprocessableEntityError.__new__(openai.UnprocessableEntityError)
+    Exception.__init__(err, "Error code: 422 - reasoning_effort: Extra inputs are not permitted")
+    client, fake = client_with(err, answer('{"ok": 3}'), provider="mistral")
+    client.settings.reasoning_effort = "low"
+    assert call(client) == {"ok": 3}
+    assert "reasoning_effort" not in fake.requests[1]
+
+
+def test_rate_limit_without_a_hint_waits_the_default(monkeypatch):
+    waits = []
+    monkeypatch.setattr("typo3_publisher.retry.sleep", waits.append)
+    client, _fake = client_with(rate_limited("Requests rate limit exceeded"), answer('{"ok": 4}'), provider="mistral")
+    assert call(client) == {"ok": 4}
+    assert waits == [pytest.approx(21)]

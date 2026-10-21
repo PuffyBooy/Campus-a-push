@@ -44,22 +44,25 @@ typo3:
     locale: de-AT
 
 llm:
-  # groq: OpenAI-compatible API of Groq (key in the GROQ_API_KEY secret)
-  # openai: OpenAI (key in OPENAI_API_KEY). Check model names at https://console.groq.com/docs/models
-  provider: groq
+  # mistral: Mistral API (key in the MISTRAL_API_KEY secret). Models: https://docs.mistral.ai/models
+  # groq:    Groq (GROQ_API_KEY), e.g. writer/editor openai/gpt-oss-120b with reasoning_effort: low,
+  #          image model qwen/qwen3.8-27b. Free tier: only 8000 tokens per minute, 200000 per day.
+  # openai:  OpenAI (OPENAI_API_KEY)
+  provider: mistral
   base_url: ""              # empty = provider default
-  api_key_env: ""           # empty = GROQ_API_KEY for groq, OPENAI_API_KEY for openai
-  writer_model: openai/gpt-oss-120b
-  editor_model: openai/gpt-oss-120b
+  api_key_env: ""           # empty = MISTRAL_API_KEY / GROQ_API_KEY / OPENAI_API_KEY
+  writer_model: mistral-large-latest
+  editor_model: mistral-large-latest
   writer_temperature: 0.7
   editor_temperature: 0.2   # set to null for models that do not accept a temperature
   max_output_tokens: 8000
   timeout_seconds: 180
-  reasoning_effort: low     # gpt-oss thinks less: fewer tokens per minute and per day (empty = model default)
-  # Rate limits (HTTP 429): wait as long as the provider asks. Groq's free tier allows only ~8000 tokens
-  # per minute, so most steps wait 30-60 s. A longer wait (e.g. the daily limit) ends the run.
+  reasoning_effort: ""      # low | medium | high for reasoning models (gpt-oss); Mistral Large: empty
+  # Rate limits (HTTP 429): wait as long as the provider asks (or rate_limit_default_wait_seconds if it
+  # does not say). A longer wait than rate_limit_max_wait_seconds (e.g. a daily limit) ends the run.
   rate_limit_retries: 8
   rate_limit_max_wait_seconds: 120
+  rate_limit_default_wait_seconds: 20
 
 editorial:
   prompt_file: config/editorial_prompt.md
@@ -136,9 +139,9 @@ images:
   max_file_mb: 15
   text:                     # caption (Bildtext) + description/alt text (Bildbeschreibung)
     mode: vision            # vision: the model looks at the downloaded image | tags: templates only
-    # Must accept image input. On Groq only qwen/qwen3.8-27b does (a preview model, may be retired:
-    # see https://console.groq.com/docs/vision). Empty = llm.writer_model.
-    model: qwen/qwen3.8-27b
+    # Must accept image input. Mistral Large is multimodal; on Groq use qwen/qwen3.8-27b.
+    # Empty = llm.writer_model.
+    model: mistral-large-latest
     caption_max_chars: 200
     description_max_chars: 250
     caption_fallback: "Symbolbild: {tags}"
