@@ -26,6 +26,7 @@ ENV_VARS = [
     "TYPO3_PASSWORD",
     "TYPO3_STORAGE_STATE",
     "OPENAI_API_KEY",
+    "GROQ_API_KEY",
     "PIXABAY_API_KEY",
     "NOTIFY_WEBHOOK_URL",
 ]
@@ -119,12 +120,14 @@ def make_image(path: Path) -> ImageInfo:
         user="photographer",
         license_name="Pixabay Content License",
         license_url="https://pixabay.com/service/license-summary/",
-        attribution="Bild: photographer auf Pixabay",
-        alt_text="key, lock",
+        attribution="© photographer / Pixabay",
+        alt_text="Ein silberner Schlüssel steckt in einem Türschloss",
         relevance=1.0,
         local_path=str(path),
         sha256="abc",
         file_name=path.name,
+        caption="Symbolbild: Ein Schlüssel als Zeichen für sichere Anmeldung",
+        text_source="vision",
     )
 
 

@@ -32,10 +32,12 @@ Last updated with the initial implementation. Three levels:
 | Update existing record (same uid, slug kept) | ✅ | ✅ | ❌ |
 | Content-element profile (page + tt_content) | ✅ | ✅ | ❌ |
 | Discovery report + selector proposal | ✅ | ✅ | ❌ |
-| Writer / editor / revision loop | ✅ | ✅ (scripted LLM) | ❌ needs `OPENAI_API_KEY` |
+| Writer / editor / revision loop | ✅ | ✅ (scripted LLM) | ❌ needs `GROQ_API_KEY` |
+| Groq / OpenAI client (JSON mode, invalid-JSON retry, images) | ✅ | ✅ (fake HTTP client) | ❌ needs `GROQ_API_KEY` |
 | Deterministic fact-grounding checks | ✅ | ✅ | n/a |
 | Research from approved feeds | ✅ | ✅ (feed parsing) | ❌ |
 | Pixabay search, filters, download | ✅ | ✅ (fake API) | ❌ needs `PIXABAY_API_KEY` |
+| Image caption + description (vision), copyright line | ✅ | ✅ (scripted LLM; fields written in mock form) | ❌ needs `GROQ_API_KEY` + discovery of the image fields |
 | DST-correct slots, catch-up, duplicate-slot protection | ✅ | ✅ | n/a |
 | Git-branch state + lease lock | ✅ | ✅ (local bare remote) | ❌ first Actions run |
 | GitHub Actions workflows | ✅ | ❌ (YAML validated only) | ❌ |

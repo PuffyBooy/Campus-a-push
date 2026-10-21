@@ -42,9 +42,13 @@ typo3:
     locale: de-AT
 
 llm:
-  provider: openai
-  writer_model: gpt-4.1
-  editor_model: gpt-4.1
+  # groq: OpenAI-compatible API of Groq (key in the GROQ_API_KEY secret)
+  # openai: OpenAI (key in OPENAI_API_KEY). Check model names at https://console.groq.com/docs/models
+  provider: groq
+  base_url: ""              # empty = provider default
+  api_key_env: ""           # empty = GROQ_API_KEY for groq, OPENAI_API_KEY for openai
+  writer_model: openai/gpt-oss-120b
+  editor_model: openai/gpt-oss-120b
   writer_temperature: 0.7
   editor_temperature: 0.2   # set to null for models that do not accept a temperature
   max_output_tokens: 8000
@@ -99,13 +103,22 @@ images:
   max_queries: 4
   safesearch: true
   exclude_people: true      # avoid identifiable persons (Pixabay Content License restrictions)
-  alt_template: "{tags}"
   download_dir: artifacts/images
   max_file_mb: 15
-  attribution:
+  text:                     # caption (Bildtext) + description/alt text (Bildbeschreibung)
+    mode: vision            # vision: the model looks at the downloaded image | tags: templates only
+    # Must accept image input. On Groq only qwen/qwen3.8-27b does (a preview model, may be retired:
+    # see https://console.groq.com/docs/vision). Empty = llm.writer_model.
+    model: qwen/qwen3.8-27b
+    caption_max_chars: 200
+    description_max_chars: 250
+    caption_fallback: "Symbolbild: {tags}"
+    description_fallback: "{tags}"
+    max_image_mb: 4
+  attribution:              # copyright line from Pixabay
     enabled: true
-    template: "Bild: {user} auf Pixabay"
-    target: caption         # caption (image description field) | body | both
+    template: "© {user} / Pixabay"
+    target: caption         # caption (image fields, see typo3_selectors.yaml) | body | both
 
 publishing:
   enabled: false            # MASTER SWITCH. Enable only after discovery + a verified test publication.

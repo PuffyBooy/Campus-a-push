@@ -23,7 +23,7 @@ from .config import Settings, TopicsFile
 from .content_generator import ContentGenerator
 from .editorial_reviewer import EditorialLoop, EditorialReviewer
 from .html_utils import extract_links
-from .image_finder import ImageFinder
+from .image_finder import ImageFinder, ImageTextWriter
 from .llm import FakeLLM, LLMClient
 from .logging_utils import get_logger
 from .models import (
@@ -138,6 +138,7 @@ class ArticleManager:
         self.verifier = verifier
         self.publisher_factory = publisher_factory
         self.notifier = notifier
+        self.image_text = ImageTextWriter(settings.images, llm, settings.llm.writer_model, settings.website.language)
         self.run_id = run_id
         self.dry_run = dry_run
         self.planner = TopicPlanner(topics, store, settings.publishing.timezone)
@@ -211,7 +212,7 @@ class ArticleManager:
         assert article.content is not None
         img = article.image
         if img and img.local_path and Path(img.local_path).exists():
-            return True
+            return self._ensure_image_text(article)
         if self.image_finder is None:
             article.image_status = "not_required"
             return not self.settings.images.required
@@ -224,7 +225,7 @@ class ArticleManager:
                 if not img.sha256 or sha == img.sha256:
                     img.local_path = str(path)
                     img.file_name = path.name
-                    return True
+                    return self._ensure_image_text(article)
             except Exception as exc:
                 log.warning("re-download of image %s failed (%s); searching again", img.provider_id, exc)
             article.image = None
@@ -236,6 +237,15 @@ class ArticleManager:
         article.image_status = "found"
         if not self.dry_run:
             self.store.register_image(found.provider, found.provider_id, found.sha256, article.id)
+        return self._ensure_image_text(article)
+
+    def _ensure_image_text(self, article: Article) -> bool:
+        """Caption (Bildtext) and description (Bildbeschreibung) are written once per image."""
+        img = article.image
+        assert img is not None and article.content is not None
+        wants_vision = self.settings.images.text.mode == "vision" and img.text_source != "vision"
+        if wants_vision or not img.caption or not img.alt_text:
+            self.image_text.describe(img, article.content)
         return True
 
     def _options(self, article: Article, publish: bool = True) -> PublishOptions:

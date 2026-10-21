@@ -96,7 +96,8 @@ def test_image_selects_relevant_and_downloads(store, tmp_path):
     image = f.find(content, "Technology")
     assert image.provider_id == "11" and image.relevance == 1.0
     assert image.license_name == "Pixabay Content License"
-    assert image.attribution == "Bild: u auf Pixabay"
+    assert image.attribution == "© u / Pixabay"
+    assert image.caption == "Symbolbild: key, lock, security" and image.text_source == "tags"
     assert (tmp_path / "img" / image.file_name).read_bytes() == png
 
 
@@ -109,6 +110,87 @@ def test_download_rejects_non_images(store, tmp_path):
     f = finder(store, tmp_path, [], {"https://cdn.example/1.png": Resp(content=b"<html>")})
     with pytest.raises(ImageError):
         f.download(hit(1, "x"), "slug")
+
+
+# ------------------------------------------------------------------ caption / description / copyright
+
+
+def stored_image(tmp_path, content=b""):
+    from tests.conftest import make_image
+
+    img = make_image(tmp_path / "key.png")
+    if content:
+        (tmp_path / "key.png").write_bytes(content)
+    img.caption, img.alt_text, img.text_source = "", "", ""
+    return img
+
+
+def test_vision_caption_and_description(tmp_path):
+    from typo3_publisher.image_finder import ImageTextWriter
+    from typo3_publisher.llm import FakeLLM
+
+    def respond(purpose, system, user):
+        assert purpose == "image_text"
+        assert "Describe ONLY what is actually visible" in system and "Language: de" in system
+        return {
+            "caption": "Symbolbild: Ein Schlüssel steckt im Schloss einer Holztür, " + "sehr " * 80,
+            "description": "Nahaufnahme eines Messingschlüssels in einem alten Türschloss.",
+        }
+
+    llm = FakeLLM(respond)
+    img = ImageTextWriter(ImageSettings(), llm, "gpt-test", "de").describe(stored_image(tmp_path), make_content())
+    assert img.text_source == "vision"
+    assert img.alt_text == "Nahaufnahme eines Messingschlüssels in einem alten Türschloss."
+    assert img.caption.startswith("Symbolbild: Ein Schlüssel") and len(img.caption) <= 200
+    assert img.caption.endswith("…")
+    call = llm.calls[0]
+    assert call["model"] == "gpt-test"
+    assert call["images"][0].startswith("data:image/png;base64,")
+
+
+def test_caption_falls_back_to_tags_on_failure(tmp_path):
+    from typo3_publisher.image_finder import ImageTextWriter
+    from typo3_publisher.llm import FakeLLM, LLMError
+
+    def broken(purpose, system, user):
+        raise LLMError("model does not support images")
+
+    img = ImageTextWriter(ImageSettings(), FakeLLM(broken), "m", "de").describe(stored_image(tmp_path), make_content())
+    assert (img.caption, img.alt_text, img.text_source) == ("Symbolbild: key, lock", "key, lock", "tags")
+
+    empty = ImageTextWriter(ImageSettings(), FakeLLM(lambda *a: {"caption": "", "description": "x"}), "m", "de")
+    assert empty.describe(stored_image(tmp_path), make_content()).text_source == "tags"
+
+
+def test_tags_mode_and_oversized_images_skip_the_model(tmp_path):
+    from typo3_publisher.config import ImageTextSettings
+    from typo3_publisher.image_finder import ImageTextWriter
+    from typo3_publisher.llm import FakeLLM
+
+    llm = FakeLLM()
+    settings = ImageSettings(text=ImageTextSettings(mode="tags"))
+    assert ImageTextWriter(settings, llm, "m", "de").describe(stored_image(tmp_path), make_content()).caption
+    settings = ImageSettings(text=ImageTextSettings(max_image_mb=0.000001))
+    ImageTextWriter(settings, llm, "m", "de").describe(stored_image(tmp_path), make_content())
+    assert llm.calls == []
+
+
+def test_reference_values_mapping_and_copyright_target(tmp_path):
+    from tests.conftest import make_image
+    from typo3_publisher.typo3_browser import PublishOptions, attribution_html, reference_values
+
+    img = make_image(tmp_path / "a.png")
+    caption_mode = reference_values({}, img, PublishOptions(attribution_target="caption"))
+    assert caption_mode == {
+        "alternative": "Ein silberner Schlüssel steckt in einem Türschloss",
+        "description": "Symbolbild: Ein Schlüssel als Zeichen für sichere Anmeldung © photographer / Pixabay",
+    }
+    body_mode = reference_values({}, img, PublishOptions(attribution_target="body"))
+    assert body_mode["description"] == "Symbolbild: Ein Schlüssel als Zeichen für sichere Anmeldung"
+    custom = reference_values({"fields": {"title": "{caption}", "description": "{copyright}"}}, img, PublishOptions())
+    assert custom == {"title": img.caption, "description": "© photographer / Pixabay"}
+    img.attribution = "© <b>x</b> / Pixabay"
+    assert "&lt;b&gt;" in attribution_html(img)
 
 
 # ------------------------------------------------------------------ verifier

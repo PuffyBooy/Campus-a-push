@@ -9,7 +9,10 @@ images must not be used in a way that suggests endorsement. This module therefor
 * rejects images whose tags indicate people or brands (configurable lists),
 * never reuses an image (provider id and SHA-256 are tracked in the state),
 * refuses to pick an image below the relevance threshold - no unrelated images,
-* downloads the file (Pixabay forbids permanent hotlinking) and stores attribution.
+* downloads the file (Pixabay forbids permanent hotlinking) and stores the copyright line
+  ("© <uploader> / Pixabay"),
+* writes a caption (Bildtext) and a description/alt text (Bildbeschreibung) with
+  :class:`ImageTextWriter`, which looks at the actual image instead of guessing from tags.
 
 Tag-based filtering cannot detect every identifiable person or logo; the README asks
 editors to spot-check images, and ``images.required`` decides what happens if none fits.
@@ -17,6 +20,7 @@ editors to spot-check images, and ``images.required`` decides what happens if no
 
 from __future__ import annotations
 
+import base64
 import hashlib
 import re
 from dataclasses import dataclass
@@ -27,6 +31,7 @@ import requests
 
 from .config import ImageSettings, RetryPolicy
 from .html_utils import normalise
+from .llm import LLMClient
 from .logging_utils import get_logger
 from .models import ArticleContent, ImageInfo, slugify
 from .retry import retry_call
@@ -227,7 +232,7 @@ class ImageFinder:
         attribution = self.settings.attribution.template.format(
             user=user, page_url=hit.get("pageURL", ""), license=LICENSE_NAME
         )
-        alt = self.settings.alt_template.format(tags=", ".join(tags[:4]), title=content.title)
+        caption, alt = fallback_texts(self.settings, tags, content.title)
         return ImageInfo(
             provider="pixabay",
             provider_id=str(hit.get("id")),
@@ -240,9 +245,110 @@ class ImageFinder:
             license_name=LICENSE_NAME,
             license_url=LICENSE_URL,
             attribution=attribution,
-            alt_text=alt[:250],
+            alt_text=alt,
             relevance=candidate.relevance,
             local_path=str(path),
             sha256=sha,
             file_name=path.name,
+            caption=caption,
+            text_source="tags",
         )
+
+
+# ============================================================================ caption / description
+
+IMAGE_TEXT_SYSTEM = """You write the caption and the image description for a stock photo that illustrates a
+news article. Language: {language}.
+
+Rules:
+- Describe ONLY what is actually visible in the image. Do not invent people, names, places, brands, dates,
+  events or text that you cannot clearly see.
+- The photo is a stock image from Pixabay. It does NOT show the people, places or events of the article.
+  Never claim it does. The caption connects the visible motif to the article topic and starts with
+  "Symbolbild:" (or the equivalent in the article language).
+- caption: one sentence, at most {caption_max} characters.
+- description: alternative text for screen readers; a factual description of the visible content, at most
+  {description_max} characters, no "image of"/"Bild von" prefix.
+- No copyright notice, no URLs, no hashtags, no quotation marks around the text.
+
+Respond with JSON only: {{"caption": "...", "description": "..."}}
+"""
+
+
+def _clip(text: str, limit: int) -> str:
+    text = " ".join(str(text or "").split()).strip().strip('"„“”')
+    if len(text) <= limit:
+        return text
+    cut = text[: limit - 1].rsplit(" ", 1)[0].rstrip(",;:-")
+    return cut + "…"
+
+
+def fallback_texts(settings: ImageSettings, tags: list[str], title: str) -> tuple[str, str]:
+    """Caption and description built from Pixabay tags only (no model involved)."""
+    t = settings.text
+    joined = ", ".join(tags[:4])
+    caption = t.caption_fallback.format(tags=joined, title=title)
+    description = t.description_fallback.format(tags=joined, title=title)
+    return _clip(caption, t.caption_max_chars), _clip(description, t.description_max_chars)
+
+
+_MIME = {b"\xff\xd8\xff": "image/jpeg", b"\x89PNG": "image/png"}
+
+
+def image_data_url(path: Path, max_mb: float) -> str | None:
+    data = path.read_bytes()
+    if len(data) > max_mb * 1024 * 1024:
+        return None
+    mime = next((m for magic, m in _MIME.items() if data.startswith(magic)), None)
+    if mime is None:
+        return None
+    return f"data:{mime};base64,{base64.b64encode(data).decode('ascii')}"
+
+
+class ImageTextWriter:
+    """Generates caption (Bildtext) and description (Bildbeschreibung) for a selected image.
+
+    In ``vision`` mode the downloaded image itself is sent to the model, so the text describes
+    what is really in the picture. Any failure falls back to the tag-based texts that
+    :meth:`ImageFinder.find` already stored - the article is never blocked by this step.
+    """
+
+    def __init__(self, settings: ImageSettings, llm: LLMClient | None, model: str, language: str):
+        self.settings = settings
+        self.llm = llm
+        self.model = settings.text.model or model
+        self.language = language
+
+    def describe(self, image: ImageInfo, content: ArticleContent) -> ImageInfo:
+        t = self.settings.text
+        if not image.caption or not image.alt_text:
+            image.caption, image.alt_text = fallback_texts(self.settings, image.tags, content.title)
+            image.text_source = "tags"
+        if t.mode != "vision" or self.llm is None:
+            return image
+        try:
+            data_url = image_data_url(Path(image.local_path), t.max_image_mb)
+            if data_url is None:
+                log.info(
+                    "image %s not sent to the vision model (size/format); using tag-based texts", image.provider_id
+                )
+                return image
+            system = IMAGE_TEXT_SYSTEM.format(
+                language=self.language, caption_max=t.caption_max_chars, description_max=t.description_max_chars
+            )
+            user = (
+                f"ARTICLE TITLE: {content.title}\nARTICLE TEASER: {content.teaser}\n"
+                f"PIXABAY TAGS (may be inaccurate): {', '.join(image.tags)}\n"
+                "Write caption and description for the attached image."
+            )
+            data = self.llm.complete_json(
+                system=system, user=user, model=self.model, temperature=0.2, purpose="image_text", images=[data_url]
+            )
+            caption = _clip(data.get("caption", ""), t.caption_max_chars)
+            description = _clip(data.get("description", ""), t.description_max_chars)
+            if not caption or not description or "http" in caption + description:
+                raise ValueError("model returned an empty or invalid caption/description")
+            image.caption, image.alt_text, image.text_source = caption, description, "vision"
+        except Exception as exc:  # captions must never block publication
+            log.warning("image caption generation failed (%s); using tag-based texts", exc)
+        return image

@@ -56,7 +56,7 @@ Slot due? (Europe/Vienna) ─► claim slot in state ─► resume failed public
 | `content_generator.py` | Writer prompts from `config/editorial_prompt.md`, plus non-negotiable rules against fabrication |
 | `editorial_reviewer.py` | Deterministic checks + LLM editor scores, write → review → revise loop |
 | `research.py` | Optional research from approved RSS/Atom feeds; evidence snippets are checked verbatim |
-| `image_finder.py` | Pixabay search, people/brand/size/orientation filters, relevance threshold, de-duplication, download |
+| `image_finder.py` | Pixabay search, people/brand/size/orientation filters, relevance threshold, de-duplication, download; caption + description written from the actual image, copyright line |
 | `verifier.py` | Anonymous public-page verification (title similarity + content overlap, retries) |
 | `scheduler.py` / `topic_planner.py` | DST-correct slots, catch-up rules, weekly topic quotas, backlog, editorial calendar |
 | `state_manager.py` | Article registry as JSON on a dedicated `bot-state` git branch, lease lock (compare-and-swap via fast-forward push) |
@@ -109,12 +109,21 @@ In GitHub Actions the composite action `.github/actions/setup-bot` does the same
 | `TYPO3_BACKEND_URL` | Backend base URL including `/typo3`, e.g. `https://www.example.org/typo3` |
 | `TYPO3_USERNAME` | A dedicated **editor** account (not admin), limited to the news storage folder / article pages and the upload folder |
 | `TYPO3_PASSWORD` | Its password |
-| `OPENAI_API_KEY` | OpenAI API key |
+| `GROQ_API_KEY` | Groq API key (https://console.groq.com/keys), used with `llm.provider: groq`, the default |
+| `OPENAI_API_KEY` | *only with `llm.provider: openai`*: OpenAI API key |
 | `PIXABAY_API_KEY` | Pixabay API key (https://pixabay.com/api/docs/) |
 | `WEBSITE_BASE_URL` | Public site URL, e.g. `https://www.example.org` |
 | `NOTIFY_WEBHOOK_URL` | *optional* Slack/Teams/generic webhook |
 | `DIAGNOSTICS_PASSPHRASE` | *optional* encrypts failure screenshots before upload (otherwise none are uploaded) |
 | `TYPO3_STORAGE_STATE` | *optional, MFA sites only*, see [MFA or CAPTCHA](#sites-with-mfa-or-captcha) |
+
+**LLM provider.** The bot calls an OpenAI-compatible chat-completions API. The default is
+**Groq** (`llm.provider: groq`, key in `GROQ_API_KEY`) with these models:
+`openai/gpt-oss-120b` for writing and reviewing, and `qwen/qwen3.8-27b` for image captions, because
+it is the only Groq model that accepts images. That model is still a *preview* model, so check
+https://console.groq.com/docs/models now and then and change the names in `config/settings.yaml` if
+Groq retires one. If a vision model disappears, captions fall back to the tag-based texts.
+To use OpenAI instead, set `llm.provider: openai`, OpenAI model names, and the `OPENAI_API_KEY` secret.
 
 Repository **variables** (not secrets) control operation without code changes:
 `BOT_PAUSED=true` (stop publishing), `BOT_PUBLISHING_ENABLED=true|false`, `BOT_UPDATES_ENABLED=true|false`.
@@ -146,6 +155,24 @@ limit, word counts and forbidden terms live under `editorial:` in `settings.yaml
   **critical issues** that block publication, no matter what scores the LLM gives.
 - The LLM editor is *not* independent fact verification. The deterministic checks only prove
   that a claim is grounded in an approved source. They don't prove the source is right.
+
+### Image caption, description and copyright
+
+For every selected Pixabay image the bot produces three texts:
+
+| Text | How it is made | Default TYPO3 column |
+|---|---|---|
+| **Caption** (Bildtext) | A vision call: the downloaded image itself is sent to the model together with the article title. The caption starts with "Symbolbild:", because a stock photo never shows the people or events of the article | `description` of the image relation, followed by the copyright |
+| **Description** (Bildbeschreibung) | Same call: a factual description of what is visible, used as alternative text for screen readers | `alternative` |
+| **Copyright** | From the Pixabay uploader: `© {user} / Pixabay` (`images.attribution.template`) | appended to the caption (`images.attribution.target: caption`), or a line under the article (`body`), or both |
+
+- `images.text.mode: tags` skips the model and builds caption and description from the Pixabay
+  tags (`caption_fallback`, `description_fallback`).
+- If the vision call fails, the tag-based texts are used. The article is never blocked by this step.
+- Which column receives which text is set in `config/typo3_selectors.yaml` → `image_reference.fields`.
+  Placeholders are `{caption}`, `{description}` and `{copyright}`. For example, add
+  `title: "{caption}"` if your templates render the image title as the caption.
+- The model in `images.text.model` (default: `llm.writer_model`) must accept image input.
 
 ## 5. Configure topics
 
