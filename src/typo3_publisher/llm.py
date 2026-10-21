@@ -101,8 +101,48 @@ class OpenAIClient:
         )
         self.settings = settings
         self.retry = retry
+        self.unavailable: set[str] = set()  # models the account may not use (e.g. not in a free tier)
+
+    def _unavailable_model(self, exc: Exception) -> bool:
+        """403 'not available in your subscription tier' (Mistral free mode) or 404 for an unknown model."""
+        o = self._openai
+        text = str(exc).lower()
+        if isinstance(exc, o.PermissionDeniedError):
+            return "tier" in text or "not available" in text or "model" in text
+        return isinstance(exc, o.NotFoundError) and "model" in text
 
     def complete_json(
+        self,
+        *,
+        system: str,
+        user: str,
+        model: str,
+        temperature: float | None,
+        purpose: str,
+        images: list[str] | None = None,
+    ) -> dict[str, Any]:
+        """Ask ``model``; if the account may not use it, the next of ``llm.fallback_models``."""
+        candidates = [m for m in dict.fromkeys([model, *self.settings.fallback_models]) if m not in self.unavailable]
+        for i, candidate in enumerate(candidates):
+            try:
+                return self._complete_json(
+                    system=system,
+                    user=user,
+                    model=candidate,
+                    temperature=temperature,
+                    purpose=purpose,
+                    images=images,
+                )
+            except (self._openai.PermissionDeniedError, self._openai.NotFoundError) as exc:
+                if not self._unavailable_model(exc) or i == len(candidates) - 1:
+                    raise
+                self.unavailable.add(candidate)
+                log.warning(
+                    "model %s is not available for this account (%s); trying %s", candidate, exc, candidates[i + 1]
+                )
+        raise LLMError(f"none of the configured models is available: {model}, {self.settings.fallback_models}")
+
+    def _complete_json(
         self,
         *,
         system: str,

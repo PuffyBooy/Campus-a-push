@@ -146,6 +146,8 @@ class LLMSettings:
     # Reasoning models (gpt-oss on Groq, OpenAI o-series): low | medium | high. Empty = not sent.
     # "low" uses far fewer (hidden) reasoning tokens, which count towards the per-minute limit.
     reasoning_effort: str = ""
+    # Tried in this order when the account may not use a model (e.g. Mistral's free tier). Empty = none.
+    fallback_models: list[str] = field(default_factory=list)
     # On HTTP 429 the bot waits as long as the provider asks, up to this many times / seconds per wait.
     rate_limit_retries: int = 8
     rate_limit_max_wait_seconds: float = 120.0
