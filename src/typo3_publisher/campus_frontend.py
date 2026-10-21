@@ -111,8 +111,6 @@ class CampusBrowser:
         if not self.campus.site_id:
             raise ConfigError("WEBSITE_ID is not set (the site identifier of the article form, e.g. campus-a-college)")
         self.base_url = self.campus.resolved_base_url(settings.website.base_url)
-        if not self.base_url:
-            raise ConfigError(f"WEBSITE_BASE_URL is not set and the website id {self.campus.site_id!r} is unknown")
         self._pw: Playwright | None = None
         self.browser: Browser | None = None
         self.context: BrowserContext | None = None
@@ -289,8 +287,9 @@ class CampusBrowser:
         L.find(self.page, self._f("steps")[1], timeout_ms=self.nav_timeout, what="step 1 of the article form")
         site = self._value(self._f("site_id"))
         if site != self.campus.site_id:
-            raise Typo3Error(
-                f"website id mismatch: the form reports {site!r} but WEBSITE_ID is {self.campus.site_id!r}"
+            raise ConfigError(
+                f"website id mismatch: the article form on {self.base_url} has the id {site!r}, but WEBSITE_ID "
+                f"is set to something else - set WEBSITE_ID to exactly {site!r}"
             )
 
     def _value(self, selector: str) -> str:

@@ -34,7 +34,7 @@ Copyright, dann Ressort, Region und Tags. Danach klickt er **nur „Als Entwurf 
 
 | Name | Art | Wert |
 |---|---|---|
-| `WEBSITE_ID` | Secret oder Variable | `campus-a-college` (die Website-ID aus dem Formular) |
+| `WEBSITE_ID` | Variable (besser als Secret: sie ist nicht geheim und bleibt im Log lesbar) | `campus-a-college` (die Website-ID aus dem Formular; Großschreibung, Anführungszeichen oder die Adresse `www.campus-a-college.at` gehen auch) |
 | `TYPO3_USERNAME` | Secret | E-Mail deines campus-a-Accounts |
 | `TYPO3_PASSWORD` | Secret | Passwort deines campus-a-Accounts |
 | `GROQ_API_KEY`, `PIXABAY_API_KEY` | Secret | wie unten beschrieben |

@@ -15,7 +15,7 @@ from tests.conftest import make_article, make_content, make_image
 from tests.test_article_manager import Commits
 from typo3_publisher.article_manager import ArticleManager, RunSummary
 from typo3_publisher.campus_frontend import CampusBrowser, CampusDraftPublisher, draft_uid, form_field
-from typo3_publisher.config import Secrets, load_settings, load_topics
+from typo3_publisher.config import Secrets, load_settings, load_topics, normalise_site_id
 from typo3_publisher.llm import FakeLLM
 from typo3_publisher.main import browser_session_factory
 from typo3_publisher.models import ArticleStatus, PublicationStage
@@ -29,7 +29,6 @@ from typo3_publisher.typo3_browser import (
     FormError,
     LoginError,
     PublishOptions,
-    Typo3Error,
 )
 from typo3_publisher.verifier import PublicVerifier
 
@@ -68,6 +67,25 @@ def test_website_id_comes_from_the_environment(config_dir, monkeypatch):
     assert settings.campus.site_id == "campus-a-college"
     assert settings.campus.resolved_base_url("") == "https://www.campus-a-college.at"
     assert settings.campus.resolved_base_url("https://example.org/") == "https://example.org"
+
+
+@pytest.mark.parametrize(
+    "raw",
+    [
+        "campus-a-college",
+        '"campus-a-college"',
+        "Campus-A-College",
+        "campus a college",
+        "https://www.campus-a-college.at/",
+    ],
+)
+def test_website_id_spellings_are_accepted(raw):
+    assert normalise_site_id(raw) == "campus-a-college"
+
+
+def test_unknown_website_id_still_opens_campus_a_college(settings):
+    settings.campus.site_id = "12345"
+    assert settings.campus.resolved_base_url("") == "https://www.campus-a-college.at"
 
 
 def test_missing_website_id_is_a_clear_error(settings):
@@ -113,7 +131,10 @@ def test_captcha_is_not_bypassed(campus_env, mock_campus):
 def test_website_id_must_match_the_form(campus_env, mock_campus):
     settings, selectors = campus_env
     mock_campus.state.site_id = "campus-a-medien"
-    with open_browser(settings, selectors) as b, pytest.raises(Typo3Error, match="website id mismatch"):
+    with (
+        open_browser(settings, selectors) as b,
+        pytest.raises(ConfigError, match="set WEBSITE_ID to exactly 'campus-a-medien'"),
+    ):
         b.open_form()
 
 

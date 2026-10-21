@@ -18,6 +18,7 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 import yaml
 
@@ -81,6 +82,15 @@ class Typo3Settings:
 CAMPUS_SITES = {"campus-a-college": "https://www.campus-a-college.at"}
 
 
+def normalise_site_id(raw: str) -> str:
+    """Accept common spellings of the website id: quotes, upper case, spaces or the site address."""
+    value = raw.strip().strip("\"'`").strip().lower()
+    for site_id, url in CAMPUS_SITES.items():
+        if urlparse(url).hostname.removeprefix("www.") in value:
+            return site_id
+    return "-".join(value.split())
+
+
 @dataclass
 class CampusSettings:
     """Profile ``campus_frontend``: the public author pages of campus a (no TYPO3 backend).
@@ -117,7 +127,9 @@ class CampusSettings:
     )
 
     def resolved_base_url(self, website_base_url: str) -> str:
-        return (self.base_url or website_base_url or CAMPUS_SITES.get(self.site_id, "")).rstrip("/")
+        # Unknown id: open campus a college anyway; the form check then names the expected id.
+        known = CAMPUS_SITES.get(self.site_id, CAMPUS_SITES["campus-a-college"])
+        return (self.base_url or website_base_url or known).rstrip("/")
 
 
 @dataclass
@@ -427,7 +439,7 @@ def apply_env_overrides(settings: Settings) -> Settings:
     if url := os.environ.get("WEBSITE_BASE_URL"):
         settings.website.base_url = url
     if site_id := os.environ.get("WEBSITE_ID"):
-        settings.campus.site_id = site_id.strip()
+        settings.campus.site_id = normalise_site_id(site_id)
     if (enabled := _env_bool("BOT_PUBLISHING_ENABLED")) is not None:
         settings.publishing.enabled = enabled
     if (paused := _env_bool("BOT_PAUSED")) is not None and paused:
