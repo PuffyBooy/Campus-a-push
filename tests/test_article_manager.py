@@ -353,3 +353,22 @@ def test_update_workflow_versions_and_keeps_slug(env, store, settings):
     assert len(publisher.records) == 1, "update must not create a duplicate record"
     assert summary.updated and not summary.published
     assert f"update:{article.id}" in publisher.calls
+
+
+def test_image_texts_are_generated_before_publishing(env, store, tmp_path):
+    build, _publisher = env
+
+    class TagOnlyFinder(FakeImageFinder):
+        def find(self, content, topic):
+            img = super().find(content, topic)
+            img.caption, img.alt_text, img.text_source = "Symbolbild: key, lock", "key, lock", "tags"
+            return img
+
+    manager = build(image_finder=TagOnlyFinder(tmp_path))
+    assert manager.run_full(RunSummary(run_id="r", mode="full", dry_run=False), NOW)
+    [article] = store.list_articles()
+    assert article.image.text_source == "vision"
+    assert article.image.caption == "[TEST] Symbolbild"
+    assert article.image.alt_text == "[TEST] Platzhalter-Bildbeschreibung"
+    vision_calls = [c for c in manager.llm.calls if c["purpose"] == "image_text"]
+    assert len(vision_calls) == 1 and vision_calls[0]["images"][0].startswith("data:image/png;base64,")

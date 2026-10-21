@@ -136,12 +136,14 @@ class ImageInfo:
     user: str
     license_name: str
     license_url: str
-    attribution: str
-    alt_text: str
+    attribution: str  # copyright line, e.g. "© user / Pixabay"
+    alt_text: str  # image description (Bildbeschreibung), used as alternative text
     relevance: float
     local_path: str = ""
     sha256: str = ""
     file_name: str = ""
+    caption: str = ""  # caption shown with the image (Bildtext)
+    text_source: str = ""  # vision | tags
 
 
 @dataclass

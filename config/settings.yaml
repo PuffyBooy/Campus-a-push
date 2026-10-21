@@ -99,13 +99,20 @@ images:
   max_queries: 4
   safesearch: true
   exclude_people: true      # avoid identifiable persons (Pixabay Content License restrictions)
-  alt_template: "{tags}"
   download_dir: artifacts/images
   max_file_mb: 15
-  attribution:
+  text:                     # caption (Bildtext) + description/alt text (Bildbeschreibung)
+    mode: vision            # vision: the model looks at the downloaded image | tags: templates only
+    model: ""               # empty = llm.writer_model (must support image input in vision mode)
+    caption_max_chars: 200
+    description_max_chars: 250
+    caption_fallback: "Symbolbild: {tags}"
+    description_fallback: "{tags}"
+    max_image_mb: 4
+  attribution:              # copyright line from Pixabay
     enabled: true
-    template: "Bild: {user} auf Pixabay"
-    target: caption         # caption (image description field) | body | both
+    template: "© {user} / Pixabay"
+    target: caption         # caption (image fields, see typo3_selectors.yaml) | body | both
 
 publishing:
   enabled: false            # MASTER SWITCH. Enable only after discovery + a verified test publication.

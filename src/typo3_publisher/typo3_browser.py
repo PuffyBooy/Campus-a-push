@@ -15,6 +15,7 @@ fetches the public page afterwards.
 
 from __future__ import annotations
 
+import html
 import json
 import re
 import time
@@ -952,10 +953,33 @@ class PublishOptions:
 
 
 def attribution_html(image: ImageInfo) -> str:
+    e = html.escape
     return (
-        f'<p><em>{image.attribution} (<a href="{image.page_url}">Pixabay</a>, '
-        f'<a href="{image.license_url}">{image.license_name}</a>)</em></p>'
+        f'<p><em>{e(image.attribution)} (<a href="{e(image.page_url, quote=True)}">Pixabay</a>, '
+        f'<a href="{e(image.license_url, quote=True)}">{e(image.license_name)}</a>)</em></p>'
     )
+
+
+# Default mapping of image texts to sys_file_reference columns. Placeholders:
+# {caption} (Bildtext), {description} (Bildbeschreibung / alt text), {copyright} ("© user / Pixabay").
+DEFAULT_REFERENCE_FIELDS = {"alternative": "{description}", "description": "{caption} {copyright}"}
+
+
+def reference_values(ref_cfg: dict[str, Any], image: ImageInfo, options: PublishOptions) -> dict[str, str]:
+    """Column → value for the image reference, from ``image_reference.fields`` in the selector file."""
+    in_caption = options.attribution_enabled and options.attribution_target in {"caption", "both"}
+    values = {
+        "caption": image.caption,
+        "description": image.alt_text,
+        "copyright": image.attribution if in_caption else "",
+    }
+    mapping = ref_cfg.get("fields") or DEFAULT_REFERENCE_FIELDS
+    result = {}
+    for column, template in mapping.items():
+        value = " ".join(str(template).format(**values).split())
+        if value:
+            result[column] = value
+    return result
 
 
 class NewsPublisher:
@@ -1017,12 +1041,8 @@ class NewsPublisher:
         ref = self.cfg.get("image_reference", {})
         ref_table = ref.get("table", "sys_file_reference")
         key = form.upload_file(self.fields["media"], Path(image.local_path), ref_table)
-        meta = {ref.get("alternative", "alternative"): image.alt_text, ref.get("title", "title"): ""}
-        if options.attribution_enabled and options.attribution_target in {"caption", "both"}:
-            meta[ref.get("description", "description")] = image.attribution
-        for column, value in meta.items():
-            if value:
-                form.set_text(FieldSpec(key=column, name=column), value, table=ref_table, key=key)
+        for column, value in reference_values(ref, image, options).items():
+            form.set_text(FieldSpec(key=column, name=column), value, table=ref_table, key=key)
         for column, checked in (ref.get("checkboxes") or {}).items():
             form.set_checkbox(
                 FieldSpec(key=column, name=column, kind="checkbox"), bool(checked), table=ref_table, key=key
@@ -1149,21 +1169,11 @@ class ContentElementPublisher:
         checkpoint(pub)
 
         ref = self.cfg.get("image_reference", {})
-        if article.image and not form.reference_keys(ref.get("table", "sys_file_reference")):
-            key = form.upload_file(cf["media"], Path(article.image.local_path), ref.get("table", "sys_file_reference"))
-            form.set_text(
-                FieldSpec(key="alt", name=ref.get("alternative", "alternative")),
-                article.image.alt_text,
-                table=ref.get("table", "sys_file_reference"),
-                key=key,
-            )
-            if options.attribution_enabled and options.attribution_target in {"caption", "both"}:
-                form.set_text(
-                    FieldSpec(key="desc", name=ref.get("description", "description")),
-                    article.image.attribution,
-                    table=ref.get("table", "sys_file_reference"),
-                    key=key,
-                )
+        ref_table = ref.get("table", "sys_file_reference")
+        if article.image and not form.reference_keys(ref_table):
+            key = form.upload_file(cf["media"], Path(article.image.local_path), ref_table)
+            for column, value in reference_values(ref, article.image, options).items():
+                form.set_text(FieldSpec(key=column, name=column), value, table=ref_table, key=key)
             form = form.save()
         if "hidden" in cf:
             form.set_visibility(cf["hidden"], True)

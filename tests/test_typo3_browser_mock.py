@@ -87,8 +87,10 @@ def test_news_publish_full_workflow_and_public_verification(browser_env, mock_ty
     assert record["hidden"] == 0
     assert record["datetime"]
     ref = next(iter(record["references"].values()))
-    assert ref["alternative"] == "key, lock"
-    assert ref["description"] == "Bild: photographer auf Pixabay"
+    assert ref["alternative"] == "Ein silberner Schlüssel steckt in einem Türschloss"
+    assert ref["description"] == (
+        "Symbolbild: Ein Schlüssel als Zeichen für sichere Anmeldung © photographer / Pixabay"
+    )
     assert ref["showinpreview"] == "1"
     assert checkpoints[0] == PublicationStage.STARTED
     assert PublicationStage.SAVED in checkpoints and checkpoints[-1] == PublicationStage.PUBLISHED

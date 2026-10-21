@@ -136,9 +136,24 @@ class ResearchSettings:
 
 @dataclass
 class AttributionSettings:
+    """The copyright line of the image (Pixabay uploader)."""
+
     enabled: bool = True
-    template: str = "Bild: {user} auf Pixabay"
-    target: str = "caption"  # caption | body | both
+    template: str = "© {user} / Pixabay"
+    target: str = "caption"  # caption (image fields) | body | both
+
+
+@dataclass
+class ImageTextSettings:
+    """Caption (Bildtext) and description/alt text (Bildbeschreibung) of the image."""
+
+    mode: str = "vision"  # vision: the LLM looks at the downloaded image | tags: templates from Pixabay tags
+    model: str = ""  # empty: llm.writer_model (must accept image input in vision mode)
+    caption_max_chars: int = 200
+    description_max_chars: int = 250
+    caption_fallback: str = "Symbolbild: {tags}"
+    description_fallback: str = "{tags}"
+    max_image_mb: float = 4.0  # larger files are not sent to the vision model (fallback is used)
 
 
 @dataclass
@@ -203,9 +218,9 @@ class ImageSettings:
             "mcdonalds",
         ]
     )
-    alt_template: str = "{tags}"
     download_dir: str = "artifacts/images"
     max_file_mb: float = 15.0
+    text: ImageTextSettings = field(default_factory=ImageTextSettings)
     attribution: AttributionSettings = field(default_factory=AttributionSettings)
 
 
@@ -387,6 +402,8 @@ def validate(settings: Settings) -> None:
         raise ConfigError("state.backend must be 'local' or 'git_branch'")
     if settings.images.attribution.target not in {"caption", "body", "both"}:
         raise ConfigError("images.attribution.target must be caption, body or both")
+    if settings.images.text.mode not in {"vision", "tags"}:
+        raise ConfigError("images.text.mode must be 'vision' or 'tags'")
     if settings.publishing.catch_up not in {"latest_only", "none"}:
         raise ConfigError("publishing.catch_up must be 'latest_only' or 'none'")
     if settings.website.public_url.strategy not in {"pattern", "listing", "pattern_then_listing", "backend_view"}:

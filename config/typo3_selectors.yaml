@@ -123,9 +123,12 @@ news:
     hidden: {name: hidden, kind: visibility}
   image_reference:
     table: sys_file_reference
-    alternative: alternative
-    title: title
-    description: description
+    # column of the image relation -> text. Placeholders: {caption} (Bildtext),
+    # {description} (Bildbeschreibung / alt text), {copyright} ("© <Pixabay user> / Pixabay").
+    # Add e.g. `title: "{caption}"` if your templates render the title as caption.
+    fields:
+      alternative: "{description}"
+      description: "{caption} {copyright}"
     # tx_news: "Show in views" / showinpreview checkbox on the media relation
     checkboxes: {showinpreview: true}
   rte_mode: api   # api (CKEditor setData) | type (keyboard input of plain text paragraphs)
@@ -153,8 +156,8 @@ content_element:
     hidden: {name: hidden, kind: visibility}
   image_reference:
     table: sys_file_reference
-    alternative: alternative
-    title: title
-    description: description
+    fields:
+      alternative: "{description}"
+      description: "{caption} {copyright}"
     checkboxes: {}
   rte_mode: api

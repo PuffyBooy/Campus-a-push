@@ -20,7 +20,14 @@ class LLMError(RuntimeError):
 
 class LLMClient(Protocol):
     def complete_json(
-        self, *, system: str, user: str, model: str, temperature: float | None, purpose: str
+        self,
+        *,
+        system: str,
+        user: str,
+        model: str,
+        temperature: float | None,
+        purpose: str,
+        images: list[str] | None = None,
     ) -> dict[str, Any]: ...
 
 
@@ -54,15 +61,28 @@ class OpenAIClient:
         self.retry = retry
 
     def complete_json(
-        self, *, system: str, user: str, model: str, temperature: float | None, purpose: str
+        self,
+        *,
+        system: str,
+        user: str,
+        model: str,
+        temperature: float | None,
+        purpose: str,
+        images: list[str] | None = None,
     ) -> dict[str, Any]:
+        """``images`` are data URLs (``data:image/jpeg;base64,...``) for vision-capable models."""
         o = self._openai
+        user_content: str | list[dict[str, Any]] = user
+        if images:
+            user_content = [{"type": "text", "text": user}] + [
+                {"type": "image_url", "image_url": {"url": url}} for url in images
+            ]
         transient = (o.APIConnectionError, o.APITimeoutError, o.RateLimitError, o.InternalServerError, LLMError)
 
         def call() -> dict[str, Any]:
             kwargs: dict[str, Any] = {
                 "model": model,
-                "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
+                "messages": [{"role": "system", "content": system}, {"role": "user", "content": user_content}],
                 "response_format": {"type": "json_object"},
                 "max_completion_tokens": self.settings.max_output_tokens,
             }
@@ -96,9 +116,16 @@ class FakeLLM:
         self.words = words
 
     def complete_json(
-        self, *, system: str, user: str, model: str, temperature: float | None, purpose: str
+        self,
+        *,
+        system: str,
+        user: str,
+        model: str,
+        temperature: float | None,
+        purpose: str,
+        images: list[str] | None = None,
     ) -> dict[str, Any]:
-        self.calls.append({"purpose": purpose, "system": system, "user": user, "model": model})
+        self.calls.append({"purpose": purpose, "system": system, "user": user, "model": model, "images": images})
         if self.responder:
             return self.responder(purpose, system, user)
         if purpose in {"write", "revise", "update"}:
@@ -123,6 +150,8 @@ class FakeLLM:
                 "feedback": [],
                 "summary": "Offline fake review.",
             }
+        if purpose == "image_text":
+            return {"caption": "[TEST] Symbolbild", "description": "[TEST] Platzhalter-Bildbeschreibung"}
         if purpose == "update_assessment":
             return {"needs_update": True, "reasons": ["offline fake assessment"], "score": 6}
         raise LLMError(f"FakeLLM has no canned response for {purpose}")
