@@ -80,6 +80,7 @@ def parse_json_object(text: str) -> dict[str, Any]:
 PROVIDERS: dict[str, dict[str, str]] = {
     "openai": {"base_url": "", "key_env": "OPENAI_API_KEY"},
     "groq": {"base_url": "https://api.groq.com/openai/v1", "key_env": "GROQ_API_KEY"},
+    "mistral": {"base_url": "https://api.mistral.ai/v1", "key_env": "MISTRAL_API_KEY"},
 }
 
 
@@ -125,7 +126,10 @@ class OpenAIClient:
                 "model": model,
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user_content}],
                 "response_format": {"type": "json_object"},
-                "max_completion_tokens": self.settings.max_output_tokens,
+                # Mistral's chat completions know only max_tokens; OpenAI deprecated it for reasoning models.
+                ("max_tokens" if self.settings.provider == "mistral" else "max_completion_tokens"): (
+                    self.settings.max_output_tokens
+                ),
             }
             if self.settings.reasoning_effort:
                 kwargs["reasoning_effort"] = self.settings.reasoning_effort
@@ -133,7 +137,7 @@ class OpenAIClient:
                 kwargs["temperature"] = temperature
             try:
                 response = self._create(kwargs, purpose)
-            except o.BadRequestError as exc:
+            except (o.BadRequestError, o.UnprocessableEntityError) as exc:  # 422: Mistral's unknown-field error
                 text = str(exc)
                 if "json_validate_failed" in text:
                     # Groq rejects answers that are not valid JSON; asking again usually works.
@@ -170,14 +174,15 @@ class OpenAIClient:
                     ) from exc
                 if not isinstance(exc, self._openai.RateLimitError):
                     raise
-                wait = rate_limit_wait(exc)
-                if wait is not None and wait > s.rate_limit_max_wait_seconds:
+                # No hint (e.g. Mistral): wait a fixed time instead of retrying at once.
+                wait = rate_limit_wait(exc) or s.rate_limit_default_wait_seconds
+                if wait > s.rate_limit_max_wait_seconds:
                     raise LLMQuotaError(
                         f"{s.provider} rate limit needs a wait of {wait:.0f}s (more than "
                         f"llm.rate_limit_max_wait_seconds={s.rate_limit_max_wait_seconds:.0f}); try again later: "
                         f"{str(exc)[:300]}"
                     ) from exc
-                if wait is None or attempt >= s.rate_limit_retries:
+                if attempt >= s.rate_limit_retries:
                     raise
                 log.warning(
                     "LLM %s: %s rate limit, waiting %.0fs as requested (%d/%d)",

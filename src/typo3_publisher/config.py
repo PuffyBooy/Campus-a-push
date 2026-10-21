@@ -134,9 +134,9 @@ class CampusSettings:
 
 @dataclass
 class LLMSettings:
-    provider: str = "openai"  # openai | groq | fake (offline testing only)
-    base_url: str = ""  # empty: provider default (groq: https://api.groq.com/openai/v1)
-    api_key_env: str = ""  # empty: OPENAI_API_KEY (openai) / GROQ_API_KEY (groq)
+    provider: str = "openai"  # openai | groq | mistral | fake (offline testing only)
+    base_url: str = ""  # empty: provider default (groq: https://api.groq.com/openai/v1, mistral: api.mistral.ai)
+    api_key_env: str = ""  # empty: OPENAI_API_KEY / GROQ_API_KEY / MISTRAL_API_KEY
     writer_model: str = "gpt-4.1"
     editor_model: str = "gpt-4.1"
     writer_temperature: float | None = 0.7
@@ -149,6 +149,7 @@ class LLMSettings:
     # On HTTP 429 the bot waits as long as the provider asks, up to this many times / seconds per wait.
     rate_limit_retries: int = 8
     rate_limit_max_wait_seconds: float = 120.0
+    rate_limit_default_wait_seconds: float = 20.0  # when the provider names no wait time
 
 
 @dataclass
@@ -473,8 +474,8 @@ def validate(settings: Settings) -> None:
         raise ConfigError("state.backend must be 'local' or 'git_branch'")
     if settings.images.attribution.target not in {"caption", "body", "both"}:
         raise ConfigError("images.attribution.target must be caption, body or both")
-    if settings.llm.provider not in {"openai", "groq", "fake"}:
-        raise ConfigError("llm.provider must be 'openai', 'groq' or 'fake'")
+    if settings.llm.provider not in {"openai", "groq", "mistral", "fake"}:
+        raise ConfigError("llm.provider must be 'openai', 'groq', 'mistral' or 'fake'")
     if settings.llm.reasoning_effort not in {"", "low", "medium", "high"}:
         raise ConfigError("llm.reasoning_effort must be empty, 'low', 'medium' or 'high'")
     if settings.images.text.mode not in {"vision", "tags"}:
@@ -542,6 +543,7 @@ SECRET_NAMES = (
     "TYPO3_PASSWORD",
     "OPENAI_API_KEY",
     "GROQ_API_KEY",
+    "MISTRAL_API_KEY",
     "PIXABAY_API_KEY",
     "NOTIFY_WEBHOOK_URL",
     "TYPO3_STORAGE_STATE",
