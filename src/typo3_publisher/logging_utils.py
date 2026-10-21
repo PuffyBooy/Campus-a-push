@@ -25,6 +25,7 @@ _PATTERNS = [
     (re.compile(r"(?i)(authorization\s*[:=]\s*)(bearer\s+)?[^\s,\"']+"), r"\1***"),
     (re.compile(r"(?i)([?&](?:key|api_key|apikey|token|password)=)[^&\s\"']+"), r"\1***"),
     (re.compile(r"sk-[A-Za-z0-9_\-]{16,}"), "sk-***"),
+    (re.compile(r"gsk_[A-Za-z0-9]{16,}"), "gsk_***"),  # Groq API keys
 ]
 
 
@@ -99,7 +100,7 @@ def setup_logging(level: str | None = None, json_logs: bool | None = None) -> No
     root = logging.getLogger()
     root.handlers[:] = [handler]
     root.setLevel(level.upper())
-    for noisy in ("urllib3", "httpx", "openai", "httpcore"):
+    for noisy in ("urllib3", "httpx", "openai", "httpcore", "groq"):
         logging.getLogger(noisy).setLevel(logging.WARNING)
 
 

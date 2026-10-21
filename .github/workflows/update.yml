@@ -36,6 +36,7 @@ jobs:
       TYPO3_USERNAME: ${{ secrets.TYPO3_USERNAME }}
       TYPO3_PASSWORD: ${{ secrets.TYPO3_PASSWORD }}
       TYPO3_STORAGE_STATE: ${{ secrets.TYPO3_STORAGE_STATE }}
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       PIXABAY_API_KEY: ${{ secrets.PIXABAY_API_KEY }}
       WEBSITE_BASE_URL: ${{ secrets.WEBSITE_BASE_URL }}

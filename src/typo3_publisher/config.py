@@ -79,7 +79,9 @@ class Typo3Settings:
 
 @dataclass
 class LLMSettings:
-    provider: str = "openai"  # openai | fake (offline testing only)
+    provider: str = "openai"  # openai | groq | fake (offline testing only)
+    base_url: str = ""  # empty: provider default (groq: https://api.groq.com/openai/v1)
+    api_key_env: str = ""  # empty: OPENAI_API_KEY (openai) / GROQ_API_KEY (groq)
     writer_model: str = "gpt-4.1"
     editor_model: str = "gpt-4.1"
     writer_temperature: float | None = 0.7
@@ -402,6 +404,8 @@ def validate(settings: Settings) -> None:
         raise ConfigError("state.backend must be 'local' or 'git_branch'")
     if settings.images.attribution.target not in {"caption", "body", "both"}:
         raise ConfigError("images.attribution.target must be caption, body or both")
+    if settings.llm.provider not in {"openai", "groq", "fake"}:
+        raise ConfigError("llm.provider must be 'openai', 'groq' or 'fake'")
     if settings.images.text.mode not in {"vision", "tags"}:
         raise ConfigError("images.text.mode must be 'vision' or 'tags'")
     if settings.publishing.catch_up not in {"latest_only", "none"}:
@@ -465,6 +469,7 @@ SECRET_NAMES = (
     "TYPO3_USERNAME",
     "TYPO3_PASSWORD",
     "OPENAI_API_KEY",
+    "GROQ_API_KEY",
     "PIXABAY_API_KEY",
     "NOTIFY_WEBHOOK_URL",
     "TYPO3_STORAGE_STATE",

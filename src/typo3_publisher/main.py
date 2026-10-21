@@ -35,8 +35,8 @@ from .config import (
     read_text,
 )
 from .image_finder import ImageFinder, PixabayClient
-from .llm import FakeLLM, LLMClient, create_llm
-from .logging_utils import get_logger, redact, setup_logging
+from .llm import FakeLLM, LLMClient, api_key_env, create_llm
+from .logging_utils import get_logger, redact, register_secret, setup_logging
 from .models import ArticleStatus, iso
 from .notifier import Notifier, write_step_summary
 from .research import Researcher
@@ -81,7 +81,9 @@ class LazyLLM:
 
     def complete_json(self, **kwargs: Any) -> dict[str, Any]:
         if self._client is None:
-            self._client = create_llm(self.settings.llm, self.settings.retries.llm, self.secrets.get("OPENAI_API_KEY"))
+            key = self.secrets.get(api_key_env(self.settings.llm))
+            register_secret(key)  # also covers a custom llm.api_key_env
+            self._client = create_llm(self.settings.llm, self.settings.retries.llm, key)
         return self._client.complete_json(**kwargs)
 
     @property

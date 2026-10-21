@@ -36,6 +36,7 @@ jobs:
     env:
       BOT_STATE_BACKEND: git_branch
       BOT_LOG_FORMAT: json
+      GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       WEBSITE_BASE_URL: ${{ secrets.WEBSITE_BASE_URL }}
       NOTIFY_WEBHOOK_URL: ${{ secrets.NOTIFY_WEBHOOK_URL }}

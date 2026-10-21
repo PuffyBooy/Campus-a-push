@@ -51,12 +51,28 @@ def parse_json_object(text: str) -> dict[str, Any]:
     return data
 
 
+# OpenAI-compatible chat-completions providers: default endpoint and API-key variable.
+PROVIDERS: dict[str, dict[str, str]] = {
+    "openai": {"base_url": "", "key_env": "OPENAI_API_KEY"},
+    "groq": {"base_url": "https://api.groq.com/openai/v1", "key_env": "GROQ_API_KEY"},
+}
+
+
+def api_key_env(settings: LLMSettings) -> str:
+    return settings.api_key_env or PROVIDERS.get(settings.provider, PROVIDERS["openai"])["key_env"]
+
+
 class OpenAIClient:
+    """Chat-completions client for OpenAI and OpenAI-compatible providers such as Groq."""
+
     def __init__(self, api_key: str, settings: LLMSettings, retry: RetryPolicy):
         import openai
 
+        base_url = settings.base_url or PROVIDERS.get(settings.provider, PROVIDERS["openai"])["base_url"] or None
         self._openai = openai
-        self._client = openai.OpenAI(api_key=api_key, timeout=settings.timeout_seconds, max_retries=0)
+        self._client = openai.OpenAI(
+            api_key=api_key, base_url=base_url, timeout=settings.timeout_seconds, max_retries=0
+        )
         self.settings = settings
         self.retry = retry
 
@@ -88,7 +104,19 @@ class OpenAIClient:
             }
             if temperature is not None:
                 kwargs["temperature"] = temperature
-            response = self._client.chat.completions.create(**kwargs)
+            try:
+                response = self._client.chat.completions.create(**kwargs)
+            except o.BadRequestError as exc:
+                text = str(exc)
+                if "json_validate_failed" in text:
+                    # Groq rejects answers that are not valid JSON; asking again usually works.
+                    raise LLMError(f"provider could not produce valid JSON: {text[:200]}") from exc
+                if "response_format" not in text:
+                    raise
+                # Model without JSON mode: ask without it, the prompt still demands JSON.
+                log.warning("model %s does not accept response_format; retrying without JSON mode", model)
+                kwargs.pop("response_format")
+                response = self._client.chat.completions.create(**kwargs)
             choice = response.choices[0]
             if choice.finish_reason == "length":
                 raise LLMError("model output was truncated (increase llm.max_output_tokens)")
@@ -191,8 +219,8 @@ class FakeLLM:
 def create_llm(settings: LLMSettings, retry: RetryPolicy, api_key: str | None) -> LLMClient:
     if settings.provider == "fake":
         return FakeLLM()
-    if settings.provider != "openai":
+    if settings.provider not in PROVIDERS:
         raise LLMError(f"unsupported llm.provider {settings.provider!r}")
     if not api_key:
-        raise LLMError("OPENAI_API_KEY is not set")
+        raise LLMError(f"{api_key_env(settings)} is not set (llm.provider: {settings.provider})")
     return OpenAIClient(api_key, settings, retry)
