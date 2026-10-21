@@ -7,7 +7,7 @@ from datetime import UTC, datetime
 
 import pytest
 
-from tests.conftest import make_content, make_image
+from tests.conftest import make_article, make_content, make_image
 from typo3_publisher.article_manager import ArticleManager, PublishingDisabledError, RunSummary
 from typo3_publisher.config import Secrets, load_topics
 from typo3_publisher.llm import FakeLLM
@@ -326,6 +326,15 @@ def test_pending_draft_from_an_aborted_run_is_reviewed_not_rewritten(env, store)
     assert build().run_full(full, NOW)
     assert [a.id for a in store.list_articles()] == [draft.id]
     assert full.published[0]["id"] == draft.id and not full.generated
+
+
+def test_drafts_of_topics_no_longer_planned_are_not_resumed(env, store):
+    build, _publisher = env
+    store.save_article(make_article("20250101-000000-old00000", topic="Removed topic"))
+    full = RunSummary(run_id="r", mode="full", dry_run=False)
+    assert build().run_full(full, NOW)
+    assert full.generated and "20250101-000000-old00000" not in [p["id"] for p in full.published]
+    assert store.load_article("20250101-000000-old00000").status == ArticleStatus.DRAFT
 
 
 def test_manual_idea_and_backlog(env, store):

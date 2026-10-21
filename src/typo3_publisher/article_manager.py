@@ -418,7 +418,9 @@ class ArticleManager:
 
         A draft that a previous run generated but did not review (e.g. it stopped at an LLM rate
         limit) is reviewed first instead of writing a new one."""
-        pending = [] if idea else self.store.list_articles(ArticleStatus.DRAFT)
+        pending = (
+            [] if idea else [a for a in self.store.list_articles(ArticleStatus.DRAFT) if self.planner.topic(a.topic)]
+        )
         for _ in range(max(1, self.settings.publishing.max_generation_attempts)):
             if pending:
                 log.info("reviewing pending draft %s from an earlier run", pending[0].id)

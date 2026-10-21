@@ -143,6 +143,9 @@ class LLMSettings:
     editor_temperature: float | None = 0.2
     max_output_tokens: int = 8000
     timeout_seconds: float = 180.0
+    # Reasoning models (gpt-oss on Groq, OpenAI o-series): low | medium | high. Empty = not sent.
+    # "low" uses far fewer (hidden) reasoning tokens, which count towards the per-minute limit.
+    reasoning_effort: str = ""
     # On HTTP 429 the bot waits as long as the provider asks, up to this many times / seconds per wait.
     rate_limit_retries: int = 8
     rate_limit_max_wait_seconds: float = 120.0
@@ -472,6 +475,8 @@ def validate(settings: Settings) -> None:
         raise ConfigError("images.attribution.target must be caption, body or both")
     if settings.llm.provider not in {"openai", "groq", "fake"}:
         raise ConfigError("llm.provider must be 'openai', 'groq' or 'fake'")
+    if settings.llm.reasoning_effort not in {"", "low", "medium", "high"}:
+        raise ConfigError("llm.reasoning_effort must be empty, 'low', 'medium' or 'high'")
     if settings.images.text.mode not in {"vision", "tags"}:
         raise ConfigError("images.text.mode must be 'vision' or 'tags'")
     if settings.publishing.catch_up not in {"latest_only", "none"}:

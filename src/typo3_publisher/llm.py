@@ -23,6 +23,10 @@ class LLMQuotaError(RuntimeError):
     """The provider's limit needs a longer wait than llm.rate_limit_max_wait_seconds (e.g. a daily limit)."""
 
 
+class LLMRequestTooLargeError(LLMQuotaError):
+    """This one request exceeds the provider's per-minute token limit; waiting does not help."""
+
+
 def rate_limit_wait(exc: Exception) -> float | None:
     """Seconds the provider asks to wait: Retry-After header, or "try again in 1m2.5s" in the message."""
     response = getattr(exc, "response", None)
@@ -123,6 +127,8 @@ class OpenAIClient:
                 "response_format": {"type": "json_object"},
                 "max_completion_tokens": self.settings.max_output_tokens,
             }
+            if self.settings.reasoning_effort:
+                kwargs["reasoning_effort"] = self.settings.reasoning_effort
             if temperature is not None:
                 kwargs["temperature"] = temperature
             try:
@@ -132,11 +138,12 @@ class OpenAIClient:
                 if "json_validate_failed" in text:
                     # Groq rejects answers that are not valid JSON; asking again usually works.
                     raise LLMError(f"provider could not produce valid JSON: {text[:200]}") from exc
-                if "response_format" not in text:
+                # A model without JSON mode or adjustable reasoning: ask again without that parameter.
+                param = next((p for p in ("reasoning_effort", "response_format") if p in text and p in kwargs), None)
+                if param is None:
                     raise
-                # Model without JSON mode: ask without it, the prompt still demands JSON.
-                log.warning("model %s does not accept response_format; retrying without JSON mode", model)
-                kwargs.pop("response_format")
+                log.warning("model %s does not accept %s; retrying without it", model, param)
+                kwargs.pop(param)
                 response = self._create(kwargs, purpose)
             choice = response.choices[0]
             if choice.finish_reason == "length":
@@ -156,7 +163,7 @@ class OpenAIClient:
                 return self._client.chat.completions.create(**kwargs)
             except self._openai.APIStatusError as exc:
                 if getattr(exc, "status_code", None) == 413 or "Request too large" in str(exc):
-                    raise LLMQuotaError(
+                    raise LLMRequestTooLargeError(
                         "the request is larger than the provider allows per minute; lower "
                         "research.max_chars_per_source / research.max_sources or upgrade the plan: "
                         f"{str(exc)[:300]}"

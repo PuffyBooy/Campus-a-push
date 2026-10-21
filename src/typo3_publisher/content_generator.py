@@ -6,7 +6,7 @@ import json
 import re
 from typing import Any
 
-from .config import Settings, TopicConfig
+from .config import Settings, TopicConfig, read_text
 from .html_utils import sanitize_html
 from .llm import LLMClient, LLMError
 from .logging_utils import get_logger
@@ -125,10 +125,15 @@ class ContentGenerator:
         self.llm = llm
         self.prompt_template = prompt_template
 
-    def system_prompt(self) -> str:
+    def system_prompt(self, compact: bool = False) -> str:
+        """``compact``: the short review checklist instead of the full editorial prompt (revisions; the
+        draft already follows the full prompt, and Groq's free tier allows only 8000 tokens per request)."""
         e = self.settings.editorial
+        template = self.prompt_template
+        if compact and e.review_checklist_file:
+            template = read_text(self.settings, e.review_checklist_file)
         rendered = render_template(
-            self.prompt_template,
+            template,
             {
                 "language": self.settings.website.language,
                 "min_words": e.min_words,
@@ -139,9 +144,9 @@ class ContentGenerator:
         draft = DRAFT_MODE_RULES if e.draft_mode else ""
         return f"{rendered}\n\n{NON_NEGOTIABLE_RULES}{draft}\n{OUTPUT_FORMAT}"
 
-    def _complete(self, user: str, purpose: str) -> ArticleContent:
+    def _complete(self, user: str, purpose: str, compact: bool = False) -> ArticleContent:
         data = self.llm.complete_json(
-            system=self.system_prompt(),
+            system=self.system_prompt(compact),
             user=user,
             model=self.settings.llm.writer_model,
             temperature=self.settings.llm.writer_temperature,
@@ -196,7 +201,7 @@ class ContentGenerator:
             f"EDITOR FEEDBACK:\n{json.dumps(feedback, ensure_ascii=False)}\n\n"
             f"RESEARCH MATERIAL:\n{research.as_prompt()}"
         )
-        return self._complete(user, "revise")
+        return self._complete(user, "revise", compact=True)
 
     def improve_existing(
         self, content: ArticleContent, reasons: list[str], research: ResearchBundle, preserve_links: list[str]

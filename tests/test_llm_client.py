@@ -162,3 +162,16 @@ def test_request_larger_than_the_minute_limit_stops_clearly(monkeypatch):
     with pytest.raises(LLMQuotaError, match="max_chars_per_source"):
         call(client)
     assert len(fake.requests) == 1
+
+
+def test_reasoning_effort_is_sent_and_dropped_for_models_without_it():
+    client, fake = client_with(answer('{"ok": 1}'))
+    client.settings.reasoning_effort = "low"
+    assert call(client) == {"ok": 1}
+    assert fake.requests[0]["reasoning_effort"] == "low"
+
+    client, fake = client_with(bad_request("`reasoning_effort` is not supported with this model"), answer('{"ok": 2}'))
+    client.settings.reasoning_effort = "low"
+    assert call(client) == {"ok": 2}
+    assert "reasoning_effort" not in fake.requests[1]
+    assert fake.requests[1]["response_format"] == {"type": "json_object"}
