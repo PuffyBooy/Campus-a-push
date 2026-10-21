@@ -203,3 +203,76 @@ def test_parse_rss_and_atom():
     )
     assert parse_feed(rss)[0]["url"] == "https://a.example/1"
     assert parse_feed(atom)[0]["url"] == "https://b.example/2"
+
+
+def test_parse_rss1_rdf_feed():
+    rdf = (
+        '<rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#" xmlns="http://purl.org/rss/1.0/" '
+        'xmlns:dc="http://purl.org/dc/elements/1.1/"><item rdf:about="https://orf.at/stories/1/">'
+        "<title>C</title><link>https://orf.at/stories/1/</link><dc:date>2026-10-21T20:10:44+02:00</dc:date>"
+        "</item></rdf:RDF>"
+    )
+    [item] = parse_feed(rdf)
+    assert item["url"] == "https://orf.at/stories/1/" and item["published"].startswith("2026-10-21")
+
+
+def test_article_text_drops_navigation_lines():
+    from typo3_publisher.html_utils import ParsedPage
+    from typo3_publisher.research import article_text
+
+    page = ParsedPage(
+        "<nav><a>Zum Inhalt</a><a>Sport</a><a>Wetter</a></nav><h1>Kurz</h1>"
+        "<p>Eine neue Studie zeigt, dass Jugendliche in Österreich deutlich weniger schlafen als empfohlen.</p>"
+    )
+    assert article_text(page) == (
+        "Eine neue Studie zeigt, dass Jugendliche in Österreich deutlich weniger schlafen als empfohlen."
+    )
+
+
+# ------------------------------------------------------------------ draft mode
+
+
+def test_draft_mode_prompts_and_author_todos(settings):
+    settings.editorial.draft_mode = True
+    settings.editorial.review_checklist_file = "config/review_checklist.md"
+    gen_llm = FakeLLM()
+    ContentGenerator(settings, gen_llm, "Prompt").generate(None, "Wissenschaft", "", "", research(), [])
+    assert "DRAFT MODE" in gen_llm.calls[0]["system"]
+    assert "invent personal experiences" in gen_llm.calls[0]["system"]
+    assert "at least 600" in gen_llm.calls[0]["user"]
+
+    def respond(purpose, system, user):
+        assert "DRAFT MODE" in system and "author_todos" in system
+        assert "Prüfliste für campus a college" in system and "FULL WRITER PROMPT" not in system
+        scores = dict.fromkeys(settings.editorial.criteria_weights, 9.0)
+        return {"scores": scores, "critical_issues": [], "author_todos": ["Eine Schülerin befragen", " "]}
+
+    reviewer = EditorialReviewer(settings, FakeLLM(respond), "rubric", "FULL WRITER PROMPT")
+    result = reviewer.review(make_content(), research(), 0)
+    assert result.author_todos == ["Eine Schülerin befragen"]
+
+
+def test_without_draft_mode_the_editor_gets_the_full_prompt(settings):
+    settings.editorial.review_checklist_file = ""
+
+    def respond(purpose, system, user):
+        assert "FULL WRITER PROMPT" in system and "DRAFT MODE" not in system
+        return {"scores": dict.fromkeys(settings.editorial.criteria_weights, 9.0), "critical_issues": []}
+
+    EditorialReviewer(settings, FakeLLM(respond), "rubric", "FULL WRITER PROMPT").review(make_content(), research(), 0)
+
+
+def test_live_configuration_matches_the_campus_form():
+    """Topics map to Ressorts that exist in the campus a form; research uses approved feeds only."""
+    from tests.conftest import REPO
+    from typo3_publisher.config import load_settings, load_topics
+    from typo3_publisher.html_utils import domain_allowed
+
+    settings = load_settings(REPO / "config")
+    resorts = {"Kultur", "Panorama", "Politik", "Sport", "Wirtschaft", "Wissenschaft"}
+    for topic in load_topics(REPO / "config").topics:
+        assert settings.campus.resort_by_topic.get(topic.name, settings.campus.default_resort) in resorts
+    r = settings.research
+    assert r.enabled and r.feeds
+    assert all(domain_allowed(f, r.approved_domains) for f in r.feeds)
+    assert settings.editorial.draft_mode and settings.editorial.review_checklist_file

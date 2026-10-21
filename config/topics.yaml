@@ -1,29 +1,51 @@
 # Topics and weekly quotas. The planner picks the topic with the largest unmet weekly quota
 # (weighted by priority), skipping topics whose quota for the current ISO week (Europe/Vienna)
-# is already fulfilled.
+# is already fulfilled. The names match the Ressorts of campus a college (campus.resort_by_topic).
+# The keywords also select matching news from the research feeds (config/settings.yaml).
 topics:
-  - name: Technology
+  - name: Wissenschaft
     priority: high
-    articles_per_week: 3
-    description: Practical explanations of technologies that matter to students and staff.
-    keywords: [software, hardware, internet, cloud, security]
+    articles_per_week: 1
+    description: >-
+      Neue Studien und Forschung, die Jugendliche betreffen: Gesundheit, Schlaf, Ernährung, Psyche,
+      Klima, Technik und KI. Was bedeutet das Ergebnis für den Alltag von Schüler*innen?
+    keywords: [studie, forschung, gesundheit, jugendliche, klima, medizin, universität, psych, schlaf, ernährung]
     categories: []
-  - name: Artificial Intelligence
+  - name: Politik
     priority: high
-    articles_per_week: 2
-    description: How AI tools work, their limits, and responsible use in study and work.
-    keywords: [ai, machine learning, ki, llm]
+    articles_per_week: 1
+    description: >-
+      Politische Entscheidungen in Österreich und der EU, die Schule, Bildung, Jugend, Wohnen oder
+      Mitbestimmung betreffen. Erklärt, ohne Partei zu ergreifen.
+    keywords: [schule, bildung, jugend, regierung, parlament, minister, gesetz, wahl, lehrer, matura]
     categories: []
-  - name: Digital Trends
+  - name: Wirtschaft
     priority: medium
-    articles_per_week: 2
-    description: Evergreen analysis of digital habits and trends, without speculation presented as fact.
-    keywords: [digital, trend, social media, apps]
+    articles_per_week: 1
+    description: >-
+      Geld, Preise, Lehre und Jobs aus Sicht von Jugendlichen: Teuerung, Taschengeld, Ferialjobs,
+      Lehrstellen, Mieten, Abos, Online-Shopping.
+    keywords: [preise, teuerung, inflation, lehre, lehrling, arbeitsmarkt, job, miete, geld, konsum]
+    categories: []
+  - name: Panorama
+    priority: medium
+    articles_per_week: 1
+    description: >-
+      Was junge Menschen in Österreich gerade bewegt: Social Media, Handy, Verkehr und Öffis,
+      Sicherheit, Freizeit, Trends.
+    keywords: [jugendliche, kinder, social media, tiktok, handy, öffis, wien, polizei, verkehr, internet]
+    categories: []
+  - name: Kultur
+    priority: low
+    articles_per_week: 1
+    description: >-
+      Film, Serien, Musik, Bücher, Festivals und Games mit Bezug zu jungen Menschen in Österreich.
+    keywords: [film, serie, musik, buch, festival, konzert, ausstellung, game, streaming, kino]
     categories: []
 
 # Optional backlog of future article ideas, used before the topic rotation (each once).
 # Ideas can also be added at runtime: python -m typo3_publisher add-idea "..." --topic "..."
 backlog: []
-#  - title: "Passkeys statt Passwörter: wie die neue Anmeldung funktioniert"
-#    topic: Technology
-#    notes: "Erklärend, ohne Marktzahlen."
+#  - title: "Handyverbot an Schulen: was die neue Regel im Alltag ändert"
+#    topic: Politik
+#    notes: "Faktenstory, aktuelle Zahlen aus Österreich."

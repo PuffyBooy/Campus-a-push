@@ -59,20 +59,29 @@ class ResearchBundle:
 
 
 _NS = {"atom": "http://www.w3.org/2005/Atom"}
+_RSS1 = "{http://purl.org/rss/1.0/}"  # RSS 1.0 / RDF feeds, e.g. rss.orf.at/news.xml
+
+
+def article_text(page: ParsedPage) -> str:
+    """Main text of a news page: navigation, buttons and teasers are short lines, sentences are not."""
+    return "\n".join(line for line in page.text.splitlines() if len(line.split()) >= 8)
 
 
 def parse_feed(xml_text: str) -> list[dict[str, str]]:
     root = ET.fromstring(xml_text)
     items = []
-    for item in root.iter("item"):  # RSS 2.0
-        items.append(
-            {
-                "title": (item.findtext("title") or "").strip(),
-                "url": (item.findtext("link") or "").strip(),
-                "summary": ParsedPage(item.findtext("description") or "").text,
-                "published": (item.findtext("pubDate") or "").strip(),
-            }
-        )
+    for ns in ("", _RSS1):  # RSS 2.0, RSS 1.0
+        for item in root.iter(f"{ns}item"):
+            items.append(
+                {
+                    "title": (item.findtext(f"{ns}title") or "").strip(),
+                    "url": (item.findtext(f"{ns}link") or "").strip(),
+                    "summary": ParsedPage(item.findtext(f"{ns}description") or "").text,
+                    "published": (
+                        item.findtext("pubDate") or item.findtext("{http://purl.org/dc/elements/1.1/}date") or ""
+                    ).strip(),
+                }
+            )
     for entry in root.iter("{http://www.w3.org/2005/Atom}entry"):
         link = entry.find("atom:link[@rel='alternate']", _NS)
         if link is None:  # Element truthiness depends on children, so compare with None
@@ -136,7 +145,7 @@ class Researcher:
             except Exception as exc:
                 log.warning("research source %s unavailable: %s", item["url"], exc)
                 continue
-            text = page.text[: self.settings.max_chars_per_source]
+            text = article_text(page)[: self.settings.max_chars_per_source]
             if len(text.split()) < 80:
                 continue
             bundle.documents.append(

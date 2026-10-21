@@ -154,7 +154,15 @@ class OpenAIClient:
         for attempt in range(s.rate_limit_retries + 1):
             try:
                 return self._client.chat.completions.create(**kwargs)
-            except self._openai.RateLimitError as exc:
+            except self._openai.APIStatusError as exc:
+                if getattr(exc, "status_code", None) == 413 or "Request too large" in str(exc):
+                    raise LLMQuotaError(
+                        "the request is larger than the provider allows per minute; lower "
+                        "research.max_chars_per_source / research.max_sources or upgrade the plan: "
+                        f"{str(exc)[:300]}"
+                    ) from exc
+                if not isinstance(exc, self._openai.RateLimitError):
+                    raise
                 wait = rate_limit_wait(exc)
                 if wait is not None and wait > s.rate_limit_max_wait_seconds:
                     raise LLMQuotaError(

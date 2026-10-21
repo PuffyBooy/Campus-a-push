@@ -116,6 +116,7 @@ class ReviewResult:
     summary: str = ""
     model: str = ""
     created_at: str = field(default_factory=iso)
+    author_todos: list[str] = field(default_factory=list)  # draft mode: what the human author still adds
 
 
 @dataclass

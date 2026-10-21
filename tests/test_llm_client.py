@@ -152,3 +152,13 @@ def test_daily_limit_stops_with_a_clear_error(monkeypatch):
     with pytest.raises(LLMQuotaError, match="try again later"):
         call(client)
     assert len(fake.requests) == 1
+
+
+def test_request_larger_than_the_minute_limit_stops_clearly(monkeypatch):
+    err = openai.APIStatusError.__new__(openai.APIStatusError)
+    Exception.__init__(err, "Error code: 413 - Request too large for model on tokens per minute (TPM): Limit 8000")
+    err.status_code = 413
+    client, fake = client_with(err)
+    with pytest.raises(LLMQuotaError, match="max_chars_per_source"):
+        call(client)
+    assert len(fake.requests) == 1
