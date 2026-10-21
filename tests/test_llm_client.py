@@ -202,3 +202,28 @@ def test_rate_limit_without_a_hint_waits_the_default(monkeypatch):
     client, _fake = client_with(rate_limited("Requests rate limit exceeded"), answer('{"ok": 4}'), provider="mistral")
     assert call(client) == {"ok": 4}
     assert waits == [pytest.approx(21)]
+
+
+def tier_not_allowed() -> openai.PermissionDeniedError:
+    err = openai.PermissionDeniedError.__new__(openai.PermissionDeniedError)
+    Exception.__init__(
+        err, "Error code: 403 - This model is not available in your subscription tier (tier_not_allowed)"
+    )
+    return err
+
+
+def test_model_not_in_the_plan_falls_back_and_is_remembered():
+    client, fake = client_with(tier_not_allowed(), answer('{"ok": 5}'), answer('{"ok": 6}'), provider="mistral")
+    client.settings.fallback_models = ["mistral-medium-latest", "mistral-small-latest"]
+    assert client.complete_json(system="s", user="u", model="mistral-large-latest", temperature=0.2, purpose="t") == {
+        "ok": 5
+    }
+    assert [r["model"] for r in fake.requests] == ["mistral-large-latest", "mistral-medium-latest"]
+    client.complete_json(system="s", user="u", model="mistral-large-latest", temperature=0.2, purpose="t")
+    assert fake.requests[-1]["model"] == "mistral-medium-latest"  # the unavailable model is not asked again
+
+
+def test_without_fallbacks_the_tier_error_is_raised():
+    client, _fake = client_with(tier_not_allowed(), provider="mistral")
+    with pytest.raises(openai.PermissionDeniedError):
+        call(client)
