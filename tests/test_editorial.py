@@ -276,3 +276,33 @@ def test_live_configuration_matches_the_campus_form():
     assert r.enabled and r.feeds
     assert all(domain_allowed(f, r.approved_domains) for f in r.feeds)
     assert settings.editorial.draft_mode and settings.editorial.review_checklist_file
+
+
+def test_revision_uses_the_compact_checklist(settings):
+    from typo3_publisher.models import ReviewResult
+
+    settings.editorial.review_checklist_file = "config/review_checklist.md"
+    llm = FakeLLM()
+    gen = ContentGenerator(settings, llm, "FULL WRITER PROMPT")
+    gen.generate(None, "Wissenschaft", "", "", research(), [])
+    gen.revise(make_content(), ReviewResult(0, {}, 5.0, False), research())
+    write, revise = llm.calls
+    assert "FULL WRITER PROMPT" in write["system"]
+    assert "FULL WRITER PROMPT" not in revise["system"] and "Prüfliste für campus a college" in revise["system"]
+    assert "NON-NEGOTIABLE" in revise["system"]
+
+
+def test_revision_too_large_for_the_provider_rejects_only_this_article(settings):
+    from typo3_publisher.llm import LLMRequestTooLargeError
+
+    def respond(purpose, system, user):
+        if purpose == "revise":
+            raise LLMRequestTooLargeError("Request too large: Limit 8000, Requested 8129")
+        return {"scores": dict.fromkeys(settings.editorial.criteria_weights, 5.0), "critical_issues": []}
+
+    llm = FakeLLM(respond)
+    gen = ContentGenerator(settings, llm, "prompt")
+    loop = EditorialLoop(settings, gen, EditorialReviewer(settings, llm, "rubric", "prompt"))
+    article = loop.run(make_article(), research(), [])
+    assert article.status == ArticleStatus.REJECTED
+    assert any("per-minute token limit" in r for r in article.rejected_reasons)

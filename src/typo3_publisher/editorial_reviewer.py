@@ -20,7 +20,7 @@ from collections.abc import Iterable
 from .config import Settings, read_text
 from .content_generator import ContentGenerator
 from .html_utils import extract_links, html_to_text, jaccard, normalise, title_similarity, word_count
-from .llm import LLMClient
+from .llm import LLMClient, LLMRequestTooLargeError
 from .logging_utils import get_logger
 from .models import Article, ArticleContent, ArticleStatus, Issue, ReviewResult, Revision
 from .research import ResearchBundle
@@ -317,7 +317,16 @@ class EditorialLoop:
                 return article
             if cycle == max_cycles:
                 break
-            content = self.generator.revise(content, review, research)
+            try:
+                content = self.generator.revise(content, review, research)
+            except LLMRequestTooLargeError as exc:
+                log.warning("article %s: revision too large for the provider limit (%s)", article.id, exc)
+                article.status = ArticleStatus.REJECTED
+                article.rejected_reasons = [
+                    *rejection_reasons(review, self.settings),
+                    "revision request exceeds the provider's per-minute token limit",
+                ]
+                return article
             article.content = content
             article.revisions.append(
                 Revision(iteration=iteration + 1, content=content, note=f"revision after review {iteration}")
