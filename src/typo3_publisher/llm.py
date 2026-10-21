@@ -7,6 +7,7 @@ import re
 from collections.abc import Callable
 from typing import Any, Protocol
 
+from . import retry as retry_module
 from .config import LLMSettings, RetryPolicy
 from .logging_utils import get_logger
 from .retry import retry_call
@@ -16,6 +17,26 @@ log = get_logger("llm")
 
 class LLMError(RuntimeError):
     pass
+
+
+class LLMQuotaError(RuntimeError):
+    """The provider's limit needs a longer wait than llm.rate_limit_max_wait_seconds (e.g. a daily limit)."""
+
+
+def rate_limit_wait(exc: Exception) -> float | None:
+    """Seconds the provider asks to wait: Retry-After header, or "try again in 1m2.5s" in the message."""
+    response = getattr(exc, "response", None)
+    header = getattr(response, "headers", {}).get("retry-after") if response is not None else None
+    try:
+        if header:
+            return float(header)
+    except ValueError:
+        pass
+    m = re.search(r"try again in (?:(\d+)h)?(?:(\d+)m)?(?:([\d.]+)s)?", str(exc))
+    if not m or not any(m.groups()):
+        return None
+    hours, minutes, seconds = (float(g) if g else 0.0 for g in m.groups())
+    return hours * 3600 + minutes * 60 + seconds
 
 
 class LLMClient(Protocol):
@@ -105,7 +126,7 @@ class OpenAIClient:
             if temperature is not None:
                 kwargs["temperature"] = temperature
             try:
-                response = self._client.chat.completions.create(**kwargs)
+                response = self._create(kwargs, purpose)
             except o.BadRequestError as exc:
                 text = str(exc)
                 if "json_validate_failed" in text:
@@ -116,7 +137,7 @@ class OpenAIClient:
                 # Model without JSON mode: ask without it, the prompt still demands JSON.
                 log.warning("model %s does not accept response_format; retrying without JSON mode", model)
                 kwargs.pop("response_format")
-                response = self._client.chat.completions.create(**kwargs)
+                response = self._create(kwargs, purpose)
             choice = response.choices[0]
             if choice.finish_reason == "length":
                 raise LLMError("model output was truncated (increase llm.max_output_tokens)")
@@ -125,6 +146,34 @@ class OpenAIClient:
             return parse_json_object(choice.message.content or "")
 
         return retry_call(call, self.retry, retry_on=transient, description=f"LLM {purpose}")
+
+    def _create(self, kwargs: dict[str, Any], purpose: str) -> Any:
+        """One request. On a rate limit, wait as long as the provider asks (Groq's free tier allows
+        only a few thousand tokens per minute, so one article step often has to wait ~30-60 s)."""
+        s = self.settings
+        for attempt in range(s.rate_limit_retries + 1):
+            try:
+                return self._client.chat.completions.create(**kwargs)
+            except self._openai.RateLimitError as exc:
+                wait = rate_limit_wait(exc)
+                if wait is not None and wait > s.rate_limit_max_wait_seconds:
+                    raise LLMQuotaError(
+                        f"{s.provider} rate limit needs a wait of {wait:.0f}s (more than "
+                        f"llm.rate_limit_max_wait_seconds={s.rate_limit_max_wait_seconds:.0f}); try again later: "
+                        f"{str(exc)[:300]}"
+                    ) from exc
+                if wait is None or attempt >= s.rate_limit_retries:
+                    raise
+                log.warning(
+                    "LLM %s: %s rate limit, waiting %.0fs as requested (%d/%d)",
+                    purpose,
+                    s.provider,
+                    wait + 1,
+                    attempt + 1,
+                    s.rate_limit_retries,
+                )
+                retry_module.sleep(wait + 1)
+        raise AssertionError("unreachable")  # pragma: no cover
 
 
 class FakeLLM:

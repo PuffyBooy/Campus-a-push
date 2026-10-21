@@ -410,8 +410,18 @@ class ArticleManager:
             self.review(article, summary)
 
     def run_prepare(self, summary: RunSummary, now: datetime, idea: str = "", topic: str = "") -> Article | None:
-        """Generate and review until one article is approved (bounded by max_generation_attempts)."""
+        """Generate and review until one article is approved (bounded by max_generation_attempts).
+
+        A draft that a previous run generated but did not review (e.g. it stopped at an LLM rate
+        limit) is reviewed first instead of writing a new one."""
+        pending = [] if idea else self.store.list_articles(ArticleStatus.DRAFT)
         for _ in range(max(1, self.settings.publishing.max_generation_attempts)):
+            if pending:
+                log.info("reviewing pending draft %s from an earlier run", pending[0].id)
+                article = self.review(pending.pop(0), summary)
+                if article.status == ArticleStatus.APPROVED:
+                    return article
+                continue
             generated = self.run_generate_only(summary, now, 1, idea, topic)
             if not generated:
                 return None

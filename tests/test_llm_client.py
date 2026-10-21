@@ -6,7 +6,7 @@ import openai
 import pytest
 
 from typo3_publisher.config import LLMSettings, RetryPolicy, Secrets
-from typo3_publisher.llm import LLMError, OpenAIClient, api_key_env, create_llm
+from typo3_publisher.llm import LLMError, LLMQuotaError, OpenAIClient, api_key_env, create_llm, rate_limit_wait
 from typo3_publisher.logging_utils import redact
 
 RETRY = RetryPolicy(attempts=3, base_delay_seconds=0, max_delay_seconds=0)
@@ -116,3 +116,39 @@ def test_groq_key_is_redacted():
     assert key not in redact(f"calling groq with {key}")
     Secrets({"GROQ_API_KEY": "custom-groq-secret-value"})
     assert "custom-groq-secret-value" not in redact("x custom-groq-secret-value y")
+
+
+def rate_limited(message: str) -> openai.RateLimitError:
+    err = openai.RateLimitError.__new__(openai.RateLimitError)
+    Exception.__init__(err, message)
+    return err
+
+
+GROQ_TPM = (
+    "Error code: 429 - Rate limit reached for model `openai/gpt-oss-120b` on tokens per minute (TPM): "
+    "Limit 8000, Used 5942, Requested 5930. Please try again in 29.04s."
+)
+
+
+def test_rate_limit_wait_reads_the_requested_delay():
+    assert rate_limit_wait(rate_limited(GROQ_TPM)) == pytest.approx(29.04)
+    assert rate_limit_wait(rate_limited("Please try again in 1m2.5s.")) == pytest.approx(62.5)
+    assert rate_limit_wait(rate_limited("Please try again in 2h3m.")) == pytest.approx(7380)
+    assert rate_limit_wait(rate_limited("slow down")) is None
+
+
+def test_waits_as_long_as_groq_asks_and_then_succeeds(monkeypatch):
+    waits = []
+    monkeypatch.setattr("typo3_publisher.retry.sleep", waits.append)
+    client, fake = client_with(rate_limited(GROQ_TPM), rate_limited(GROQ_TPM), answer('{"ok": true}'))
+    assert call(client) == {"ok": True}
+    assert waits == [pytest.approx(30.04), pytest.approx(30.04)]
+    assert len(fake.requests) == 3
+
+
+def test_daily_limit_stops_with_a_clear_error(monkeypatch):
+    monkeypatch.setattr("typo3_publisher.retry.sleep", lambda s: None)
+    client, fake = client_with(rate_limited("Limit on tokens per day (TPD). Please try again in 1h12m3s."))
+    with pytest.raises(LLMQuotaError, match="try again later"):
+        call(client)
+    assert len(fake.requests) == 1

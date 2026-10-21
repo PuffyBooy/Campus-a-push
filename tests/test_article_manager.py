@@ -317,6 +317,17 @@ def test_generate_and_review_only_modes(env, store):
     assert len(store.list_articles(ArticleStatus.PUBLISHED)) == 1
 
 
+def test_pending_draft_from_an_aborted_run_is_reviewed_not_rewritten(env, store):
+    build, _publisher = env
+    manager = build()
+    summary = RunSummary(run_id="r", mode="generate-only", dry_run=False)
+    [draft] = manager.run_generate_only(summary, NOW)  # the run then stopped (e.g. LLM rate limit)
+    full = RunSummary(run_id="r2", mode="full", dry_run=False)
+    assert build().run_full(full, NOW)
+    assert [a.id for a in store.list_articles()] == [draft.id]
+    assert full.published[0]["id"] == draft.id and not full.generated
+
+
 def test_manual_idea_and_backlog(env, store):
     build, _ = env
     store.add_backlog_item("Backlog idea about cloud storage", "Technology")
