@@ -316,3 +316,13 @@ def test_writer_builds_on_one_story_when_research_is_available(settings):
     with_sources, without = llm.calls
     assert "ONE concrete news item" in with_sources["user"]
     assert "ONE concrete news item" not in without["user"]
+
+
+def test_writer_knows_the_title_limit_and_drafts_avoid_direct_quotes(settings):
+    settings.editorial.draft_mode = True
+    settings.editorial.max_title_length = 90
+    llm = FakeLLM()
+    ContentGenerator(settings, llm, "prompt").generate(None, "Politik", "", "", research(), [])
+    system = llm.calls[0]["system"]
+    assert "at most 90 characters" in system and "{max_title}" not in system
+    assert "No direct quotations at all" in system
