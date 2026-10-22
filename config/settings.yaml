@@ -44,23 +44,25 @@ typo3:
     locale: de-AT
 
 llm:
+  # anthropic: Claude (key in the ANTHROPIC_API_KEY secret), e.g. claude-sonnet-5-5 or claude-opus-5-5 (~2x cost). Takes no temperature; reasoning_effort
+  #          low | medium | high | xhigh | max sets how thoroughly it thinks.
   # mistral: Mistral API (key in the MISTRAL_API_KEY secret). Models: https://docs.mistral.ai/models
   # groq:    Groq (GROQ_API_KEY), e.g. writer/editor openai/gpt-oss-120b with reasoning_effort: low,
   #          image model qwen/qwen3.8-27b. Free tier: only 8000 tokens per minute, 200000 per day.
   # openai:  OpenAI (OPENAI_API_KEY)
-  provider: mistral
+  provider: anthropic
   base_url: ""              # empty = provider default
-  api_key_env: ""           # empty = MISTRAL_API_KEY / GROQ_API_KEY / OPENAI_API_KEY
-  writer_model: mistral-large-latest
-  editor_model: mistral-large-latest
-  # Used in this order when your Mistral plan does not include a model ("not available in your
-  # subscription tier"); the run log names the model that answered.
-  fallback_models: [mistral-medium-latest, mistral-small-latest, open-mistral-nemo]
+  api_key_env: ""           # empty = ANTHROPIC_API_KEY / MISTRAL_API_KEY / GROQ_API_KEY / OPENAI_API_KEY
+  writer_model: claude-sonnet-5-5
+  editor_model: claude-sonnet-5-5
+  # Mistral only: used in this order when your plan does not include a model ("not available in your
+  # subscription tier"), e.g. [mistral-medium-latest, mistral-small-latest, open-mistral-nemo].
+  fallback_models: []
   writer_temperature: 0.7
   editor_temperature: 0.2   # set to null for models that do not accept a temperature
-  max_output_tokens: 8000
+  max_output_tokens: 32000  # Claude's thinking counts towards this
   timeout_seconds: 180
-  reasoning_effort: ""      # low | medium | high for reasoning models (gpt-oss); Mistral Large: empty
+  reasoning_effort: medium  # Claude: low..max; gpt-oss: low | medium | high; Mistral: empty
   # Rate limits (HTTP 429): wait as long as the provider asks (or rate_limit_default_wait_seconds if it
   # does not say). A longer wait than rate_limit_max_wait_seconds (e.g. a daily limit) ends the run.
   rate_limit_retries: 8
@@ -124,10 +126,10 @@ research:
     - https://www.derstandard.at/rss/web
     - https://www.diepresse.com/rss
     - https://kurier.at/xml/rss
-  # Kept small on purpose: every source is sent to the writer and the editor, and Groq's free tier allows
-  # only 8000 tokens per minute per request. Raise both with a paid plan.
-  max_sources: 2
-  max_chars_per_source: 2200
+  # Every source is sent to the writer and the editor. More material means fewer gaps the model fills
+  # itself; for Groq's free tier (8000 tokens per minute) use max_sources 2 and 2200 characters.
+  max_sources: 3
+  max_chars_per_source: 4000
   min_keyword_matches: 1
   timeout_seconds: 20
 
@@ -148,7 +150,7 @@ images:
     mode: vision            # vision: the model looks at the downloaded image | tags: templates only
     # Must accept image input. Mistral Large is multimodal; on Groq use qwen/qwen3.8-27b.
     # Empty = llm.writer_model.
-    model: mistral-large-latest
+    model: claude-sonnet-5-5
     caption_max_chars: 200
     description_max_chars: 250
     caption_fallback: "Symbolbild: {tags}"

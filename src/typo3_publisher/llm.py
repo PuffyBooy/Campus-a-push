@@ -85,6 +85,8 @@ PROVIDERS: dict[str, dict[str, str]] = {
     "openai": {"base_url": "", "key_env": "OPENAI_API_KEY"},
     "groq": {"base_url": "https://api.groq.com/openai/v1", "key_env": "GROQ_API_KEY"},
     "mistral": {"base_url": "https://api.mistral.ai/v1", "key_env": "MISTRAL_API_KEY"},
+    # Not OpenAI-compatible: served by anthropic_llm.AnthropicClient.
+    "anthropic": {"base_url": "", "key_env": "ANTHROPIC_API_KEY"},
 }
 
 
@@ -347,4 +349,8 @@ def create_llm(settings: LLMSettings, retry: RetryPolicy, api_key: str | None) -
         raise LLMError(f"unsupported llm.provider {settings.provider!r}")
     if not api_key:
         raise LLMError(f"{api_key_env(settings)} is not set (llm.provider: {settings.provider})")
+    if settings.provider == "anthropic":
+        from .anthropic_llm import AnthropicClient
+
+        return AnthropicClient(api_key, settings, retry)
     return OpenAIClient(api_key, settings, retry)
