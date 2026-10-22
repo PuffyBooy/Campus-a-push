@@ -46,12 +46,14 @@ interviews, survey, photos, personal experience), real quotes and the final head
 - Write a complete, publishable factual text based on the research material; deliver exactly one title.
 - Do not put placeholders, notes to the author or questions into the article text.
 - Do not imitate own reporting: no invented scenes, first-person experiences or quotes.
+- No direct quotations at all, no quotation marks around anyone's words: report what people said in
+  indirect speech with attribution ("laut X", "sagte X dem *Standard*"). The author adds real quotes.
 """
 
 OUTPUT_FORMAT = """
 Respond with a single JSON object and nothing else, using exactly these keys:
 {
-  "title": "headline",
+  "title": "headline (at most {max_title} characters)",
   "teaser": "introductory paragraph / teaser (plain text, 1-3 sentences)",
   "body_html": "article body as HTML using only <h2>, <h3>, <p>, <ul>, <ol>, <li>, <strong>, <em>, <a href>, <blockquote>",
   "seo_title": "SEO title (max 60 characters)",
@@ -147,7 +149,8 @@ class ContentGenerator:
             },
         )
         draft = DRAFT_MODE_RULES if e.draft_mode else ""
-        return f"{rendered}\n\n{NON_NEGOTIABLE_RULES}{draft}\n{OUTPUT_FORMAT}"
+        output = OUTPUT_FORMAT.replace("{max_title}", str(e.max_title_length))
+        return f"{rendered}\n\n{NON_NEGOTIABLE_RULES}{draft}\n{output}"
 
     def _complete(self, user: str, purpose: str, compact: bool = False) -> ArticleContent:
         data = self.llm.complete_json(
