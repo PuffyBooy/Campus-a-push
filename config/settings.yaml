@@ -77,6 +77,9 @@ editorial:
   # Draft mode: you complete each draft (own reporting, real quotes, final headline) before publishing.
   # Missing own reporting then becomes a to-do in the run summary instead of a reason to reject.
   draft_mode: true
+  # false = invented or unverified quotes no longer reject a draft; each one is listed as a
+  # "Zitat prüfen" to-do in the run summary. Check or replace every quote before publishing.
+  check_quotes: false
   quality_threshold: 8.0    # weighted score (0-10) required for approval
   min_criterion_score: 6.0  # every single criterion must reach this
   min_factual_score: 7.0

@@ -53,6 +53,15 @@ before publishing. Therefore:
 Add to the JSON: "author_todos": ["..."]
 """
 
+QUOTES_UNCHECKED_REVIEW = """
+QUOTES ARE NOT CHECKED: the author verifies or replaces every quotation before publishing. Do NOT report
+quotations or O-Töne (invented, altered or missing from the research material) as critical issues and do
+not lower scores for them; add "Zitat prüfen: <first words of the quote>" to "author_todos" instead.
+"""
+
+# Editor findings that are only about quotations (moved to the author's to-dos when quotes are unchecked).
+_QUOTE_FINDING_RE = re.compile(r"zitat|quot|o-t[öo]n", re.I)
+
 _QUOTE_RE = re.compile(r"[\"„“«»](?P<q>[^\"„“”«»]{20,400})[\"“”«»]")
 _PERCENT_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s?(?:%|prozent|percent|per cent)", re.I)
 
@@ -129,7 +138,7 @@ class EditorialReviewer:
             if len(quote.split()) >= 6 and quote not in research_text:
                 issues.append(
                     Issue(
-                        "critical",
+                        "critical" if e.check_quotes else "minor",
                         "unsupported_quote",
                         f"quotation '{match.group('q')[:80]}' does not appear in the research material",
                     )
@@ -178,6 +187,8 @@ class EditorialReviewer:
     def system_prompt(self) -> str:
         criteria = ", ".join(f'"{c}": 0-10' for c in self.settings.editorial.criteria_weights)
         draft = DRAFT_MODE_REVIEW if self.settings.editorial.draft_mode else ""
+        if not self.settings.editorial.check_quotes:
+            draft = draft.replace("invented quotes and ", "") + QUOTES_UNCHECKED_REVIEW
         return (
             f"{self.rubric}\n\nEDITORIAL INSTRUCTIONS GIVEN TO THE WRITER:\n<<<\n{self.editorial_prompt}\n>>>\n"
             + REVIEW_FORMAT.replace("{CRITERIA}", "{" + criteria + "}")
@@ -226,6 +237,12 @@ class EditorialReviewer:
             for c in (data.get("critical_issues") or [])
             if isinstance(c, dict)
         ]
+        todos = [str(t) for t in (data.get("author_todos") or []) if str(t).strip()][:10]
+        if not e.check_quotes:
+            quote_findings = [i for i in critical if _QUOTE_FINDING_RE.search(i.message)]
+            critical = [i for i in critical if i not in quote_findings]
+            todos += [f"Zitat prüfen: {i.message}" for i in quote_findings]
+            todos += [f"Zitat prüfen: {i.message}" for i in automated if i.code == "unsupported_quote"]
         weighted = self.weighted_score(scores)
         blocking_auto = [i for i in automated if i.severity in {"critical", "major"}]
         passed = (
@@ -246,7 +263,7 @@ class EditorialReviewer:
             feedback=feedback,
             summary=str(data.get("summary", "")),
             model=self.settings.llm.editor_model,
-            author_todos=[str(t) for t in (data.get("author_todos") or []) if str(t).strip()][:10],
+            author_todos=todos,
         )
         log.info(
             "review iteration %d: score=%.2f passed=%s critical=%d automated=%d",

@@ -326,3 +326,24 @@ def test_writer_knows_the_title_limit_and_drafts_avoid_direct_quotes(settings):
     system = llm.calls[0]["system"]
     assert "at most 90 characters" in system and "{max_title}" not in system
     assert "No direct quotations at all" in system
+
+
+def test_unchecked_quotes_become_author_todos_instead_of_blocking(settings):
+    settings.editorial.draft_mode = True
+    settings.editorial.check_quotes = False
+    c = make_content()
+    c.body_html += '<p>Eine Schülerin sagte: "Ich kann bei dieser Hitze im Klassenzimmer nicht mehr denken."</p>'
+
+    def respond(purpose, system, user):
+        assert "QUOTES ARE NOT CHECKED" in system and "invented quotes" not in system
+        scores = dict.fromkeys(settings.editorial.criteria_weights, 9.0)
+        return {
+            "scores": scores,
+            "critical_issues": [{"category": "factual", "description": "Zitat von Lena ist erfunden."}],
+        }
+
+    reviewer = EditorialReviewer(settings, FakeLLM(respond), "rubric", "instructions")
+    result = reviewer.review(c, ResearchBundle(), 0)
+    assert result.passed and not result.critical_issues
+    assert result.author_todos[0] == "Zitat prüfen: Zitat von Lena ist erfunden."
+    assert result.author_todos[1].startswith("Zitat prüfen: quotation 'Ich kann bei dieser Hitze")
