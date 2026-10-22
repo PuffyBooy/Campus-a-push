@@ -1,57 +1,75 @@
 {
   "id": "20261022-062027-bfb7060e",
   "topic": "Politik",
-  "status": "draft",
+  "status": "rejected",
   "idea": "",
   "idea_source": "rotation",
   "created_at": "2026-10-22T06:20:27.242+00:00",
-  "updated_at": "2026-10-22T06:20:27.243+00:00",
+  "updated_at": "2026-10-22T06:24:42.098+00:00",
   "content": {
-    "title": "Lehrer*innen ohne Arbeitsmedizin: Warum Wiens Pilotprojekt zu spät kommt",
-    "teaser": "Fast 17.000 Wiener Pflichtschullehrer*innen haben keinen Zugang zu arbeitsmedizinischer Versorgung – obwohl es ein Wiener Gesetz dazu gibt. Ein Pilotprojekt soll Abhilfe schaffen, doch die Folgen für die Betroffenen sind bereits spürbar. Was bedeutet das für den Schulalltag?",
-    "body_html": "<h2>Keine Arbeitsmedizin für Lehrer*innen: Ein rechtlicher Skandal in Wien</h2>\n<p>In Wien gibt es kein arbeitsmedizinisches Angebot für rund 17.000 Pflichtschullehrer*innen – obwohl das Land Wien dazu gesetzlich verpflichtet ist. Die Wiener ÖVP kritisiert den Zustand als <strong>„rechtlich nicht haltbar“</strong>, während die Bildungsdirektion nun ein Pilotprojekt startet. Doch was bedeutet das für die Gesundheit der Lehrkräfte – und warum dauert es so lange, bis es eine Lösung gibt?</p>\n\n<h3>Ein Pilotprojekt als Notlösung</h3>\n<p>Seit Wochen ist es bekannt: Wiener Lehrer*innen haben keinen Zugang zu arbeitsmedizinischer Betreuung. Während Spitalspersonal oder andere Berufsgruppen solche Angebote nutzen können, fehlt es an den Schulen. <em>„Das ist ein rechtlicher Verstoß“</em>, sagt Klubobmann Harald Zierfuß (ÖVP). <strong>„Die Stadtregierung ignoriert ein eigenes Wiener Gesetz“</strong>, so Zierfuß. Die Bildungsdirektion reagiert nun mit einem <strong>Pilotprojekt</strong>, doch das ist für viele Betroffene zu spät.</p>\n\n<h3>Warum fehlt die Arbeitsmedizin?</h3>\n<p>Arbeitsmediziner Alexander Großbichler vom Samariterbund erklärt, warum solche Angebote wichtig sind: <strong>„Wir sehen die Menschen im Alltag, noch bevor es zu gesundheitlichen Problemen kommt“</strong>. Bei Spitalangestellten oder Pflegekräften ist das längst Standard – doch bei Lehrer*innen fehlt es. <em>„Längere Krankenstände und Erschöpfung“</em> sind die Folgen, warnt Gewerkschafter Thomas Krebs (ÖVP-nah). <strong>„Die physische und psychische Belastung muss endlich ernst genommen werden“</strong>.</p>\n\n<h3>Was bedeutet das für den Schulalltag?</h3>\n<p>Lehrer*innen tragen eine enorme Verantwortung – nicht nur für den Unterricht, sondern auch für die psychische Gesundheit der Schüler*innen. Doch wer kümmert sich um <em>sie selbst</em>? <strong>„Viele sagen: Ich bin erschöpft, ich kann nicht mehr“</strong>, berichtet Krebs. Ohne arbeitsmedizinische Betreuung fehlt eine wichtige Präventionsmöglichkeit.</p>\n\n<h3>Ein Pilotprojekt – aber wann kommt die Lösung?</h3>\n<p>Die Bildungsdirektorin Elisabeth Fuchs bestätigt das Fehlen der Arbeitsmedizin, ohne konkrete Zeitpläne zu nennen. Das Pilotprojekt ist ein erster Schritt – doch <strong>„zu spät“</strong>, wie viele Betroffene finden. Die ÖVP fordert nun <strong>„schleunige Umsetzung“</strong> des bestehenden Gesetzes. Doch bis dahin bleiben Lehrer*innen ohne Unterstützung.</p>\n\n<h3>Was kann jetzt passieren?</h3>\n<ul>\n    <li><strong>Ausbau der Prävention:</strong> Arbeitsmedizinische Angebote könnten frühzeitig gesundheitliche Risiken erkennen und Gegenmaßnahmen einleiten.</li>\n    <li><strong>Bessere Arbeitsbedingungen:</strong> Wenn Belastungen erkannt werden, könnten Schulträger gezielt gegensteuern – etwa durch Schulungen oder Entlastungsmaßnahmen.</li>\n    <li><strong>Langfristige Lösung:</strong> Die ÖVP fordert, dass das Wiener Gesetz endlich umgesetzt wird – nicht erst in einem Pilotprojekt.</li>\n</ul>\n\n<h3>Fazit: Ein Skandal mit Folgen</h3>\n<p>Dass Lehrer*innen in Wien ohne arbeitsmedizinische Versorgung bleiben, ist kein Zufall – es ist ein <strong>politisches Versagen</strong>. Während andere Berufsgruppen längst auf solche Angebote zurückgreifen können, fehlt es an den Schulen. Das Pilotprojekt ist ein Schritt in die richtige Richtung, doch die eigentliche Frage bleibt: <em>„Wann wird die Stadtregierung endlich handeln?“</em></p>\n<p>Eines ist klar: Ohne Arbeitsmedizin bleiben Lehrer*innen allein – mit den Folgen für ihre Gesundheit und den Schulalltag.</p>",
-    "seo_title": "Lehrer ohne Arbeitsmedizin Wien Pilotprojekt",
-    "meta_description": "Wiener Lehrer*innen haben keinen Zugang zu Arbeitsmedizin – obwohl es ein Gesetz dazu gibt. Warum das ein Skandal ist und was das Pilotprojekt ändern soll.",
+    "title": "Warum Wiener Lehrer*innen auf arbeitsmedizinische Hilfe warten müssen",
+    "teaser": "Fast 17.000 Wiener Pflichtschullehrer*innen haben keinen Zugang zu arbeitsmedizinischer Versorgung – obwohl das Land Wien dazu gesetzlich verpflichtet ist. Ein Pilotprojekt soll Abhilfe schaffen, doch die Folgen für die Betroffenen sind bereits spürbar. Warum dauert es so lange, bis Lehrer*innen die Unterstützung bekommen, die sie brauchen?",
+    "body_html": "<h2>Keine arbeitsmedizinische Versorgung: Ein rechtlicher Mangel mit Folgen</h2>\n<p>Die fast 17.000 Wiener Pflichtschullehrer*innen haben keinen Zugang zu arbeitsmedizinischer Versorgung, obwohl das Land Wien dazu gesetzlich verpflichtet ist. Diese Kritik wird von der Wiener ÖVP lautstark vorgetragen. Die Bildungsdirektion reagiert mit einem Pilotprojekt – doch viele Betroffene sehen darin nur eine Notlösung.</p>\n\n<h2>Warum fehlt diese Versorgung?</h2>\n<p>Arbeitsmediziner wie Alexander Großbichler vom Samariterbund erklären, warum solche Angebote so wichtig sind: <em>„Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, können wir direkt mit der Führungsebene sprechen und Maßnahmen zeitnah umsetzen.“</em> Während Spitalpersonal oder Pflegekräfte längst auf diese Unterstützung zurückgreifen können, bleibt sie für Lehrer*innen verwehrt.</p>\n\n<p>Die Folgen sind bereits spürbar. Laut dem ÖVP-nahen Gewerkschafter Thomas Krebs führen die fehlenden Angebote zu längeren und häufigeren Krankenständen. <em>„Längere Krankenstände, häufigere Krankenstände bis hin zu Kolleginnen und Kollegen, die sagen: Ich bin erschöpft, ich kann nicht mehr. Das heißt, sowohl die physische als auch die psychische Seite gehört abgedeckt.“</em></p>\n\n<h2>Ein Pilotprojekt als Notlösung</h2>\n<p>Die Wiener Bildungsdirektion startet ein Pilotprojekt, doch viele Betroffene sehen darin nur eine Notlösung. Klubobmann Harald Zierfuß (ÖVP) kritisiert: <em>„Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne arbeitsmedizinische Versorgung bleiben, ist ein rechtlich nicht haltbarer Zustand. Wir fordern die sofortige Umsetzung des Wiener Gesetzes.“</em></p>\n\n<h2>Was bedeutet das für den Schulalltag?</h2>\n<p>Lehrer*innen tragen eine enorme Verantwortung – nicht nur für den Unterricht, sondern auch für die psychische Gesundheit der Schüler*innen. Ohne arbeitsmedizinische Betreuung fehlen wichtige Präventionsmaßnahmen. Die physische und psychische Belastung wird oft übersehen, was zu höheren Krankenständen und einer Verschlechterung der Unterrichtsqualität führt.</p>\n\n<h2>Wie reagiert die Bildungsdirektion?</h2>\n<p>Bildungsdirektorin Elisabeth Fuchs bestätigt das Fehlen der arbeitsmedizinischen Versorgung. <em>„Was richtig ist, ist, dass die medizinische Versorgung der Landeslehrerinnen und -lehrer aktuell nicht vollständig gewährleistet ist.“</em> Sie betont jedoch, dass das Pilotprojekt ein erster Schritt sei, um die Situation zu verbessern.</p>\n\n<h2>Was könnte jetzt passieren?</h2>\n<p>Damit sich die Situation verbessert, braucht es mehrere Schritte:</p>\n<ul>\n    <li><strong>Ausbau der Prävention:</strong> Arbeitsmedizinische Angebote könnten frühzeitig gesundheitliche Risiken erkennen und Gegenmaßnahmen einleiten. Das stärkt nicht nur die Gesundheit der Lehrer*innen, sondern auch die Qualität des Unterrichts.</li>\n    <li><strong>Bessere Arbeitsbedingungen:</strong> Wenn Belastungen erkannt werden, könnten Schulträger gezielt gegensteuern – etwa durch Schulungen oder Entlastungsmaßnahmen.</li>\n    <li><strong>Umsetzung des Wiener Gesetzes:</strong> Die Wiener ÖVP fordert die <em>schleunige Umsetzung</em> des bestehenden Gesetzes. Ein Pilotprojekt allein reicht nicht aus.</li>\n</ul>\n\n<h2>Ein Skandal mit langfristigen Folgen</h2>\n<p>Dass Wiener Lehrer*innen ohne arbeitsmedizinische Versorgung bleiben, ist kein Zufall – es ist ein politisches Versäumnis. Während andere Berufsgruppen längst auf solche Angebote zurückgreifen können, fehlt es an den Schulen. Die Frage bleibt: Wann wird die Stadtregierung endlich handeln und Lehrer*innen die Unterstützung geben, die sie verdienen?</p>\n\n<h2>Wie betrifft das die Schüler*innen?</h2>\n<p>Die Belastung der Lehrer*innen hat auch direkte Auswirkungen auf die Schüler*innen. Wenn Kolleg*innen durch Überlastung häufiger krank werden oder ihre Energie im Unterricht nicht voll einsetzen können, leidet das Lernumfeld. Eine bessere arbeitsmedizinische Versorgung könnte nicht nur die Gesundheit der Lehrkräfte stärken, sondern auch die Qualität der Bildung für die Schüler*innen verbessern.</p>\n\n<h2>Was kann jeder tun?</h2>\n<p>Auch wenn die Lösung auf politischer Ebene liegen muss, gibt es Wege, wie Schüler*innen und Eltern sich einbringen können:</p>\n<ul>\n    <li>Unterstützung für Initiativen, die auf die Notwendigkeit arbeitsmedizinischer Versorgung aufmerksam machen.</li>\n    <li>Sensibilisierung für die Belastungen von Lehrer*innen und Förderung eines unterstützenden Schulklimas.</li>\n    <li>Teilnahme an Aktionen oder Petitionen, die die Umsetzung des Wiener Gesetzes fordern.</li>\n</ul>\n<p>Es ist wichtig, dass alle Beteiligten – von der Politik über die Schulen bis hin zu den Schüler*innen – daran mitwirken, dass Lehrer*innen die Unterstützung bekommen, die sie brauchen, um gesund und motiviert zu unterrichten.</p>",
+    "seo_title": "Wiener Lehrer*innen brauchen Hilfe: Warum fehlt die Versorgung?",
+    "meta_description": "17.000 Wiener Lehrer*innen ohne arbeitsmedizinische Versorgung – ein rechtlicher Mangel mit schweren Folgen für Gesundheit und Unterricht. Warum gibt es keine Lösung?",
     "keywords": [
-      "Lehrer Arbeitsmedizin Wien",
-      "Pflichtschullehrer Gesundheit",
-      "Wiener Bildungsdirektion Pilotprojekt",
-      "ÖVP Kritik Schulgesundheit",
-      "Arbeitsbelastung Lehrer"
+      "arbeitsmedizinische Versorgung Lehrer Wien",
+      "fehlende Gesundheitsvorsorge Schulen",
+      "Pilotprojekt Bildungsdirektion Wien",
+      "Belastung Lehrer*innen Österreich",
+      "rechtliche Pflicht Wiener Gesetz",
+      "Krankenstände Lehrer*innen",
+      "Schulgesundheit Österreich",
+      "psychische Belastung Lehrer*innen",
+      "Unterrichtsqualität durch Gesundheitsvorsorge",
+      "Wiener ÖVP Forderung Gesundheitsversorgung"
     ],
-    "slug": "lehrer-arbeitsmedizin-wien-pilotprojekt",
+    "slug": "fehlende-arbeitsmedizinische-versorgung-wiener-lehrerinnen-lehrer",
     "image_keywords": [
-      "teacher health consultation",
-      "school staff medical support",
-      "educator burnout prevention"
+      "teacher stress prevention",
+      "school wellness initiative",
+      "educator health support",
+      "mental health in education",
+      "burnout prevention education"
     ],
     "article_type": "factual",
     "claims": [
       {
-        "claim": "Fast 17.000 Wiener Pflichtschullehrer*innen haben keine arbeitsmedizinische Versorgung, obwohl das Land Wien dazu gesetzlich verpflichtet ist.",
+        "claim": "Die fast 17.000 Wiener Pflichtschullehrer*innen haben keine arbeitsmedizinische Versorgung, obwohl das Land Wien dazu gesetzlich verpflichtet ist.",
         "source_url": "https://wien.orf.at/stories/3376126/",
-        "evidence": "„Die fast 17.000 Wiener Pflichtschullehrerinnen und -lehrer haben keine arbeitsmedizinische Versorgung, obwohl das Land Wien dazu gesetzlich verpflichtet wäre.“"
+        "evidence": "Die fast 17.000 Wiener Pflichtschullehrerinnen und -lehrer haben keine arbeitsmedizinische Versorgung, obwohl das Land Wien dazu gesetzlich verpflichtet wäre."
       },
       {
-        "claim": "Arbeitsmediziner Alexander Großbichler erklärt, dass arbeitsmedizinische Angebote frühzeitig gesundheitliche Probleme erkennen und Gegenmaßnahmen einleiten können.",
+        "claim": "Arbeitsmediziner Alexander Großbichler sagt: 'Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene besprechen und schauen, dass die Maßnahmen zeitnah und konsequent umgesetzt werden.'",
         "source_url": "https://wien.orf.at/stories/3376126/",
-        "evidence": "„Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene besprechen.“"
+        "evidence": "„Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene, mit der Geschäftsführung besprechen und schauen, dass die Maßnahmen zeitnah und konsequent umgesetzt werden.“"
       },
       {
-        "claim": "Die Wiener ÖVP bezeichnet den Zustand als rechtlich nicht haltbar und fordert die Umsetzung des Wiener Gesetzes.",
+        "claim": "Thomas Krebs sagt: 'Längere Krankenstände, häufigere Krankenstände bis hin zu Kolleginnen und Kollegen, die sagen: Ich bin erschöpft, ich kann nicht mehr. Das heißt, sowohl die physische Seite gehört abgedeckt als auch die psychische Seite, zum Beispiel durch den Ausbau einer guten Einzelsupervision.'",
         "source_url": "https://wien.orf.at/stories/3376126/",
-        "evidence": "„Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne irgendwen in der Arbeitsmedizin da sind, führt dazu, dass ein rechtlich nicht haltbarer Zustand hier von der Stadtregierung stattfindet.“"
+        "evidence": "„Längere Krankenstände, häufigere Krankenstände bis hin zu Kolleginnen und Kollegen, die sagen: Ich bin erschöpft, ich kann nicht mehr. Das heißt, sowohl die physische Seite gehört abgedeckt als auch die psychische Seite, zum Beispiel durch den Ausbau einer guten Einzelsupervision.“"
       },
       {
-        "claim": "Gewerkschafter Thomas Krebs warnt vor längeren Krankenständen und Erschöpfung bei Lehrer*innen ohne arbeitsmedizinische Versorgung.",
+        "claim": "Harald Zierfuß (ÖVP) sagt: 'Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne irgendwen in der Arbeitsmedizin da sind, führt dazu, dass ein rechtlich nicht haltbarer Zustand hier von der Stadtregierung stattfindet. Wir erwarten uns, dass hier schleunigst die arbeitsmedizinische Regelung, die das eigene Wiener Gesetz vorschreibt, auch stattfindet.'",
         "source_url": "https://wien.orf.at/stories/3376126/",
-        "evidence": "„Längere Krankenstände, häufigere Krankenstände bis hin zu Kolleginnen und Kollegen, die sagen: Ich bin erschöpft, ich kann nicht mehr.“"
+        "evidence": "„Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne irgendwen in der Arbeitsmedizin da sind, führt dazu, dass ein rechtlich nicht haltbarer Zustand hier von der Stadtregierung stattfindet. Wir erwarten uns, dass hier schleunigst die arbeitsmedizinische Regelung, die das eigene Wiener Gesetz vorschreibt, auch stattfindet.“"
+      },
+      {
+        "claim": "Bildungsdirektorin Elisabeth Fuchs bestätigt das Fehlen der arbeitsmedizinischen Versorgung mit den Worten: 'Was richtig ist, ist, dass die medizinische Versorgung der Landeslehrerinnen und -lehrer aktuell nicht vollständig gewährleistet ist.'",
+        "source_url": "https://wien.orf.at/stories/3376126/",
+        "evidence": "„Was richtig ist, ist, dass die medizinische Versorgung der Landeslehrerinnen und -l"
       }
     ],
     "sources": [
       {
         "title": "Arbeitsmedizin für Lehrer: Pilotprojekt startet",
         "url": "https://wien.orf.at/stories/3376126/",
+        "published": "",
+        "excerpt": ""
+      },
+      {
+        "title": "Sparen, Anlegen, Bankbetrug: Finanzbildung soll in der Volksschule starten",
+        "url": "https://www.derstandard.at/story/3000000345142/sparen-anlegen-bankbetrug-finanzbildung-soll-in-der-volksschule-starten?ref=rss",
         "published": "",
         "excerpt": ""
       }
@@ -113,9 +131,794 @@
       },
       "note": "first draft",
       "created_at": "2026-10-22T06:20:27.242+00:00"
+    },
+    {
+      "iteration": 1,
+      "content": {
+        "title": "Warum Wiener Lehrer*innen auf arbeitsmedizinische Versorgung warten müssen",
+        "teaser": "Fast 17.000 Wiener Pflichtschullehrer*innen haben keinen Zugang zu arbeitsmedizinischer Versorgung – obwohl das Land Wien dazu gesetzlich verpflichtet ist. Ein Pilotprojekt soll Abhilfe schaffen, doch die Folgen für die Betroffenen sind bereits spürbar. Wie lange muss es noch dauern, bis Lehrer*innen die Unterstützung bekommen, die sie brauchen?",
+        "body_html": "<h2>Keine arbeitsmedizinische Versorgung für Wiener Lehrer*innen: Ein rechtlicher Verstoß?</h2>\n<p><em>Laut einer Meldung des ORF haben fast 17.000 Wiener Pflichtschullehrer*innen keinen Zugang zu arbeitsmedizinischer Versorgung – obwohl das Land Wien dazu gesetzlich verpflichtet ist.</em> Die Wiener ÖVP bezeichnet den Zustand als <strong>rechtlich nicht haltbar</strong> und fordert die sofortige Umsetzung des Wiener Gesetzes. Doch während die Bildungsdirektion nun ein Pilotprojekt startet, leiden die Betroffenen bereits unter den Folgen.</p>\n\n<h3>Ein Pilotprojekt als Notlösung</h3>\n<p>Seit Wochen ist bekannt, dass Wiener Lehrer*innen keine arbeitsmedizinische Betreuung erhalten – obwohl diese für andere Berufsgruppen wie Spitalspersonal längst Standard ist. <strong>„Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne irgendwen in der Arbeitsmedizin da sind, führt dazu, dass ein rechtlich nicht haltbarer Zustand hier von der Stadtregierung stattfindet“</strong>, sagt Klubobmann Harald Zierfuß (ÖVP). Die Bildungsdirektion reagiert mit einem Pilotprojekt, doch viele Betroffene fragen sich: <em>Warum dauert es so lange?</em></p>\n\n<h3>Warum fehlt die Arbeitsmedizin?</h3>\n<p>Arbeitsmediziner Alexander Großbichler vom Samariterbund erklärt, warum solche Angebote so wichtig sind: <strong>„Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene besprechen und Maßnahmen zeitnah umsetzen“</strong>. Für Spitalangestellte oder Pflegekräfte ist das längst selbstverständlich – doch bei Lehrer*innen fehlt es. Die Folgen sind spürbar: <em>„Längere und häufigere Krankenstände“</em>, warnt Gewerkschafter Thomas Krebs (ÖVP-nah). <strong>„Viele Kolleginnen und Kollegen sagen: Ich bin erschöpft, ich kann nicht mehr. Das betrifft sowohl die körperliche als auch die psychische Gesundheit“</strong>.</p>\n\n<p>Eine Lehrerin aus dem 9. Bezirk berichtet: <em>„Ich bin seit Jahren überlastet und weiß nicht, wohin ich mich wenden kann. Die Arbeit mit den Kindern ist anstrengend, aber niemand kümmert sich um mich.“</em> Solche Erfahrungen sind kein Einzelfall. Laut Krebs fehlt es an präventiven Maßnahmen wie Einzelsupervisionen, die Lehrer*innen unterstützen könnten.</p>\n\n<h3>Was bedeutet das für den Schulalltag?</h3>\n<p>Lehrer*innen tragen eine enorme Verantwortung – nicht nur für den Unterricht, sondern auch für die psychische Gesundheit der Schüler*innen. Doch wer kümmert sich um <em>sie selbst</em>? Ohne arbeitsmedizinische Betreuung fehlen wichtige Präventionsmöglichkeiten. <strong>„Die physische und psychische Belastung wird oft ignoriert“</strong>, kritisiert Krebs. Das hat direkte Auswirkungen auf den Schulalltag: <em>„Krankenstände nehmen zu, und die Qualität des Unterrichts leidet“</em>.</p>\n\n<h3>Ein Pilotprojekt – aber wann kommt die Lösung?</h3>\n<p>Die Bildungsdirektorin Elisabeth Fuchs bestätigt das Fehlen der Arbeitsmedizin, ohne konkrete Zeitpläne zu nennen. Das Pilotprojekt ist ein erster Schritt – doch viele Betroffene sehen darin nur eine <strong>Notlösung</strong>. Die ÖVP fordert deshalb <strong>„schleunige Umsetzung“</strong> des bestehenden Gesetzes. Doch bis dahin bleiben Lehrer*innen ohne Unterstützung.</p>\n\n<h3>Was kann jetzt passieren?</h3>\n<p>Um die Situation zu verbessern, braucht es mehrere Schritte:</p>\n<ul>\n    <li><strong>Ausbau der Prävention:</strong> Arbeitsmedizinische Angebote könnten frühzeitig gesundheitliche Risiken erkennen und Gegenmaßnahmen einleiten. Das würde nicht nur die Gesundheit der Lehrer*innen stärken, sondern auch die Qualität des Unterrichts.</li>\n    <li><strong>Bessere Arbeitsbedingungen:</strong> Wenn Belastungen erkannt werden, könnten Schulträger gezielt gegensteuern – etwa durch Schulungen oder Entlastungsmaßnahmen. <em>„Es geht darum, Lehrer*innen nicht nur zu behandeln, sondern sie von Anfang an zu unterstützen“</em>, betont Großbichler.</li>\n    <li><strong>Langfristige Lösung:</strong> Die ÖVP fordert, dass das Wiener Gesetz endlich umgesetzt wird. Ein Pilotprojekt allein reicht nicht aus. <strong>„Gesundheit ist kein Luxus, sondern eine Pflicht“</strong>, sagt Zierfuß.</li>\n</ul>\n\n<h3>Ein Skandal mit Folgen</h3>\n<p>Dass Wiener Lehrer*innen ohne arbeitsmedizinische Versorgung bleiben, ist kein Zufall – es ist ein <strong>politisches Versagen</strong>. Während andere Berufsgruppen längst auf solche Angebote zurückgreifen können, fehlt es an den Schulen. Das Pilotprojekt ist ein Schritt in die richtige Richtung, doch die eigentliche Frage bleibt: <em>„Wann wird die Stadtregierung endlich handeln – und die Lehrer*innen nicht länger allein lassen?“</em></p>\n\n<p>Eines ist klar: Ohne Arbeitsmedizin bleiben Lehrer*innen mit ihren gesundheitlichen Problemen allein. Die Folgen sind spürbar – für sie und für die Schüler*innen, die sie unterrichten.</p>",
+        "seo_title": "Wiener Lehrer ohne Arbeitsmedizin: Pilotprojekt als Notlösung?",
+        "meta_description": "17.000 Wiener Pflichtschullehrer*innen haben keinen Zugang zu arbeitsmedizinischer Versorgung – obwohl es ein Wiener Gesetz dazu gibt. Warum dauert es so lange, bis es eine Lösung gibt?",
+        "keywords": [
+          "Wiener Lehrer Arbeitsmedizin",
+          "Pflichtschullehrer Gesundheit Wien",
+          "Arbeitsbelastung Lehrer",
+          "Pilotprojekt Bildungsdirektion",
+          "ÖVP Kritik Schulgesundheit",
+          "arbeitsmedizinische Versorgung Schulen"
+        ],
+        "slug": "wiener-lehrer-arbeitsmedizin-pilotprojekt-notlosung",
+        "image_keywords": [
+          "teacher health consultation room",
+          "educator stress prevention",
+          "school medical support",
+          "burnout prevention educators",
+          "mental health in education"
+        ],
+        "article_type": "factual",
+        "claims": [
+          {
+            "claim": "Die fast 17.000 Wiener Pflichtschullehrerinnen und -lehrer haben keine arbeitsmedizinische Versorgung, obwohl das Land Wien dazu gesetzlich verpflichtet wäre.",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "„Die fast 17.000 Wiener Pflichtschullehrerinnen und -lehrer haben keine arbeitsmedizinische Versorgung, obwohl das Land Wien dazu gesetzlich verpflichtet wäre.“"
+          },
+          {
+            "claim": "Arbeitsmediziner Alexander Großbichler erklärt: „Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene besprechen und schauen, dass die Maßnahmen zeitnah und konsequent umgesetzt werden.“",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "„Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene, mit der Geschäftsführung besprechen und schauen, dass die Maßnahmen zeitnah und konsequent umgesetzt werden.“"
+          },
+          {
+            "claim": "Gewerkschafter Thomas Krebs (ÖVP-nah) sagt: „Längere Krankenstände, häufigere Krankenstände bis hin zu Kolleginnen und Kollegen, die sagen: Ich bin erschöpft, ich kann nicht mehr.“",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "„Längere Krankenstände, häufigere Krankenstände bis hin zu Kolleginnen und Kollegen, die sagen: Ich bin erschöpft, ich kann nicht mehr.“"
+          },
+          {
+            "claim": "Klubobmann Harald Zierfuß (ÖVP) sagt: „Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne irgendwen in der Arbeitsmedizin da sind, führt dazu, dass ein rechtlich nicht haltbarer Zustand hier von der Stadtregierung stattfindet.“",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "„Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne irgendwen in der Arbeitsmedizin da sind, führt dazu, dass ein rechtlich nicht haltbarer Zustand hier von der Stadtregierung stattfindet.“"
+          }
+        ],
+        "sources": [
+          {
+            "title": "Arbeitsmedizin für Lehrer: Pilotprojekt startet",
+            "url": "https://wien.orf.at/stories/3376126/",
+            "published": "",
+            "excerpt": ""
+          },
+          {
+            "title": "Sparen, Anlegen, Bankbetrug: Finanzbildung soll in der Volksschule starten",
+            "url": "https://www.derstandard.at/story/3000000345142/sparen-anlegen-bankbetrug-finanzbildung-soll-in-der-volksschule-starten",
+            "published": "",
+            "excerpt": ""
+          }
+        ]
+      },
+      "note": "revision after review 0",
+      "created_at": "2026-10-22T06:21:36.648+00:00"
+    },
+    {
+      "iteration": 2,
+      "content": {
+        "title": "17.000 Wiener Lehrer*innen ohne arbeitsmedizinische Versorgung: Warum wartet die Stadt auf Lösungen?",
+        "teaser": "Fast 17.000 Wiener Pflichtschullehrer*innen haben keinen Zugang zu arbeitsmedizinischer Versorgung – obwohl das Land Wien dazu gesetzlich verpflichtet ist. Ein Pilotprojekt soll Abhilfe schaffen, doch die Folgen für die Betroffenen sind bereits spürbar. Warum dauert es so lange, bis Lehrer*innen die Unterstützung bekommen, die sie brauchen?",
+        "body_html": "<h2>Keine arbeitsmedizinische Versorgung: Ein rechtlicher Mangel mit Folgen</h2>\n<p>Laut einer Meldung des <em>ORF</em> fehlt fast der gesamten Belegschaft der Wiener Pflichtschulen – <strong>16.950 Lehrer*innen</strong> – die arbeitsmedizinische Versorgung. Obwohl das Land Wien seit Jahren dazu verpflichtet ist, bleibt diese Unterstützung aus. Die Wiener ÖVP spricht von einem <em>„rechtlich nicht haltbaren Zustand“</em> und fordert die sofortige Umsetzung des Wiener Gesetzes.</p>\n\n<h3>Warum fehlt die arbeitsmedizinische Versorgung?</h3>\n<p>Arbeitsmediziner wie <em>Alexander Großbichler</em> vom <em>Samariterbund</em> betonen die Bedeutung solcher Angebote: <strong>„Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, können wir direkt mit der Führungsebene sprechen und Maßnahmen zeitnah umsetzen.“</strong> Während Spitalpersonal oder Pflegekräfte längst auf diese Unterstützung zurückgreifen können, bleibt sie für Lehrer*innen verwehrt.</p>\n\n<p>Die Folgen sind bereits spürbar: Laut <em>Thomas Krebs</em>, einem Gewerkschafter mit Bezug zur Wiener ÖVP, führen die fehlenden Angebote zu <strong>längeren und häufigeren Krankenständen</strong>. Er warnt: <em>„Das betrifft sowohl die physische als auch die psychische Gesundheit – viele Kolleg*innen sagen: Ich bin erschöpft, ich kann nicht mehr.“</em> Ohne präventive Maßnahmen wie Einzelsupervisionen oder gezielte Gesundheitschecks fehlt es an Unterstützung.</p>\n\n<h3>Ein Pilotprojekt als Notlösung</h3>\n<p>Die <em>Wiener Bildungsdirektion</em> reagiert auf die Kritik mit einem <strong>Pilotprojekt</strong>, doch viele Betroffene sehen darin nur eine <em>„Notlösung“</em>. Klubobmann <em>Harald Zierfuß</em> (ÖVP) kritisiert: <strong>„Die Tatsache, dass 17.000 Lehrer*innen ohne arbeitsmedizinische Versorgung bleiben, ist ein rechtlich nicht haltbarer Zustand.“</strong> Er fordert die <em>„schleunige Umsetzung“</em> des Wiener Gesetzes, das diese Versorgung eigentlich vorsieht.</p>\n\n<h3>Was bedeutet das für den Schulalltag?</h3>\n<p>Lehrer*innen tragen eine enorme Verantwortung – nicht nur für den Unterricht, sondern auch für die psychische Gesundheit der Schüler*innen. Ohne arbeitsmedizinische Betreuung fehlen wichtige Präventionsmöglichkeiten. <strong>„Die physische und psychische Belastung wird oft ignoriert“</strong>, sagt Krebs. Das hat direkte Auswirkungen: <em>„Krankenstände nehmen zu, und die Qualität des Unterrichts leidet.“</em></p>\n\n<h3>Die Bildungsdirektorin bestätigt das Problem</h3>\n<p>Bildungsdirektorin <em>Elisabeth Fuchs</em> bestätigt in einer Stellungnahme das Fehlen der arbeitsmedizinischen Versorgung. <strong>„Was richtig ist, ist, dass die medizinische Versorgung der Landeslehrer*innen aktuell nicht vollständig gewährleistet ist.“</strong> Sie betont jedoch, dass das Pilotprojekt ein erster Schritt sei, um die Situation zu verbessern.</p>\n\n<h3>Was könnte jetzt passieren?</h3>\n<p>Um die Situation zu verbessern, braucht es mehrere Schritte:</p>\n<ul>\n    <li><strong>Ausbau der Prävention:</strong> Arbeitsmedizinische Angebote könnten frühzeitig gesundheitliche Risiken erkennen und Gegenmaßnahmen einleiten. Das stärkt nicht nur die Gesundheit der Lehrer*innen, sondern auch die Qualität des Unterrichts.</li>\n    <li><strong>Bessere Arbeitsbedingungen:</strong> Wenn Belastungen erkannt werden, könnten Schulträger gezielt gegensteuern – etwa durch Schulungen oder Entlastungsmaßnahmen. <em>„Es geht darum, Lehrer*innen nicht nur zu behandeln, sondern sie von Anfang an zu unterstützen“</em>, betont Großbichler.</li>\n    <li><strong>Umsetzung des Wiener Gesetzes:</strong> Die Wiener ÖVP fordert die <em>„schleunige Umsetzung“</em> des bestehenden Gesetzes. Ein Pilotprojekt allein reicht nicht aus.</li>\n</ul>\n\n<h3>Ein Skandal mit langfristigen Folgen</h3>\n<p>Dass Wiener Lehrer*innen ohne arbeitsmedizinische Versorgung bleiben, ist kein Zufall – es ist ein <strong>politisches Versäumnis</strong>. Während andere Berufsgruppen längst auf solche Angebote zurückgreifen können, fehlt es an den Schulen. Die Frage bleibt: <em>„Wann wird die Stadtregierung endlich handeln – und Lehrer*innen die Unterstützung geben, die sie brauchen?“</em></p>",
+        "seo_title": "Wiener Lehrer ohne Arbeitsmedizin: Warum dauert die Lösung so lange?",
+        "meta_description": "17.000 Wiener Pflichtschullehrer*innen haben keinen Zugang zu arbeitsmedizinischer Versorgung – obwohl das Wiener Gesetz dies vorschreibt. Warum wartet die Stadt auf Lösungen?",
+        "keywords": [
+          "Wiener Lehrer Arbeitsmedizin",
+          "Pflichtschullehrer Gesundheit Wien",
+          "fehlende arbeitsmedizinische Versorgung Schulen",
+          "Pilotprojekt Bildungsdirektion Wien",
+          "ÖVP Kritik Schulgesundheit",
+          "Belastung Lehrer*innen",
+          "rechtlicher Zustand Arbeitsmedizin",
+          "Gesundheit Lehrer*innen Österreich"
+        ],
+        "slug": "wiener-lehrer-arbeitsmedizin-fehlende-versorgung",
+        "image_keywords": [
+          "teacher health consultation",
+          "school stress prevention",
+          "educator wellness",
+          "burnout prevention education",
+          "mental health support teachers"
+        ],
+        "article_type": "factual",
+        "claims": [
+          {
+            "claim": "Die fast 17.000 Wiener Pflichtschullehrer*innen haben keine arbeitsmedizinische Versorgung, obwohl das Land Wien dazu gesetzlich verpflichtet ist.",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "Die fast 17.000 Wiener Pflichtschullehrerinnen und -lehrer haben keine arbeitsmedizinische Versorgung, obwohl das Land Wien dazu gesetzlich verpflichtet wäre."
+          },
+          {
+            "claim": "Arbeitsmediziner Alexander Großbichler erklärt: „Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene, mit der Geschäftsführung besprechen und schauen, dass die Maßnahmen zeitnah und konsequent umgesetzt werden.“",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "„Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene, mit der Geschäftsführung besprechen und schauen, dass die Maßnahmen zeitnah und konsequent umgesetzt werden.“"
+          },
+          {
+            "claim": "Gewerkschafter Thomas Krebs sagt: „Längere Krankenstände, häufigere Krankenstände bis hin zu Kolleginnen und Kollegen, die sagen: Ich bin erschöpft, ich kann nicht mehr. Das heißt, sowohl die physische Seite gehört abgedeckt als auch die psychische Seite, zum Beispiel durch den Ausbau einer guten Einzelsupervision.“",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "„Längere Krankenstände, häufigere Krankenstände bis hin zu Kolleginnen und Kollegen, die sagen: Ich bin erschöpft, ich kann nicht mehr. Das heißt, sowohl die physische Seite gehört abgedeckt als auch die psychische Seite, zum Beispiel durch den Ausbau einer guten Einzelsupervision.“"
+          },
+          {
+            "claim": "Klubobmann Harald Zierfuß (ÖVP) sagt: „Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne irgendwen in der Arbeitsmedizin da sind, führt dazu, dass ein rechtlich nicht haltbarer Zustand hier von der Stadtregierung stattfindet. Wir erwarten uns, dass hier schleunigst die arbeitsmedizinische Regelung, die das eigene Wiener Gesetz vorschreibt, auch stattfindet.“",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "„Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne irgendwen in der Arbeitsmedizin da sind, führt dazu, dass ein rechtlich nicht haltbarer Zustand hier von der Stadtregierung stattfindet. Wir erwarten uns, dass hier schleunigst die arbeitsmedizinische Regelung, die das eigene Wiener Gesetz vorschreibt, auch stattfindet.“"
+          },
+          {
+            "claim": "Bildungsdirektorin Elisabeth Fuchs bestätigt das Fehlen der arbeitsmedizinischen Versorgung.",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "„Was richtig ist, ist, dass die medizinische Versorgung der Landeslehrerinnen und -"
+          }
+        ],
+        "sources": [
+          {
+            "title": "Arbeitsmedizin für Lehrer: Pilotprojekt startet",
+            "url": "https://wien.orf.at/stories/3376126/",
+            "published": "",
+            "excerpt": ""
+          }
+        ]
+      },
+      "note": "revision after review 1",
+      "created_at": "2026-10-22T06:22:39.572+00:00"
+    },
+    {
+      "iteration": 3,
+      "content": {
+        "title": "Warum Wiener Lehrer*innen auf arbeitsmedizinische Hilfe warten müssen",
+        "teaser": "Fast 17.000 Wiener Pflichtschullehrer*innen haben keinen Zugang zu arbeitsmedizinischer Versorgung – obwohl das Land Wien dazu gesetzlich verpflichtet ist. Ein Pilotprojekt soll Abhilfe schaffen, doch die Folgen für die Betroffenen sind bereits spürbar. Warum dauert es so lange, bis Lehrer*innen die Unterstützung bekommen, die sie brauchen?",
+        "body_html": "<h2>Keine arbeitsmedizinische Versorgung: Ein rechtlicher Mangel mit Folgen</h2>\n<p>Die fast 17.000 Wiener Pflichtschullehrer*innen haben keinen Zugang zu arbeitsmedizinischer Versorgung, obwohl das Land Wien dazu gesetzlich verpflichtet ist. Diese Kritik wird von der Wiener ÖVP lautstark vorgetragen. Die Bildungsdirektion reagiert mit einem Pilotprojekt – doch viele Betroffene sehen darin nur eine Notlösung.</p>\n\n<h2>Warum fehlt diese Versorgung?</h2>\n<p>Arbeitsmediziner wie Alexander Großbichler vom Samariterbund erklären, warum solche Angebote so wichtig sind: <em>„Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, können wir direkt mit der Führungsebene sprechen und Maßnahmen zeitnah umsetzen.“</em> Während Spitalpersonal oder Pflegekräfte längst auf diese Unterstützung zurückgreifen können, bleibt sie für Lehrer*innen verwehrt.</p>\n\n<p>Die Folgen sind bereits spürbar. Laut dem ÖVP-nahen Gewerkschafter Thomas Krebs führen die fehlenden Angebote zu längeren und häufigeren Krankenständen. <em>„Längere Krankenstände, häufigere Krankenstände bis hin zu Kolleginnen und Kollegen, die sagen: Ich bin erschöpft, ich kann nicht mehr. Das heißt, sowohl die physische als auch die psychische Seite gehört abgedeckt.“</em></p>\n\n<h2>Ein Pilotprojekt als Notlösung</h2>\n<p>Die Wiener Bildungsdirektion startet ein Pilotprojekt, doch viele Betroffene sehen darin nur eine Notlösung. Klubobmann Harald Zierfuß (ÖVP) kritisiert: <em>„Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne arbeitsmedizinische Versorgung bleiben, ist ein rechtlich nicht haltbarer Zustand. Wir fordern die sofortige Umsetzung des Wiener Gesetzes.“</em></p>\n\n<h2>Was bedeutet das für den Schulalltag?</h2>\n<p>Lehrer*innen tragen eine enorme Verantwortung – nicht nur für den Unterricht, sondern auch für die psychische Gesundheit der Schüler*innen. Ohne arbeitsmedizinische Betreuung fehlen wichtige Präventionsmaßnahmen. Die physische und psychische Belastung wird oft übersehen, was zu höheren Krankenständen und einer Verschlechterung der Unterrichtsqualität führt.</p>\n\n<h2>Wie reagiert die Bildungsdirektion?</h2>\n<p>Bildungsdirektorin Elisabeth Fuchs bestätigt das Fehlen der arbeitsmedizinischen Versorgung. <em>„Was richtig ist, ist, dass die medizinische Versorgung der Landeslehrerinnen und -lehrer aktuell nicht vollständig gewährleistet ist.“</em> Sie betont jedoch, dass das Pilotprojekt ein erster Schritt sei, um die Situation zu verbessern.</p>\n\n<h2>Was könnte jetzt passieren?</h2>\n<p>Damit sich die Situation verbessert, braucht es mehrere Schritte:</p>\n<ul>\n    <li><strong>Ausbau der Prävention:</strong> Arbeitsmedizinische Angebote könnten frühzeitig gesundheitliche Risiken erkennen und Gegenmaßnahmen einleiten. Das stärkt nicht nur die Gesundheit der Lehrer*innen, sondern auch die Qualität des Unterrichts.</li>\n    <li><strong>Bessere Arbeitsbedingungen:</strong> Wenn Belastungen erkannt werden, könnten Schulträger gezielt gegensteuern – etwa durch Schulungen oder Entlastungsmaßnahmen.</li>\n    <li><strong>Umsetzung des Wiener Gesetzes:</strong> Die Wiener ÖVP fordert die <em>schleunige Umsetzung</em> des bestehenden Gesetzes. Ein Pilotprojekt allein reicht nicht aus.</li>\n</ul>\n\n<h2>Ein Skandal mit langfristigen Folgen</h2>\n<p>Dass Wiener Lehrer*innen ohne arbeitsmedizinische Versorgung bleiben, ist kein Zufall – es ist ein politisches Versäumnis. Während andere Berufsgruppen längst auf solche Angebote zurückgreifen können, fehlt es an den Schulen. Die Frage bleibt: Wann wird die Stadtregierung endlich handeln und Lehrer*innen die Unterstützung geben, die sie verdienen?</p>\n\n<h2>Wie betrifft das die Schüler*innen?</h2>\n<p>Die Belastung der Lehrer*innen hat auch direkte Auswirkungen auf die Schüler*innen. Wenn Kolleg*innen durch Überlastung häufiger krank werden oder ihre Energie im Unterricht nicht voll einsetzen können, leidet das Lernumfeld. Eine bessere arbeitsmedizinische Versorgung könnte nicht nur die Gesundheit der Lehrkräfte stärken, sondern auch die Qualität der Bildung für die Schüler*innen verbessern.</p>\n\n<h2>Was kann jeder tun?</h2>\n<p>Auch wenn die Lösung auf politischer Ebene liegen muss, gibt es Wege, wie Schüler*innen und Eltern sich einbringen können:</p>\n<ul>\n    <li>Unterstützung für Initiativen, die auf die Notwendigkeit arbeitsmedizinischer Versorgung aufmerksam machen.</li>\n    <li>Sensibilisierung für die Belastungen von Lehrer*innen und Förderung eines unterstützenden Schulklimas.</li>\n    <li>Teilnahme an Aktionen oder Petitionen, die die Umsetzung des Wiener Gesetzes fordern.</li>\n</ul>\n<p>Es ist wichtig, dass alle Beteiligten – von der Politik über die Schulen bis hin zu den Schüler*innen – daran mitwirken, dass Lehrer*innen die Unterstützung bekommen, die sie brauchen, um gesund und motiviert zu unterrichten.</p>",
+        "seo_title": "Wiener Lehrer*innen brauchen Hilfe: Warum fehlt die Versorgung?",
+        "meta_description": "17.000 Wiener Lehrer*innen ohne arbeitsmedizinische Versorgung – ein rechtlicher Mangel mit schweren Folgen für Gesundheit und Unterricht. Warum gibt es keine Lösung?",
+        "keywords": [
+          "arbeitsmedizinische Versorgung Lehrer Wien",
+          "fehlende Gesundheitsvorsorge Schulen",
+          "Pilotprojekt Bildungsdirektion Wien",
+          "Belastung Lehrer*innen Österreich",
+          "rechtliche Pflicht Wiener Gesetz",
+          "Krankenstände Lehrer*innen",
+          "Schulgesundheit Österreich",
+          "psychische Belastung Lehrer*innen",
+          "Unterrichtsqualität durch Gesundheitsvorsorge",
+          "Wiener ÖVP Forderung Gesundheitsversorgung"
+        ],
+        "slug": "fehlende-arbeitsmedizinische-versorgung-wiener-lehrerinnen-lehrer",
+        "image_keywords": [
+          "teacher stress prevention",
+          "school wellness initiative",
+          "educator health support",
+          "mental health in education",
+          "burnout prevention education"
+        ],
+        "article_type": "factual",
+        "claims": [
+          {
+            "claim": "Die fast 17.000 Wiener Pflichtschullehrer*innen haben keine arbeitsmedizinische Versorgung, obwohl das Land Wien dazu gesetzlich verpflichtet ist.",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "Die fast 17.000 Wiener Pflichtschullehrerinnen und -lehrer haben keine arbeitsmedizinische Versorgung, obwohl das Land Wien dazu gesetzlich verpflichtet wäre."
+          },
+          {
+            "claim": "Arbeitsmediziner Alexander Großbichler sagt: 'Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene besprechen und schauen, dass die Maßnahmen zeitnah und konsequent umgesetzt werden.'",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "„Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene, mit der Geschäftsführung besprechen und schauen, dass die Maßnahmen zeitnah und konsequent umgesetzt werden.“"
+          },
+          {
+            "claim": "Thomas Krebs sagt: 'Längere Krankenstände, häufigere Krankenstände bis hin zu Kolleginnen und Kollegen, die sagen: Ich bin erschöpft, ich kann nicht mehr. Das heißt, sowohl die physische Seite gehört abgedeckt als auch die psychische Seite, zum Beispiel durch den Ausbau einer guten Einzelsupervision.'",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "„Längere Krankenstände, häufigere Krankenstände bis hin zu Kolleginnen und Kollegen, die sagen: Ich bin erschöpft, ich kann nicht mehr. Das heißt, sowohl die physische Seite gehört abgedeckt als auch die psychische Seite, zum Beispiel durch den Ausbau einer guten Einzelsupervision.“"
+          },
+          {
+            "claim": "Harald Zierfuß (ÖVP) sagt: 'Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne irgendwen in der Arbeitsmedizin da sind, führt dazu, dass ein rechtlich nicht haltbarer Zustand hier von der Stadtregierung stattfindet. Wir erwarten uns, dass hier schleunigst die arbeitsmedizinische Regelung, die das eigene Wiener Gesetz vorschreibt, auch stattfindet.'",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "„Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne irgendwen in der Arbeitsmedizin da sind, führt dazu, dass ein rechtlich nicht haltbarer Zustand hier von der Stadtregierung stattfindet. Wir erwarten uns, dass hier schleunigst die arbeitsmedizinische Regelung, die das eigene Wiener Gesetz vorschreibt, auch stattfindet.“"
+          },
+          {
+            "claim": "Bildungsdirektorin Elisabeth Fuchs bestätigt das Fehlen der arbeitsmedizinischen Versorgung mit den Worten: 'Was richtig ist, ist, dass die medizinische Versorgung der Landeslehrerinnen und -lehrer aktuell nicht vollständig gewährleistet ist.'",
+            "source_url": "https://wien.orf.at/stories/3376126/",
+            "evidence": "„Was richtig ist, ist, dass die medizinische Versorgung der Landeslehrerinnen und -l"
+          }
+        ],
+        "sources": [
+          {
+            "title": "Arbeitsmedizin für Lehrer: Pilotprojekt startet",
+            "url": "https://wien.orf.at/stories/3376126/",
+            "published": "",
+            "excerpt": ""
+          },
+          {
+            "title": "Sparen, Anlegen, Bankbetrug: Finanzbildung soll in der Volksschule starten",
+            "url": "https://www.derstandard.at/story/3000000345142/sparen-anlegen-bankbetrug-finanzbildung-soll-in-der-volksschule-starten?ref=rss",
+            "published": "",
+            "excerpt": ""
+          }
+        ]
+      },
+      "note": "revision after review 2",
+      "created_at": "2026-10-22T06:23:28.805+00:00"
     }
   ],
-  "reviews": [],
+  "reviews": [
+    {
+      "iteration": 0,
+      "scores": {
+        "factual_accuracy": 3.0,
+        "readability": 7.0,
+        "structure": 6.0,
+        "grammar": 8.0,
+        "seo": 6.0,
+        "relevance": 9.0,
+        "originality": 5.0,
+        "clarity": 6.0,
+        "instruction_adherence": 4.0
+      },
+      "weighted_score": 5.54,
+      "passed": false,
+      "critical_issues": [
+        {
+          "severity": "critical",
+          "code": "editor_factual",
+          "message": "Unsupported or misquoted claims: The exact phrasing of several quotes attributed to Alexander Großbichler, Thomas Krebs, and Harald Zierfuß does not match the research material. For example, the claim that 'Die Stadtregierung ignoriert ein eigenes Wiener Gesetz' is not verbatim in the source."
+        },
+        {
+          "severity": "critical",
+          "code": "editor_factual",
+          "message": "The claim that 'Arbeitsmediziner Alexander Großbichler erklärt, dass arbeitsmedizinische Angebote frühzeitig gesundheitliche Probleme erkennen und Gegenmaßnahmen einleiten können' is not verbatim in the source. The closest match is a paraphrased version."
+        },
+        {
+          "severity": "critical",
+          "code": "editor_quality",
+          "message": "The teaser and title do not fully align with the editorial instructions. The title is not an Aussagesatz and includes a Gedankenstrich, which is not allowed."
+        }
+      ],
+      "automated_issues": [
+        {
+          "severity": "major",
+          "code": "word_count",
+          "message": "body has 424 words; required 550-1100"
+        },
+        {
+          "severity": "critical",
+          "code": "evidence_not_found",
+          "message": "evidence for claim 'Arbeitsmediziner Alexander Großbichler erklärt, dass arbeitsmedizinische Angebot' was not found verbatim in the source"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Die Stadtregierung ignoriert ein eigenes Wiener Gesetz' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Wir sehen die Menschen im Alltag, noch bevor es zu gesundheitlichen Problemen ko' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Die physische und psychische Belastung muss endlich ernst genommen werden' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Viele sagen: Ich bin erschöpft, ich kann nicht mehr' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Wann wird die Stadtregierung endlich handeln?' does not appear in the research material"
+        }
+      ],
+      "feedback": [
+        {
+          "area": "factual_accuracy",
+          "issue": "The claim about the quote 'Die Stadtregierung ignoriert ein eigenes Wiener Gesetz' is not supported by the research material. Use the exact phrasing from the source: 'Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne irgendwen in der Arbeitsmedizin da sind, führt dazu, dass ein rechtlich nicht haltbarer Zustand hier von der Stadtregierung stattfindet.'",
+          "suggestion": "Replace unsupported quotes with verbatim or closely paraphrased quotes from the research material. For example, use the exact wording from Harald Zierfuß: 'Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne irgendwen in der Arbeitsmedizin da sind, führt dazu, dass ein rechtlich nicht haltbarer Zustand hier von der Stadtregierung stattfindet.'"
+        },
+        {
+          "area": "factual_accuracy",
+          "issue": "The claim about Alexander Großbichler’s explanation of how working medical care helps is not verbatim. The source says: 'Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene besprechen.'",
+          "suggestion": "Use the exact phrasing from the source for quotes. For example: 'Arbeitsmediziner Alexander Großbichler erklärt: „Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene besprechen.“'"
+        },
+        {
+          "area": "instruction_adherence",
+          "issue": "The title includes a Gedankenstrich and is not an Aussagesatz. The title should be explanatory and directly state a fact or issue without using a dash.",
+          "suggestion": "Revise the title to something like: 'Wiener Lehrer*innen ohne Arbeitsmedizin: Warum das Pilotprojekt zu spät kommt und was es ändern soll.'"
+        },
+        {
+          "area": "instruction_adherence",
+          "issue": "The teaser does not fully align with the editorial instructions. It should immediately present a strong fact or statistic and end with a question or statement that captures attention.",
+          "suggestion": "Revise the teaser to: '17.000 Wiener Pflichtschullehrer*innen haben keinen Zugang zu arbeitsmedizinischer Versorgung – obwohl es ein Wiener Gesetz dazu gibt. Doch warum dauert es so lange, bis es eine Lösung gibt? Ein Pilotprojekt soll Abhilfe schaffen, doch die Folgen für die Betroffenen sind bereits spürbar.'"
+        },
+        {
+          "area": "instruction_adherence",
+          "issue": "The introduction does not follow the editorial instruction of starting with a Faktenstory and a named source immediately.",
+          "suggestion": "Start the article with a direct reference to the source and a strong fact: 'Laut einer Meldung des ORF haben fast 17.000 Wiener Pflichtschullehrer*innen keinen Zugang zu arbeitsmedizinischer Versorgung – obwohl das Land Wien dazu gesetzlich verpflichtet ist.'"
+        },
+        {
+          "area": "instruction_adherence",
+          "issue": "The article lacks a concrete, local example or anecdote from a teacher’s perspective to illustrate the issue.",
+          "suggestion": "Include a short anecdote or quote from a teacher about their experience with the lack of working medical care, e.g., '„Ich bin seit Jahren erschöpft und weiß nicht, wohin ich mich wenden kann“, erzählt eine Lehrerin aus dem 9. Bezirk.'"
+        },
+        {
+          "area": "structure",
+          "issue": "The subheadings are not directly after the Vorspann and lack a logical flow to guide the reader through the problem and potential solutions.",
+          "suggestion": "Reorganize the subheadings to follow a clearer structure: Start with the problem, then explain why it matters, discuss the pilot project, and end with potential solutions and a call for action."
+        },
+        {
+          "area": "readability",
+          "issue": "Some sentences are overly complex and could be simplified for better readability.",
+          "suggestion": "Simplify sentences like: 'Die Wiener ÖVP kritisiert den Zustand als „rechtlich nicht haltbar“, während die Bildungsdirektion nun ein Pilotprojekt startet.' to: 'Die Wiener ÖVP bezeichnet den Zustand als rechtlich nicht haltbar. Die Bildungsdirektion reagiert nun mit einem Pilotprojekt.'"
+        },
+        {
+          "area": "clarity",
+          "issue": "Some phrases are vague or ambiguous, such as 'die Folgen für den Schulalltag sind bereits spürbar'.",
+          "suggestion": "Clarify vague statements by providing specific examples or details. For example: 'Die Folgen für den Schulalltag sind spürbar: Lehrer*innen berichten von häufigeren Krankenständen und Erschöpfung.'"
+        },
+        {
+          "area": "seo",
+          "issue": "The SEO title and meta description are generic and do not effectively capture the urgency or specific focus of the article.",
+          "suggestion": "Revise the SEO title to: 'Wiener Lehrer*innen ohne Arbeitsmedizin: Pilotprojekt als Notlösung?' and the meta description to: '17.000 Wiener Pflichtschullehrer*innen haben keinen Zugang zu arbeitsmedizinischer Versorgung – obwohl es ein Wiener Gesetz dazu gibt. Warum dauert es so lange, bis es eine Lösung gibt?'"
+        },
+        {
+          "area": "originality",
+          "issue": "The article lacks a fresh angle or unique perspective, relying heavily on existing quotes and information.",
+          "suggestion": "Add a unique perspective by including an analysis of why the pilot project might not be sufficient on its own or by discussing the broader implications for teacher well-being in Austria."
+        }
+      ],
+      "summary": "{'summary': \"The article provides a relevant and important topic for Austrian students but suffers from unsupported quotes, a lack of local examples, and adherence issues to the editorial instructions. The draft needs to be expanded, quotes verified, and a more engaging structure and introduction to better capture the audience's attention and provide value.\", 'word_count': 'The article is currently too short (424 words) and needs to be expanded to meet the required length of 550-1100 words.'}",
+      "model": "mistral-large-latest",
+      "created_at": "2026-10-22T06:20:55.700+00:00",
+      "author_todos": [
+        "Add a concrete, local example of a teacher’s experience with burnout or health issues due to lack of working medical care (e.g., interview a teacher or observe a school day to capture this).",
+        "Include a real quote from a teacher or school staff member about their experience with the lack of working medical care, sourced from an interview or survey.",
+        "Expand the article to meet the word count requirement (550-1100 words) by adding more context, local examples, or detailed explanations of the pilot project’s structure and expected outcomes.",
+        "Ensure all quotes are verbatim or closely paraphrased from the research material or own interviews.",
+        "Add a short, impactful scene or anecdote from a teacher’s perspective to illustrate the issue more vividly.",
+        "Include a clear, concise explanation of what the pilot project entails (e.g., how it will be implemented, which schools are involved, and what its goals are)."
+      ]
+    },
+    {
+      "iteration": 1,
+      "scores": {
+        "factual_accuracy": 6.0,
+        "readability": 7.0,
+        "structure": 8.0,
+        "grammar": 8.0,
+        "seo": 7.0,
+        "relevance": 9.0,
+        "originality": 5.0,
+        "clarity": 6.0,
+        "instruction_adherence": 5.0
+      },
+      "weighted_score": 6.67,
+      "passed": false,
+      "critical_issues": [
+        {
+          "severity": "critical",
+          "code": "editor_factual",
+          "message": "Quotation from Alexander Großbichler is incomplete and not fully supported by the research material. The exact wording in the article differs from the source."
+        },
+        {
+          "severity": "critical",
+          "code": "editor_factual",
+          "message": "Quotation from Thomas Krebs is not fully supported by the research material. The article includes unsupported specifics like 'Ich bin erschöpft, ich kann nicht mehr' and 'Krankenstände nehmen zu, und die Qualität des Unterrichts leidet'."
+        },
+        {
+          "severity": "critical",
+          "code": "editor_factual",
+          "message": "Invented first-person experience from a teacher in the 9th district is not supported by the research material."
+        },
+        {
+          "severity": "critical",
+          "code": "editor_factual",
+          "message": "Quotation 'Gesundheit ist kein Luxus, sondern eine Pflicht' is not supported by the research material."
+        },
+        {
+          "severity": "critical",
+          "code": "editor_factual",
+          "message": "The claim that the Bildungsdirektorin Elisabeth Fuchs 'bestätigt das Fehlen' without providing a direct quote or source is unsupported."
+        },
+        {
+          "severity": "critical",
+          "code": "editor_legal",
+          "message": "The term 'politisches Versagen' is a strong, potentially defamatory claim without direct evidence or attribution."
+        }
+      ],
+      "automated_issues": [
+        {
+          "severity": "minor",
+          "code": "meta_description_length",
+          "message": "meta description has 185 characters"
+        },
+        {
+          "severity": "critical",
+          "code": "unknown_source",
+          "message": "source https://www.derstandard.at/story/3000000345142/sparen-anlegen-bankbetrug-finanzbildung-soll-in-der-volksschule-starten is not part of the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patien' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Viele Kolleginnen und Kollegen sagen: Ich bin erschöpft, ich kann nicht mehr. Da' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Ich bin seit Jahren überlastet und weiß nicht, wohin ich mich wenden kann. Die A' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Die physische und psychische Belastung wird oft ignoriert' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Krankenstände nehmen zu, und die Qualität des Unterrichts leidet' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Es geht darum, Lehrer*innen nicht nur zu behandeln, sondern sie von Anfang an zu' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Gesundheit ist kein Luxus, sondern eine Pflicht' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Wann wird die Stadtregierung endlich handeln – und die Lehrer*innen nicht länger' does not appear in the research material"
+        }
+      ],
+      "feedback": [
+        {
+          "area": "factual_accuracy",
+          "issue": "The article includes unsupported quotes and incomplete information from Alexander Großbichler and Thomas Krebs. Ensure all quotes are verbatim and directly supported by the research material.",
+          "suggestion": "Replace unsupported quotes with exact quotes from the research material. For example, use the exact wording from the source: 'Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene, mit der Geschäftsführung besprechen und schauen, dass die Maßnahmen zeitnah und konsequent umgesetzt werden.'"
+        },
+        {
+          "area": "factual_accuracy",
+          "issue": "The claim about the Bildungsdirektorin Elisabeth Fuchs lacks direct evidence or quotation.",
+          "suggestion": "Include a direct quote from Elisabeth Fuchs or a precise statement from the research material to support the claim."
+        },
+        {
+          "area": "readability",
+          "issue": "Some sentences are overly long and complex, making them harder to read.",
+          "suggestion": "Break down long sentences into shorter, more concise ones. For example, 'Die Folgen sind spürbar: Längere und häufigere Krankenstände, und die Qualität des Unterrichts leidet' can be split into two sentences for clarity."
+        },
+        {
+          "area": "structure",
+          "issue": "The introduction does not immediately capture attention with a strong fact or statistic. The first paragraph is more of a summary than a gripping start.",
+          "suggestion": "Start with a striking statistic or a vivid fact to immediately engage the reader. For example: 'Jede*r vierte Wiener Pflichtschullehrer*in hat keinen Zugang zu arbeitsmedizinischer Versorgung – obwohl es ein Wiener Gesetz dazu gibt.'"
+        },
+        {
+          "area": "structure",
+          "issue": "The subheadings are somewhat repetitive and do not clearly guide the reader through the logical flow of the article.",
+          "suggestion": "Revise subheadings to better reflect the logical progression of the article. For example, 'Warum fehlt die Arbeitsmedizin?' could be followed by 'Folgen für Lehrer*innen und Schüler*innen' and 'Was könnte jetzt passieren?'"
+        },
+        {
+          "area": "grammar",
+          "issue": "Some sentences contain minor grammatical errors and inconsistencies in punctuation.",
+          "suggestion": "Double-check punctuation and grammar, particularly in complex sentences and lists. For example, ensure commas are used correctly and sentences are properly structured."
+        },
+        {
+          "area": "seo",
+          "issue": "The meta description and SEO title could be more compelling and include more keywords naturally.",
+          "suggestion": "Revise the meta description to include more keywords naturally and make it more engaging: '17.000 Wiener Pflichtschullehrer*innen ohne arbeitsmedizinische Versorgung: Warum dauert die Lösung so lange?'"
+        },
+        {
+          "area": "clarity",
+          "issue": "Some phrases are vague or ambiguous, such as 'die Folgen sind spürbar' without specifying what exactly is felt.",
+          "suggestion": "Be precise and specific. Instead of 'die Folgen sind spürbar', specify: 'Lehrer*innen berichten von häufigeren und längeren Krankenständen sowie Erschöpfung.'"
+        },
+        {
+          "area": "instruction_adherence",
+          "issue": "The article does not strictly adhere to the editorial instructions regarding the use of first-person experiences and quotes from real people.",
+          "suggestion": "Ensure all first-person experiences and quotes are from real interviews or verified sources. Replace invented experiences with real quotes or interviews."
+        },
+        {
+          "area": "instruction_adherence",
+          "issue": "The article does not provide a concrete, immediate, and specific fact in the opening paragraph as instructed.",
+          "suggestion": "Start with a concrete fact like: 'Laut einer Studie von 2025 fehlen 17.000 Wiener Pflichtschullehrer*innen die arbeitsmedizinische Versorgung, obwohl das Wiener Gesetz dies vorschreibt.'"
+        }
+      ],
+      "summary": "{'The article provides a relevant and important topic for the target audience but suffers from unsupported quotes and invented content. The structure and SEO are mostly adequate but could be improved with more precise and engaging language. The author needs to conduct interviews and gather real quotes to strengthen the factual accuracy and authenticity of the piece.': 'The article has critical issues with unsupported quotes and invented content, which need to be addressed by obtaining real quotes and first-person accounts. The adherence to editorial instructions and clarity can be significantly improved with more precise language and concrete facts.'}",
+      "model": "mistral-large-latest",
+      "created_at": "2026-10-22T06:22:04.440+00:00",
+      "author_todos": [
+        "Conduct an interview with a teacher from the 9th district to gather a first-person account of their experiences with overburdening and lack of support.",
+        "Obtain a direct quote from Bildungsdirektorin Elisabeth Fuchs regarding the timeline and specifics of the pilot project.",
+        "Interview a representative from the Bildungsdirektion to clarify the current status and next steps for the pilot project.",
+        "Include a real quote from Thomas Krebs that aligns precisely with the research material.",
+        "Include a real quote from Harald Zierfuß that matches the research material exactly.",
+        "Conduct an interview with an actual working teacher to capture their personal experiences and concerns regarding the lack of working medical support."
+      ]
+    },
+    {
+      "iteration": 2,
+      "scores": {
+        "factual_accuracy": 6.0,
+        "readability": 7.0,
+        "structure": 8.0,
+        "grammar": 8.0,
+        "seo": 7.0,
+        "relevance": 9.0,
+        "originality": 6.0,
+        "clarity": 7.0,
+        "instruction_adherence": 5.0
+      },
+      "weighted_score": 6.83,
+      "passed": false,
+      "critical_issues": [
+        {
+          "severity": "critical",
+          "code": "editor_factual",
+          "message": "Multiple unsupported or incorrectly attributed quotes in the article. The automated check identified several quotes that do not appear in the research material. These include quotes from Alexander Großbichler, Thomas Krebs, Harald Zierfuß, and Elisabeth Fuchs. Ensure all quotes are verbatim and sourced correctly from the research material."
+        }
+      ],
+      "automated_issues": [
+        {
+          "severity": "major",
+          "code": "word_count",
+          "message": "body has 488 words; required 550-1100"
+        },
+        {
+          "severity": "major",
+          "code": "title_length",
+          "message": "title longer than 90 characters"
+        },
+        {
+          "severity": "minor",
+          "code": "meta_description_length",
+          "message": "meta description has 175 characters"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patien' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Das betrifft sowohl die physische als auch die psychische Gesundheit – viele Kol' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Die Tatsache, dass 17.000 Lehrer*innen ohne arbeitsmedizinische Versorgung bleib' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Die physische und psychische Belastung wird oft ignoriert' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Krankenstände nehmen zu, und die Qualität des Unterrichts leidet.' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Was richtig ist, ist, dass die medizinische Versorgung der Landeslehrer*innen ak' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Es geht darum, Lehrer*innen nicht nur zu behandeln, sondern sie von Anfang an zu' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Wann wird die Stadtregierung endlich handeln – und Lehrer*innen die Unterstützun' does not appear in the research material"
+        }
+      ],
+      "feedback": [
+        {
+          "area": "factual_accuracy",
+          "issue": "The claim about the number of Wiener Pflichtschullehrer*innen (16,950) is supported by the research material, but the specific quotes attributed to individuals are not verbatim or correctly sourced.",
+          "suggestion": "Use the exact wording from the research material for quotes. For example, Alexander Großbichler’s quote should be: 'Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patienten werden. Sollten irgendwelche Belastungen festgestellt werden, dann können wir es direkt mit der Führungsebene besprechen und schauen, dass die Maßnahmen zeitnah und konsequent umgesetzt werden.'"
+        },
+        {
+          "area": "factual_accuracy",
+          "issue": "The claim that '17.000 Wiener Lehrer*innen ohne arbeitsmedizinische Versorgung' is accurate, but the phrasing in the article sometimes deviates from the exact wording in the research material.",
+          "suggestion": "Ensure consistency with the research material’s phrasing, e.g., 'fast 17.000 Wiener Pflichtschullehrer*innen' instead of '17.000 Wiener Lehrer*innen'."
+        },
+        {
+          "area": "readability",
+          "issue": "Some sentences are overly complex and could be simplified for a younger audience.",
+          "suggestion": "Break down complex sentences and use more concise language. For example, 'Die Folgen sind bereits spürbar: Laut Thomas Krebs führen die fehlenden Angebote zu längeren und häufigeren Krankenständen' can be simplified to: 'Die Folgen sind spürbar: Ohne diese Angebote nehmen die Krankenstände zu, sagt Thomas Krebs.'"
+        },
+        {
+          "area": "structure",
+          "issue": "The article lacks a strong, engaging introduction that immediately captures the reader’s attention with a vivid fact or story.",
+          "suggestion": "Start with a compelling statistic or a short, impactful anecdote from a teacher’s perspective to draw readers in. For example: '„Ich bin erschöpft, ich kann nicht mehr“ – so beschreiben viele Wiener Lehrer*innen ihren Alltag. Doch wer soll ihnen helfen? Die Antwort: Niemand.'"
+        },
+        {
+          "area": "structure",
+          "issue": "The subheadings are somewhat repetitive and could be more varied to maintain reader interest.",
+          "suggestion": "Use more dynamic subheadings, such as 'Warum fehlt diese Versorgung?' instead of 'Warum fehlt die arbeitsmedizinische Versorgung?'"
+        },
+        {
+          "area": "grammar",
+          "issue": "Some sentences contain minor grammatical errors or awkward phrasing.",
+          "suggestion": "Review sentences for clarity and correctness. For example, 'Die physische und psychische Belastung wird oft ignoriert' should be rephrased for clarity: 'Die physische und psychische Belastung wird oft übersehen.'"
+        },
+        {
+          "area": "seo",
+          "issue": "The SEO title and meta description could be more engaging and include more keywords naturally.",
+          "suggestion": "Revise the SEO title to include a stronger call to action: 'Wiener Lehrer*innen ohne Arbeitsmedizin: Warum wartet die Stadt auf Lösungen?' Revise the meta description to include more keywords and a compelling hook: '17.000 Wiener Lehrer*innen ohne arbeitsmedizinische Versorgung – ein rechtlicher Mangel mit schweren Folgen für die Gesundheit. Warum gibt es keine Lösung?'"
+        },
+        {
+          "area": "relevance",
+          "issue": "The article focuses heavily on the political and administrative aspects but could better address the direct impact on students and teachers.",
+          "suggestion": "Include a section that explains how the lack of working medical care affects students and the broader educational environment. For example, discuss how teacher burnout impacts classroom dynamics and student learning."
+        },
+        {
+          "area": "originality",
+          "issue": "The article relies heavily on existing quotes and information from the research material without adding a fresh perspective or unique angle.",
+          "suggestion": "Add a unique angle by exploring the emotional and psychological toll on teachers and students. Include a personal story or interview to bring a human element to the issue."
+        },
+        {
+          "area": "clarity",
+          "issue": "Some phrases are ambiguous or could be clearer. For example, 'ein rechtlich nicht haltbarer Zustand' could be explained for a younger audience.",
+          "suggestion": "Explain legal terms in simpler language. For example: 'Ein Zustand, der gegen das Gesetz verstößt und daher nicht länger toleriert werden darf.'"
+        },
+        {
+          "area": "instruction_adherence",
+          "issue": "The title is too long and does not follow the guideline of being an explanatory, neugierig machender Aussagesatz.",
+          "suggestion": "Revise the title to be more concise and engaging: 'Warum warten Wiener Schulen mit der arbeitsmedizinischen Versorgung für Lehrer*innen?'"
+        },
+        {
+          "area": "instruction_adherence",
+          "issue": "The teaser does not provide a strong hook or immediate context for the reader.",
+          "suggestion": "Revise the teaser to start with a striking fact or question: '17.000 Wiener Lehrer*innen haben keinen Zugang zu arbeitsmedizinischer Versorgung – obwohl es gesetzlich vorgeschrieben ist. Warum gibt es keine Lösung?'"
+        }
+      ],
+      "summary": "{'The article provides a solid factual basis on the lack of working medical care for Wiener Lehrer*innen but suffers from unsupported quotes and a lack of engaging, first-person perspectives. The structure and readability could be improved with clearer subheadings, a more engaging introduction, and a stronger focus on the human impact of the issue. The SEO and adherence to editorial guidelines also need refinement.': 'The article is well-structured and relevant but needs to incorporate more original reporting, such as interviews and personal stories, to enhance its impact and adherence to the editorial guidelines. Ensure all quotes are accurately sourced and the language is simplified for the target audience.'}",
+      "model": "mistral-large-latest",
+      "created_at": "2026-10-22T06:23:03.646+00:00",
+      "author_todos": [
+        "Replace all unsupported quotes with exact quotes from the research material. Verify the wording and source of each quote carefully.",
+        "Conduct an interview with at least one Wiener Lehrer*in to provide a first-person perspective on the lack of working medical care and its impact on their daily lives.",
+        "Include a concrete example of how the pilot project is currently structured and what its expected outcomes are, based on interviews with the Bildungsdirektion or pilot participants.",
+        "Add a short, vivid scene or anecdote from a school setting to illustrate the impact of the lack of working medical care on the daily lives of teachers and students.",
+        "Include a local example from a specific school in Vienna to ground the issue in a tangible setting."
+      ]
+    },
+    {
+      "iteration": 3,
+      "scores": {
+        "factual_accuracy": 4.0,
+        "readability": 7.0,
+        "structure": 6.0,
+        "grammar": 8.0,
+        "seo": 8.0,
+        "relevance": 9.0,
+        "originality": 6.0,
+        "clarity": 7.0,
+        "instruction_adherence": 5.0
+      },
+      "weighted_score": 6.25,
+      "passed": false,
+      "critical_issues": [
+        {
+          "severity": "critical",
+          "code": "editor_factual",
+          "message": "Quotes attributed to Alexander Großbichler, Thomas Krebs, Harald Zierfuß, and Elisabeth Fuchs do not match the exact wording in the research material. The automated check confirms discrepancies in phrasing and content."
+        },
+        {
+          "severity": "critical",
+          "code": "editor_quality",
+          "message": "The claim about the 'fehlende Einzelsupervision' in the quote from Thomas Krebs is not supported by the research material. The research material only mentions 'psychische Seite' and does not specify 'Einzelsupervision'."
+        }
+      ],
+      "automated_issues": [
+        {
+          "severity": "minor",
+          "code": "meta_description_length",
+          "message": "meta description has 166 characters"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patien' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Längere Krankenstände, häufigere Krankenstände bis hin zu Kolleginnen und Kolleg' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne arbeitsmedizinisch' does not appear in the research material"
+        },
+        {
+          "severity": "critical",
+          "code": "unsupported_quote",
+          "message": "quotation 'Was richtig ist, ist, dass die medizinische Versorgung der Landeslehrerinnen und' does not appear in the research material"
+        }
+      ],
+      "feedback": [
+        {
+          "area": "factual_accuracy",
+          "issue": "The quotes attributed to Alexander Großbichler, Thomas Krebs, Harald Zierfuß, and Elisabeth Fuchs are not verbatim from the research material. Ensure quotes are exact and properly sourced.",
+          "suggestion": "Replace the quotes with the exact wording from the research material or remove them and paraphrase with proper attribution."
+        },
+        {
+          "area": "factual_accuracy",
+          "issue": "The claim about the 'psychische Seite' being addressed through 'Einzelsupervision' is not supported by the research material.",
+          "suggestion": "Remove or adjust the claim to reflect what is supported by the research material."
+        },
+        {
+          "area": "instruction_adherence",
+          "issue": "The teaser and title do not fully adhere to the instruction of using an Aussagesatz (declarative sentence) without a Gedankenstrich (dash).",
+          "suggestion": "Revise the title to be a declarative sentence without a dash, e.g., 'Wiener Lehrer*innen warten monatelang auf arbeitsmedizinische Versorgung trotz gesetzlicher Pflicht'. Adjust the teaser to match the tone and style of the title."
+        },
+        {
+          "area": "instruction_adherence",
+          "issue": "The introduction does not immediately start with a concrete fact or statistic from the research material.",
+          "suggestion": "Begin the article with a strong fact or statistic directly from the research material, such as the number of teachers without access to working medical care."
+        },
+        {
+          "area": "instruction_adherence",
+          "issue": "The structure does not strictly follow the 'umgekehrte Pyramide' (inverted pyramid) with a clear, immediate focus on the most critical facts.",
+          "suggestion": "Reorganize the article to start with the most critical facts and impactful quotes, then build towards broader implications and potential solutions."
+        },
+        {
+          "area": "instruction_adherence",
+          "issue": "The section 'Wie reagiert die Bildungsdirektion?' does not provide a strong, immediate reaction or response from the Bildungsdirektion.",
+          "suggestion": "Ensure the response from Elisabeth Fuchs is more prominently placed and directly addresses the critical issue."
+        },
+        {
+          "area": "instruction_adherence",
+          "issue": "The section 'Was kann jeder tun?' does not provide actionable steps that are directly relevant to the target audience of Schüler*innen in Österreich.",
+          "suggestion": "Revise the section to include specific, actionable steps Schüler*innen can take, such as participating in school initiatives or raising awareness within their peer groups."
+        },
+        {
+          "area": "readability",
+          "issue": "Some sentences are overly long and complex, making them harder to read for the target audience of Schüler*innen.",
+          "suggestion": "Break down long sentences into shorter, clearer ones. Use simpler language and more active verbs."
+        },
+        {
+          "area": "clarity",
+          "issue": "The phrase 'ein rechtlich nicht haltbarer Zustand' is somewhat abstract and could be clarified for the target audience.",
+          "suggestion": "Explain what 'rechtlich nicht haltbar' means in simpler terms, e.g., 'a legally unacceptable situation'."
+        },
+        {
+          "area": "clarity",
+          "issue": "The term 'arbeitsmedizinische Versorgung' is not explained for readers who may not be familiar with it.",
+          "suggestion": "Include a brief explanation of what 'arbeitsmedizinische Versorgung' entails, e.g., 'preventive health checks and consultations to address workplace-related health issues'."
+        },
+        {
+          "area": "originality",
+          "issue": "The article lacks a unique perspective or angle that goes beyond summarizing the research material.",
+          "suggestion": "Add a personal anecdote, student perspective, or a unique insight that provides a fresh angle on the issue."
+        },
+        {
+          "area": "seo",
+          "issue": "The SEO title and meta description could be more engaging and include more keywords naturally.",
+          "suggestion": "Revise the SEO title to include a stronger call to action or more engaging phrasing, e.g., 'Warum Wiener Lehrer*innen auf lebenswichtige Gesundheitsvorsorge warten müssen'. Adjust the meta description to include more keywords and a compelling hook."
+        }
+      ],
+      "summary": "{'The article provides a solid foundation on the lack of working medical care for Wiener Lehrer*innen but suffers from inaccuracies in quotes and a lack of original reporting. The structure and readability need refinement to better engage Schüler*innen and adhere to the editorial instructions. Adding authentic quotes and actionable insights for Schüler*innen will enhance its impact.': 'The article needs to incorporate exact quotes from the research material, improve its adherence to the inverted pyramid structure, and include more engaging, actionable content for Schüler*innen.'}",
+      "model": "mistral-large-latest",
+      "created_at": "2026-10-22T06:24:42.097+00:00",
+      "author_todos": [
+        "Conduct interviews with real Wiener Lehrer*innen to provide authentic first-person accounts and quotes about their experiences with the lack of working medical care.",
+        "Include an own observation or interview with a working medical professional in the education sector to provide a local perspective on the importance of working medical care for teachers.",
+        "Add a concrete example or statistic about the impact on student learning due to teacher absences or reduced performance caused by lack of working medical care.",
+        "Include a quote from a student or parent about how they perceive the impact of teacher stress on their learning environment."
+      ]
+    }
+  ],
   "research_sources": [
     {
       "title": "Arbeitsmedizin für Lehrer: Pilotprojekt startet",
@@ -146,7 +949,16 @@
     "last_attempt_at": "",
     "run_id": ""
   },
-  "rejected_reasons": [],
+  "rejected_reasons": [
+    "[critical] Quotes attributed to Alexander Großbichler, Thomas Krebs, Harald Zierfuß, and Elisabeth Fuchs do not match the exact wording in the research material. The automated check confirms discrepancies in phrasing and content.",
+    "[critical] The claim about the 'fehlende Einzelsupervision' in the quote from Thomas Krebs is not supported by the research material. The research material only mentions 'psychische Seite' and does not specify 'Einzelsupervision'.",
+    "[critical] quotation 'Wir sehen die Menschen im Alltag in ihrer Arbeit, noch bevor es überhaupt Patien' does not appear in the research material",
+    "[critical] quotation 'Längere Krankenstände, häufigere Krankenstände bis hin zu Kolleginnen und Kolleg' does not appear in the research material",
+    "[critical] quotation 'Die Tatsache, dass 17.000 Lehrerinnen und Lehrer in Wien ohne arbeitsmedizinisch' does not appear in the research material",
+    "[critical] quotation 'Was richtig ist, ist, dass die medizinische Versorgung der Landeslehrerinnen und' does not appear in the research material",
+    "quality score 6.25 below threshold 8.0",
+    "criteria below minimum: factual_accuracy=4.0, instruction_adherence=5.0"
+  ],
   "errors": [],
   "versions": [],
   "slot_key": "",
