@@ -16,7 +16,7 @@ def message(text: str, stop_reason: str = "end_turn"):
     return SimpleNamespace(
         stop_reason=stop_reason,
         stop_details=SimpleNamespace(explanation="declined"),
-        model="claude-opus-5-5",
+        model="claude-sonnet-5-5",
         content=[SimpleNamespace(type="thinking", thinking=""), SimpleNamespace(type="text", text=text)],
         usage=SimpleNamespace(input_tokens=10, output_tokens=5, cache_read_input_tokens=0),
     )
@@ -43,7 +43,7 @@ def client_with(*results, **settings) -> tuple[AnthropicClient, FakeMessages]:
 
 def call(client, **kw):
     return client.complete_json(
-        system="Answer in JSON.", user="hi", model="claude-opus-5-5", temperature=0.7, purpose="test", **kw
+        system="Answer in JSON.", user="hi", model="claude-sonnet-5-5", temperature=0.7, purpose="test", **kw
     )
 
 
