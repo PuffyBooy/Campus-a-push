@@ -9,6 +9,7 @@ are the real implementations. Still a mock TYPO3 - not proof for the live site.
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime
 
 import pytest
@@ -110,9 +111,17 @@ def test_cli_dry_run_fills_form_but_saves_nothing(browser_env, mock_typo3, confi
     if settings.typo3.browser.executable_path:
         monkeypatch.setenv("CHROMIUM_EXECUTABLE", settings.typo3.browser.executable_path)
 
+    result_file = config_dir.parent / "bot-result.json"
+    monkeypatch.setenv("BOT_RESULT_FILE", str(result_file))
+
     code = main(["--config-dir", str(config_dir), "run", "--mode", "full", "--dry-run", "--fake-llm"])
     out = capsys.readouterr().out
     assert code == 0, out
+    # The control panel shows dry-run articles from this file (kept in the bot-runs branch).
+    result = json.loads(result_file.read_text(encoding="utf-8"))
+    assert result["summary"]["dry_run"] is True
+    assert [a["id"] for a in result["articles"]] == result["summary"]["generated"]
+    assert result["articles"][0]["content"]["title"] and "revisions" not in result["articles"][0]
     assert "dry run: filled the TYPO3 form" in out
     assert mock_typo3.state.records[NEWS] == {}
     assert not (config_dir.parent / "data" / "articles").exists() or not any(

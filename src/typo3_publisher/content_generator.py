@@ -50,6 +50,17 @@ interviews, survey, photos, personal experience), real quotes and the final head
   indirect speech with attribution ("laut X", "sagte X dem *Standard*"). The author adds real quotes.
 """
 
+PLACEHOLDER_QUOTES_RULES = """
+- Exception to rules 1, 5 and 7, only at the very end of body_html: you may close with a section
+  <h2>Platzhalter-Zitate (erfunden – vor dem Veröffentlichen durch echte Zitate ersetzen oder löschen)</h2>
+  followed by a <ul> with 2-4 <li> items that show what quotes from the author's own interviews could
+  sound like. Every item starts with "[PLATZHALTER]" and is attributed only to an invented, ordinary
+  young person described by first name, age and role (e.g. "Lena, 16, Schülerin aus Wien"). Never
+  attribute a placeholder to a real or named public person, an expert, teacher, school head, official,
+  politician, organisation or any other professional. Nothing after this section.
+- The article text above this section contains no quotations.
+"""
+
 OUTPUT_FORMAT = """
 Respond with a single JSON object and nothing else, using exactly these keys:
 {
@@ -149,6 +160,8 @@ class ContentGenerator:
             },
         )
         draft = DRAFT_MODE_RULES if e.draft_mode else ""
+        if e.draft_mode and e.placeholder_quotes:
+            draft += PLACEHOLDER_QUOTES_RULES
         output = OUTPUT_FORMAT.replace("{max_title}", str(e.max_title_length))
         return f"{rendered}\n\n{NON_NEGOTIABLE_RULES}{draft}\n{output}"
 

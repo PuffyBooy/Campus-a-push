@@ -1,0 +1,36 @@
+name: Save run result for the control panel
+description: >-
+  Keeps the bot's result file (BOT_RESULT_FILE: summary and the articles of the run, also on dry
+  runs) as runs/<run id>.json in the bot-runs branch, where the control panel (site/) reads it.
+  Only the newest 100 results are kept.
+inputs:
+  file:
+    description: Result file written by the bot
+    required: true
+runs:
+  using: composite
+  steps:
+    - shell: bash
+      env:
+        RESULT: ${{ inputs.file }}
+        RUN_ID: ${{ github.run_id }}
+        DIR: ${{ runner.temp }}/bot-runs
+      run: |
+        [ -f "$RESULT" ] || { echo "No result file."; exit 0; }
+        set -e
+        if git fetch -q --depth 1 origin bot-runs 2>/dev/null; then
+          git worktree add -q "$DIR" FETCH_HEAD
+        else
+          git worktree add -q --detach "$DIR"
+          git -C "$DIR" checkout -q --orphan bot-runs-new
+          git -C "$DIR" rm -rqf --cached --ignore-unmatch .
+          git -C "$DIR" clean -fdxq
+        fi
+        cd "$DIR"
+        mkdir -p runs
+        cp "$RESULT" "runs/$RUN_ID.json"
+        ls runs/*.json | sort -V | head -n -100 | xargs -r git rm -q
+        git add runs
+        git -c user.name=typo3-publisher-bot -c user.email=typo3-publisher-bot@users.noreply.github.com \
+          commit -qm "Result of run $RUN_ID"
+        git push -q origin HEAD:refs/heads/bot-runs

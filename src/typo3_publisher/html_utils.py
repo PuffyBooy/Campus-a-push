@@ -152,6 +152,18 @@ def word_count(raw_html: str) -> int:
     return len(re.findall(r"\w+", html_to_text(raw_html)))
 
 
+# Draft mode may close the body with invented example quotes under this heading (editorial.placeholder_quotes).
+PLACEHOLDER_HEADING = "Platzhalter-Zitate"
+PLACEHOLDER_MARK = "[PLATZHALTER]"
+_PLACEHOLDER_RE = re.compile(r"<h[23][^>]*>\s*" + re.escape(PLACEHOLDER_HEADING), re.I)
+
+
+def split_placeholder_section(raw_html: str) -> tuple[str, str]:
+    """The article body and its closing placeholder-quote section ("" if there is none)."""
+    m = _PLACEHOLDER_RE.search(raw_html or "")
+    return (raw_html[: m.start()], raw_html[m.start() :]) if m else (raw_html, "")
+
+
 def extract_links(raw_html: str) -> list[str]:
     return [href for href, _ in ParsedPage(raw_html).links if href]
 

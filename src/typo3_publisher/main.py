@@ -43,7 +43,7 @@ from .research import Researcher
 from .retry import retry_call
 from .scheduler import suggest_cron, upcoming_slots
 from .serialization import to_dict
-from .state_manager import LockHeldError, StateStore, create_sync
+from .state_manager import LockHeldError, StateError, StateStore, create_sync
 from .topic_planner import TopicPlanner
 from .verifier import PublicVerifier
 
@@ -171,6 +171,26 @@ def parse_now(value: str | None) -> datetime:
     return dt
 
 
+def write_run_result(store: StateStore, summary: RunSummary) -> None:
+    """For the control panel (site/): the run summary and the articles it touched, also on dry runs.
+    The workflows pass BOT_RESULT_FILE and keep the file in the bot-runs branch."""
+    path = os.environ.get("BOT_RESULT_FILE")
+    if not path:
+        return
+    ids = [*summary.generated, *summary.approved, *summary.rejected, *(d.get("id", "") for d in summary.drafts)]
+    articles = []
+    for article_id in dict.fromkeys(i for i in ids if i):
+        try:
+            data = to_dict(store.load_article(article_id))
+        except StateError:
+            continue
+        data.pop("revisions", None)
+        data["reviews"] = data.get("reviews", [])[-1:]
+        articles.append(data)
+    result = {"summary": to_dict(summary), "articles": articles}
+    Path(path).write_text(redact(json.dumps(result, ensure_ascii=False, indent=1)), encoding="utf-8")
+
+
 # ============================================================================ commands
 
 
@@ -231,6 +251,7 @@ def cmd_run(settings: Settings, args: argparse.Namespace) -> int:
                 log.error("could not persist run summary: %s", exc)
         sync.release_lock(run_id)
         write_step_summary(summary.markdown())
+        write_run_result(store, summary)
         print(summary.markdown())
     if exit_code:
         return exit_code

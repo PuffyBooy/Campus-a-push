@@ -29,6 +29,8 @@ jobs:
     env:
       BOT_STATE_BACKEND: git_branch
       BOT_LOG_FORMAT: json
+      # Summary and articles of the run (also on dry runs) for the control panel, kept in the bot-runs branch.
+      BOT_RESULT_FILE: ${{ github.workspace }}/bot-result.json
       BOT_PAUSED: ${{ vars.BOT_PAUSED }}
       BOT_PUBLISHING_ENABLED: ${{ vars.BOT_PUBLISHING_ENABLED }}
       BOT_UPDATES_ENABLED: ${{ vars.BOT_UPDATES_ENABLED }}
@@ -53,6 +55,12 @@ jobs:
           ARTICLE_ID: ${{ inputs.article_id }}
           DRY_RUN: ${{ github.event_name != 'schedule' && inputs.dry_run && '--dry-run' || '' }}
         run: python -m typo3_publisher run --mode update $DRY_RUN --article-id "$ARTICLE_ID"
+      - name: Save the result for the control panel
+        if: always()
+        uses: ./.github/actions/save-result
+        with:
+          file: ${{ env.BOT_RESULT_FILE }}
+
       - name: Open failure issue
         if: failure()
         uses: actions/github-script@v7
