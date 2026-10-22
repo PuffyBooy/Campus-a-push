@@ -165,6 +165,9 @@ class EditorialSettings:
     # Draft mode: a human author completes the article (own reporting, real quotes, final headline)
     # before publishing. Missing own reporting is then a to-do for the author, not a reason to reject.
     draft_mode: bool = False
+    # False: invented or unverified quotations no longer block a draft; each one becomes a
+    # "Zitat prüfen" to-do for the author instead.
+    check_quotes: bool = True
     quality_threshold: float = 8.0
     min_criterion_score: float = 6.0
     min_factual_score: float = 7.0
