@@ -19,7 +19,17 @@ from collections.abc import Iterable
 
 from .config import Settings, read_text
 from .content_generator import ContentGenerator
-from .html_utils import extract_links, html_to_text, jaccard, normalise, title_similarity, word_count
+from .html_utils import (
+    PLACEHOLDER_HEADING,
+    PLACEHOLDER_MARK,
+    extract_links,
+    html_to_text,
+    jaccard,
+    normalise,
+    split_placeholder_section,
+    title_similarity,
+    word_count,
+)
 from .llm import LLMClient, LLMRequestTooLargeError
 from .logging_utils import get_logger
 from .models import Article, ArticleContent, ArticleStatus, Issue, ReviewResult, Revision
@@ -59,6 +69,14 @@ quotations or O-Töne (invented, altered or missing from the research material) 
 not lower scores for them; add "Zitat prüfen: <first words of the quote>" to "author_todos" instead.
 """
 
+PLACEHOLDER_QUOTES_REVIEW = f"""
+PLACEHOLDER QUOTES: the body may end with a section "{PLACEHOLDER_HEADING}" whose items start with
+"{PLACEHOLDER_MARK}". They are invented on purpose as examples for the author and are replaced before
+publishing: do not report them as invented quotes and do not lower scores for them. Report a critical issue
+only if a placeholder is attributed to a real or public person, an expert, teacher, official, politician,
+organisation or other professional, or if quotations appear in the article text above that section.
+"""
+
 # Editor findings that are only about quotations (moved to the author's to-dos when quotes are unchecked).
 _QUOTE_FINDING_RE = re.compile(r"zitat|zitier|quot|o-t[öo]n", re.I)
 
@@ -85,7 +103,20 @@ class EditorialReviewer:
     ) -> list[Issue]:
         e = self.settings.editorial
         issues: list[Issue] = []
-        words = word_count(content.body_html)
+        body_html, placeholders = split_placeholder_section(content.body_html)
+        if placeholders:
+            items = re.findall(r"<li[^>]*>(.*?)</li>", placeholders, re.S | re.I)
+            if not (e.draft_mode and e.placeholder_quotes):
+                issues.append(Issue("critical", "placeholder_not_allowed", "placeholder quotes are switched off"))
+            elif not items or any(not html_to_text(i).startswith(PLACEHOLDER_MARK) for i in items):
+                issues.append(
+                    Issue(
+                        "critical",
+                        "placeholder_unmarked",
+                        f"every placeholder quote must start with {PLACEHOLDER_MARK}",
+                    )
+                )
+        words = word_count(body_html)
         low, high = e.min_words * (1 - e.word_count_tolerance), e.max_words * (1 + e.word_count_tolerance)
         if not low <= words <= high:
             issues.append(Issue("major", "word_count", f"body has {words} words; required {e.min_words}-{e.max_words}"))
@@ -132,7 +163,7 @@ class EditorialReviewer:
                 )
 
         research_text = normalise(" ".join(d.text for d in research.documents))
-        body_text = html_to_text(content.body_html) + " " + content.teaser
+        body_text = html_to_text(body_html) + " " + content.teaser
         for match in _QUOTE_RE.finditer(body_text):
             quote = normalise(match.group("q"))
             if len(quote.split()) >= 6 and quote not in research_text:
@@ -189,6 +220,8 @@ class EditorialReviewer:
         draft = DRAFT_MODE_REVIEW if self.settings.editorial.draft_mode else ""
         if not self.settings.editorial.check_quotes:
             draft = draft.replace("invented quotes and ", "") + QUOTES_UNCHECKED_REVIEW
+        if self.settings.editorial.draft_mode and self.settings.editorial.placeholder_quotes:
+            draft += PLACEHOLDER_QUOTES_REVIEW
         return (
             f"{self.rubric}\n\nEDITORIAL INSTRUCTIONS GIVEN TO THE WRITER:\n<<<\n{self.editorial_prompt}\n>>>\n"
             + REVIEW_FORMAT.replace("{CRITERIA}", "{" + criteria + "}")
@@ -238,6 +271,8 @@ class EditorialReviewer:
             if isinstance(c, dict)
         ]
         todos = [str(t) for t in (data.get("author_todos") or []) if str(t).strip()][:10]
+        if split_placeholder_section(content.body_html)[1]:
+            todos.insert(0, f"{PLACEHOLDER_HEADING} am Textende durch echte Zitate ersetzen oder löschen")
         if not e.check_quotes:
             quote_findings = [i for i in critical if _QUOTE_FINDING_RE.search(i.message)]
             critical = [i for i in critical if i not in quote_findings]

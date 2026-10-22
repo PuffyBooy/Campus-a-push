@@ -65,6 +65,8 @@ def settings(config_dir) -> Settings:
     s.publishing.slots = [SlotSettings(times=["08:00", "12:00", "17:00"])]
     s.editorial.min_words, s.editorial.max_words = 600, 1200
     s.editorial.draft_mode = False
+    s.editorial.quality_threshold = 8.0
+    s.editorial.check_quotes, s.editorial.placeholder_quotes = True, False
     return s
 
 

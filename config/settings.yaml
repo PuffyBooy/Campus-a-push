@@ -81,8 +81,12 @@ editorial:
   draft_mode: true
   # false = invented or unverified quotes no longer reject a draft; each one is listed as a
   # "Zitat prüfen" to-do in the run summary. Check or replace every quote before publishing.
-  check_quotes: false
-  quality_threshold: 8.0    # weighted score (0-10) required for approval
+  check_quotes: true
+  # Draft mode: the text may end with a section "Platzhalter-Zitate" of invented example quotes from
+  # ordinary young people ("[PLATZHALTER] Lena, 16, Schülerin"), never from professionals. They show what
+  # your own interviews could add; replace or delete them before publishing.
+  placeholder_quotes: true
+  quality_threshold: 7.0    # weighted score (0-10) required for approval; you finish each draft yourself
   min_criterion_score: 6.0  # every single criterion must reach this
   min_factual_score: 7.0
   max_revision_cycles: 3
@@ -97,8 +101,9 @@ editorial:
     clarity: 1.0
     instruction_adherence: 1.5
   # Draft length. editorial_prompt.md asks for ~7000 characters in the finished text; your own reporting
-  # (quotes, survey, scene) adds to the draft. With only two sources the model reaches ~600-900 words.
-  min_words: 550
+  # (quotes, survey, scene) adds to the draft. Claude writes ~400-500 words from three sources without padding;
+  # the placeholder quotes do not count.
+  min_words: 400
   max_words: 1100
   word_count_tolerance: 0.1
   max_title_length: 90

@@ -5,6 +5,7 @@ import pytest
 from tests.conftest import make_article, make_content
 from typo3_publisher.content_generator import ContentGenerator, content_from_llm, render_template
 from typo3_publisher.editorial_reviewer import EditorialLoop, EditorialReviewer
+from typo3_publisher.html_utils import split_placeholder_section, word_count
 from typo3_publisher.llm import FakeLLM, LLMError, parse_json_object
 from typo3_publisher.models import ArticleStatus, Claim, Source
 from typo3_publisher.research import ResearchBundle, ResearchDocument, parse_feed
@@ -335,7 +336,7 @@ def test_unchecked_quotes_become_author_todos_instead_of_blocking(settings):
     c.body_html += '<p>Eine Schülerin sagte: "Ich kann bei dieser Hitze im Klassenzimmer nicht mehr denken."</p>'
 
     def respond(purpose, system, user):
-        assert "QUOTES ARE NOT CHECKED" in system and "invented quotes" not in system
+        assert "QUOTES ARE NOT CHECKED" in system and "invented quotes and" not in system
         scores = dict.fromkeys(settings.editorial.criteria_weights, 9.0)
         return {
             "scores": scores,
@@ -351,3 +352,36 @@ def test_unchecked_quotes_become_author_todos_instead_of_blocking(settings):
     assert result.author_todos[0] == "Zitat prüfen: Zitat von Lena ist erfunden."
     assert result.author_todos[1] == "Zitat prüfen: Die zitierte Aussage steht nicht in den Quellen."
     assert result.author_todos[2].startswith("Zitat prüfen: quotation 'Ich kann bei dieser Hitze")
+
+
+def test_placeholder_quotes_close_a_draft_without_counting_as_quotes(settings, reviewer):
+    settings.editorial.draft_mode = True
+    settings.editorial.placeholder_quotes = True
+    gen_llm = FakeLLM()
+    ContentGenerator(settings, gen_llm, "Prompt").generate(None, "Wissenschaft", "", "", research(), [])
+    assert "Platzhalter-Zitate" in gen_llm.calls[0]["system"]
+
+    c = make_content()
+    words = word_count(c.body_html)
+    c.body_html += (
+        "<h2>Platzhalter-Zitate (erfunden – vor dem Veröffentlichen ersetzen)</h2><ul>"
+        '<li>[PLATZHALTER] Lena, 16, Schülerin: "Ich kann bei dieser Hitze im Klassenzimmer nicht mehr denken."</li>'
+        "</ul>"
+    )
+    issues = reviewer.automated_checks(c, ResearchBundle())
+    assert not [i for i in issues if i.severity in {"critical", "major"}], issues
+
+    c.body_html = c.body_html.replace("[PLATZHALTER] ", "")
+    assert "placeholder_unmarked" in codes(reviewer.automated_checks(c, ResearchBundle()))
+    settings.editorial.placeholder_quotes = False
+    assert "placeholder_not_allowed" in codes(reviewer.automated_checks(c, ResearchBundle()))
+    assert word_count(split_placeholder_section(c.body_html)[0]) == words
+
+    def respond(purpose, system, user):
+        assert "PLACEHOLDER QUOTES" in system
+        return {"scores": dict.fromkeys(settings.editorial.criteria_weights, 9.0), "critical_issues": []}
+
+    settings.editorial.placeholder_quotes = True
+    c.body_html = c.body_html.replace("<li>", "<li>[PLATZHALTER] ")
+    result = EditorialReviewer(settings, FakeLLM(respond), "rubric", "instructions").review(c, ResearchBundle(), 0)
+    assert result.passed and result.author_todos[0].startswith("Platzhalter-Zitate am Textende")

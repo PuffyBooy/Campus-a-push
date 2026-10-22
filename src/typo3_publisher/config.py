@@ -168,6 +168,9 @@ class EditorialSettings:
     # False: invented or unverified quotations no longer block a draft; each one becomes a
     # "Zitat prüfen" to-do for the author instead.
     check_quotes: bool = True
+    # Draft mode only: the writer may close the text with clearly marked, invented example quotes of
+    # ordinary young people (never professionals) that the author replaces before publishing.
+    placeholder_quotes: bool = False
     quality_threshold: float = 8.0
     min_criterion_score: float = 6.0
     min_factual_score: float = 7.0
