@@ -11,6 +11,7 @@ requires-python = ">=3.12"
 dependencies = [
     "playwright>=1.45",
     "openai>=1.40",
+    "anthropic>=2.1",
     "PyYAML>=6.0",
     "requests>=2.31",
     "tzdata>=2024.1",

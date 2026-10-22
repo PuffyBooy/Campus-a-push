@@ -38,6 +38,7 @@ jobs:
       BOT_LOG_FORMAT: json
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
       OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
       WEBSITE_BASE_URL: ${{ secrets.WEBSITE_BASE_URL }}
       # Website id of the campus a article form (profile campus_frontend), e.g. campus-a-college.
