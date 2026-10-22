@@ -339,11 +339,15 @@ def test_unchecked_quotes_become_author_todos_instead_of_blocking(settings):
         scores = dict.fromkeys(settings.editorial.criteria_weights, 9.0)
         return {
             "scores": scores,
-            "critical_issues": [{"category": "factual", "description": "Zitat von Lena ist erfunden."}],
+            "critical_issues": [
+                {"category": "factual", "description": "Zitat von Lena ist erfunden."},
+                {"category": "factual", "description": "Die zitierte Aussage steht nicht in den Quellen."},
+            ],
         }
 
     reviewer = EditorialReviewer(settings, FakeLLM(respond), "rubric", "instructions")
     result = reviewer.review(c, ResearchBundle(), 0)
     assert result.passed and not result.critical_issues
     assert result.author_todos[0] == "Zitat prüfen: Zitat von Lena ist erfunden."
-    assert result.author_todos[1].startswith("Zitat prüfen: quotation 'Ich kann bei dieser Hitze")
+    assert result.author_todos[1] == "Zitat prüfen: Die zitierte Aussage steht nicht in den Quellen."
+    assert result.author_todos[2].startswith("Zitat prüfen: quotation 'Ich kann bei dieser Hitze")

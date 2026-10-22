@@ -60,7 +60,7 @@ not lower scores for them; add "Zitat prüfen: <first words of the quote>" to "a
 """
 
 # Editor findings that are only about quotations (moved to the author's to-dos when quotes are unchecked).
-_QUOTE_FINDING_RE = re.compile(r"zitat|quot|o-t[öo]n", re.I)
+_QUOTE_FINDING_RE = re.compile(r"zitat|zitier|quot|o-t[öo]n", re.I)
 
 _QUOTE_RE = re.compile(r"[\"„“«»](?P<q>[^\"„“”«»]{20,400})[\"“”«»]")
 _PERCENT_RE = re.compile(r"(\d+(?:[.,]\d+)?)\s?(?:%|prozent|percent|per cent)", re.I)
