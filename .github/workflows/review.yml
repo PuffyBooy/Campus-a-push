@@ -36,6 +36,8 @@ jobs:
     env:
       BOT_STATE_BACKEND: git_branch
       BOT_LOG_FORMAT: json
+      # Summary and articles of the run (also on dry runs) for the control panel, kept in the bot-runs branch.
+      BOT_RESULT_FILE: ${{ github.workspace }}/bot-result.json
       GROQ_API_KEY: ${{ secrets.GROQ_API_KEY }}
       MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
@@ -57,3 +59,9 @@ jobs:
           COUNT: ${{ inputs.count || '1' }}
           ARTICLE_ID: ${{ inputs.article_id }}
         run: python -m typo3_publisher run --mode "$MODE" --idea "$IDEA" --topic "$TOPIC" --count "$COUNT" --article-id "$ARTICLE_ID"
+
+      - name: Save the result for the control panel
+        if: always()
+        uses: ./.github/actions/save-result
+        with:
+          file: ${{ env.BOT_RESULT_FILE }}

@@ -37,7 +37,7 @@ Copyright, dann Ressort, Region und Tags. Danach klickt er **nur „Als Entwurf 
 | `WEBSITE_ID` | Variable (besser als Secret: sie ist nicht geheim und bleibt im Log lesbar) | `campus-a-college` (die Website-ID aus dem Formular; Großschreibung, Anführungszeichen oder die Adresse `www.campus-a-college.at` gehen auch) |
 | `TYPO3_USERNAME` | Secret | E-Mail deines campus-a-Accounts |
 | `TYPO3_PASSWORD` | Secret | Passwort deines campus-a-Accounts |
-| `GROQ_API_KEY`, `PIXABAY_API_KEY` | Secret | wie unten beschrieben |
+| `ANTHROPIC_API_KEY`, `PIXABAY_API_KEY` | Secret | Claude-API-Key (schreibt und prüft) und Pixabay-Key |
 | `WEBSITE_BASE_URL` | Secret, optional | leer lassen = `https://www.campus-a-college.at` |
 | `BOT_PUBLISHING_ENABLED` | Variable | `true`, sobald die Probeläufe passen (Hauptschalter, auch für Entwürfe) |
 
@@ -52,6 +52,30 @@ Copyright, dann Ressort, Region und Tags. Danach klickt er **nur „Als Entwurf 
    komplett aus, speichert aber nicht.
 4. Erst danach `BOT_PUBLISHING_ENABLED=true` setzen. Ab dann speichert jeder Lauf höchstens einen
    Entwurf (`publishing.slots` in `config/settings.yaml`).
+
+### Steuerseite (GitHub Pages)
+
+Statt über den Actions-Reiter kannst du den Bot über eine eigene Seite steuern:
+`https://<dein-github-name>.github.io/Campus-a-push/` (Quelltext in `site/index.html`).
+
+- **Starten:** Artikel schreiben lassen (mit Thema, eigener Idee, Testlauf), Login testen,
+  Formular prüfen, die Woche vorbereiten.
+- **Läufe & Ergebnisse:** Status jedes Laufs und das Ergebnis: Titel, Bewertung, Ablehnungsgründe,
+  To-dos und der ganze Text, **auch bei Testläufen**. Die Workflows legen dafür nach jedem Lauf
+  `runs/<Lauf-ID>.json` im Branch `bot-runs` ab (die neuesten 100).
+- **Schalter:** `BOT_PUBLISHING_ENABLED` (Entwürfe speichern) und `BOT_PAUSED`.
+- **Themen & Vorgaben:** `topics.yaml`, Schreibanleitung, Prüfliste und `settings.yaml` bearbeiten.
+
+Einmalig einrichten:
+
+1. Settings → Pages → *Build and deployment* → Source: **GitHub Actions**. Der Workflow *Pages*
+   veröffentlicht die Seite bei jeder Änderung an `site/` (oder per „Run workflow“).
+2. Auf der Seite unter **Zugang** einen *Fine-grained personal access token* eintragen, nur für
+   dieses Repository, mit *Actions*, *Contents* und *Variables*: Read and write. Er bleibt nur in
+   deinem Browser gespeichert. Ohne Schlüssel kann die öffentliche Seite nichts lesen oder ändern.
+
+Das Repository ist öffentlich: Die Branches `bot-state` und `bot-runs` (Entwürfe und Ergebnisse)
+kann jede*r lesen.
 
 Ressort, Region und Tags stellst du im Abschnitt `campus:` von `config/settings.yaml` ein. Die
 Selektoren stehen unter `campus_frontend:` in `config/typo3_selectors.yaml`.

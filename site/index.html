@@ -1,0 +1,579 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Campus-Bot Steuerung</title>
+<meta name="robots" content="noindex">
+<style>
+  :root {
+    --bg: #f6f7f9; --card: #ffffff; --text: #1d2330; --muted: #5d6677; --line: #dfe3ea;
+    --accent: #2457d6; --accent-text: #ffffff; --ok: #1f7a43; --warn: #9a6200; --bad: #b3261e;
+    --ok-bg: #e5f4ea; --warn-bg: #fdf1dc; --bad-bg: #fbe7e5; --code: #eef1f5;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #12151b; --card: #1b2029; --text: #e6e9ef; --muted: #9aa3b2; --line: #2c3340;
+      --accent: #7aa2ff; --accent-text: #0d1220; --ok: #6fd39b; --warn: #f0b75a; --bad: #ff8a80;
+      --ok-bg: #173225; --warn-bg: #3a2c12; --bad-bg: #3d1c1a; --code: #232a35;
+    }
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--text);
+         font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+  header { padding: 20px 16px 0; max-width: 980px; margin: 0 auto; }
+  header h1 { margin: 0; font-size: 22px; }
+  header p { margin: 4px 0 0; color: var(--muted); }
+  nav { display: flex; gap: 4px; flex-wrap: wrap; max-width: 980px; margin: 16px auto 0; padding: 0 16px; }
+  nav button { border: 1px solid var(--line); background: var(--card); color: var(--text); padding: 8px 14px;
+               border-radius: 999px; cursor: pointer; font: inherit; }
+  nav button[aria-selected="true"] { background: var(--accent); color: var(--accent-text); border-color: var(--accent); }
+  main { max-width: 980px; margin: 0 auto; padding: 16px; }
+  section[hidden] { display: none; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px; margin-bottom: 16px; }
+  .card h2 { margin: 0 0 12px; font-size: 17px; }
+  .card h3 { margin: 16px 0 6px; font-size: 15px; }
+  label { display: block; margin: 10px 0 4px; font-weight: 600; font-size: 14px; }
+  .hint { color: var(--muted); font-size: 13px; margin: 2px 0 0; }
+  input[type=text], input[type=password], select, textarea {
+    width: 100%; padding: 9px 10px; border: 1px solid var(--line); border-radius: 8px;
+    background: var(--bg); color: var(--text); font: inherit; }
+  textarea { font: 13px/1.45 ui-monospace, SFMono-Regular, Menlo, monospace; min-height: 420px; }
+  .check { display: flex; gap: 8px; align-items: flex-start; margin-top: 12px; font-weight: 400; }
+  .check input { margin-top: 4px; }
+  .row { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 16px; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 14px; }
+  button.primary, button.secondary { border-radius: 8px; padding: 9px 16px; font: inherit; cursor: pointer; }
+  button.primary { background: var(--accent); color: var(--accent-text); border: 1px solid var(--accent); font-weight: 600; }
+  button.secondary { background: transparent; color: var(--text); border: 1px solid var(--line); }
+  button:disabled { opacity: .55; cursor: default; }
+  .msg { margin-top: 12px; padding: 10px 12px; border-radius: 8px; display: none; }
+  .msg.show { display: block; }
+  .msg.ok { background: var(--ok-bg); color: var(--ok); }
+  .msg.bad { background: var(--bad-bg); color: var(--bad); }
+  .msg.warn { background: var(--warn-bg); color: var(--warn); }
+  table { width: 100%; border-collapse: collapse; }
+  td, th { text-align: left; padding: 8px 6px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: 13px; }
+  .badge { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .b-ok { background: var(--ok-bg); color: var(--ok); }
+  .b-bad { background: var(--bad-bg); color: var(--bad); }
+  .b-warn { background: var(--warn-bg); color: var(--warn); }
+  .b-neutral { background: var(--code); color: var(--muted); }
+  .switch { display: flex; justify-content: space-between; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); }
+  .switch:last-child { border-bottom: 0; }
+  .switch strong { display: block; }
+  .article { border-top: 1px solid var(--line); padding-top: 14px; margin-top: 14px; }
+  .article h3 { margin: 0 0 4px; font-size: 17px; }
+  .teaser { font-weight: 600; }
+  .story { border-left: 3px solid var(--line); padding-left: 14px; margin-top: 10px; }
+  .story h2 { font-size: 16px; margin: 16px 0 6px; }
+  .story h3 { font-size: 15px; }
+  ul.compact { margin: 6px 0; padding-left: 20px; }
+  details summary { cursor: pointer; color: var(--accent); margin-top: 8px; }
+  code, pre { background: var(--code); border-radius: 6px; }
+  code { padding: 1px 5px; }
+  pre { padding: 10px; overflow-x: auto; white-space: pre-wrap; }
+  a { color: var(--accent); }
+  .muted { color: var(--muted); }
+  .table-wrap { overflow-x: auto; }
+  @media (max-width: 560px) { .hide-sm { display: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Campus-Bot Steuerung</h1>
+  <p>Artikel-Entwürfe für campus a starten, Ergebnisse lesen, Schalter und Themen ändern. Der Bot speichert nur Entwürfe und veröffentlicht nie selbst.</p>
+</header>
+<nav role="tablist">
+  <button role="tab" data-tab="start" aria-selected="true">Starten</button>
+  <button role="tab" data-tab="runs" aria-selected="false">Läufe &amp; Ergebnisse</button>
+  <button role="tab" data-tab="switches" aria-selected="false">Schalter</button>
+  <button role="tab" data-tab="files" aria-selected="false">Themen &amp; Vorgaben</button>
+  <button role="tab" data-tab="access" aria-selected="false">Zugang</button>
+</nav>
+<main>
+  <div id="no-token" class="card msg warn">Noch kein Zugangsschlüssel gespeichert. Lege ihn unter <a href="#" data-goto="access">Zugang</a> an.</div>
+
+  <!-- ============================================================ Starten -->
+  <section id="tab-start">
+    <div class="card">
+      <h2>Artikel erstellen</h2>
+      <div class="row">
+        <div>
+          <label for="pub-mode">Was soll passieren?</label>
+          <select id="pub-mode">
+            <option value="full">Artikel schreiben, prüfen und als Entwurf speichern</option>
+            <option value="generate-only">Nur schreiben (nicht prüfen, nicht speichern)</option>
+            <option value="review-only">Gespeicherte Artikel erneut prüfen</option>
+            <option value="publish-approved">Freigegebene Artikel als Entwurf speichern</option>
+            <option value="scheduled">Wie der Zeitplan (nur wenn ein Termin fällig ist)</option>
+          </select>
+        </div>
+        <div>
+          <label for="pub-topic">Thema</label>
+          <select id="pub-topic"><option value="">Automatisch (nach Wochenplan)</option></select>
+        </div>
+      </div>
+      <label for="pub-idea">Eigene Idee <span class="muted">(optional)</span></label>
+      <input id="pub-idea" type="text" placeholder="z. B. Neue Handyregeln an Wiener Schulen">
+      <label for="pub-article">Artikel-ID <span class="muted">(optional, nur für „erneut prüfen“ / „freigegebene speichern“)</span></label>
+      <input id="pub-article" type="text" placeholder="z. B. 20261022-112721-ec68c1dc">
+      <label class="check"><input id="pub-dry" type="checkbox" checked>
+        <span><strong>Testlauf</strong> – schreibt und prüft, füllt aber nichts auf campus a aus und speichert nichts. Das Ergebnis siehst du trotzdem unter „Läufe &amp; Ergebnisse“.</span></label>
+      <div class="actions"><button class="primary" id="pub-go">Starten</button></div>
+      <div class="msg" id="pub-msg"></div>
+    </div>
+
+    <div class="card">
+      <h2>Weitere Aktionen</h2>
+      <div class="actions">
+        <button class="secondary" data-dispatch="setup.yml" data-inputs='{"action":"check-login"}'>Login bei campus a testen</button>
+        <button class="secondary" data-dispatch="setup.yml" data-inputs='{"action":"discover"}'>Formular auf campus a prüfen</button>
+        <button class="secondary" data-dispatch="review.yml" data-inputs='{"mode":"prepare"}'>Artikel für die Woche vorbereiten</button>
+      </div>
+      <p class="hint">„Vorbereiten“ schreibt und prüft die fälligen Artikel der Woche und speichert sie im Bot, ohne campus a zu öffnen.</p>
+      <div class="msg" id="more-msg"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ Läufe -->
+  <section id="tab-runs" hidden>
+    <div class="card">
+      <h2>Letzte Läufe</h2>
+      <div class="actions" style="margin-top:0"><button class="secondary" id="runs-refresh">Aktualisieren</button>
+        <span class="hint" id="runs-auto"></span></div>
+      <div class="table-wrap"><table>
+        <thead><tr><th>Lauf</th><th>Status</th><th class="hide-sm">Gestartet</th><th></th></tr></thead>
+        <tbody id="runs-body"><tr><td colspan="4" class="muted">Noch nicht geladen.</td></tr></tbody>
+      </table></div>
+    </div>
+    <div class="card" id="result-card" hidden>
+      <h2 id="result-title">Ergebnis</h2>
+      <div id="result-body"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ Schalter -->
+  <section id="tab-switches" hidden>
+    <div class="card">
+      <h2>Schalter</h2>
+      <div class="switch">
+        <div><strong>Entwürfe auf campus a speichern</strong>
+          <span class="hint">Aus: Der Bot schreibt und prüft, speichert aber nichts auf campus a (auch nicht nach Zeitplan). An: Geprüfte Artikel werden als Entwurf gespeichert – nie veröffentlicht.</span></div>
+        <button class="secondary" data-var="BOT_PUBLISHING_ENABLED">…</button>
+      </div>
+      <div class="switch">
+        <div><strong>Pause</strong>
+          <span class="hint">An: Der Bot macht gar nichts mehr, auch nicht nach Zeitplan.</span></div>
+        <button class="secondary" data-var="BOT_PAUSED">…</button>
+      </div>
+      <div class="msg" id="switch-msg"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ Dateien -->
+  <section id="tab-files" hidden>
+    <div class="card">
+      <h2>Themen &amp; Vorgaben bearbeiten</h2>
+      <label for="file-pick">Datei</label>
+      <select id="file-pick">
+        <option value="config/topics.yaml">Themen und Artikel pro Woche (topics.yaml)</option>
+        <option value="config/editorial_prompt.md">Schreibanleitung für den Bot (editorial_prompt.md)</option>
+        <option value="config/review_checklist.md">Prüfliste für den Redakteur (review_checklist.md)</option>
+        <option value="config/settings.yaml">Alle Einstellungen (settings.yaml) – vorsichtig ändern</option>
+      </select>
+      <p class="hint">Speichern legt eine neue Version im Repository an; der nächste Lauf verwendet sie. Frühere Versionen bleiben in der Git-Historie.</p>
+      <label for="file-text">Inhalt</label>
+      <textarea id="file-text" spellcheck="false"></textarea>
+      <div class="actions">
+        <button class="primary" id="file-save">Speichern</button>
+        <button class="secondary" id="file-reload">Neu laden</button>
+      </div>
+      <div class="msg" id="file-msg"></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ Zugang -->
+  <section id="tab-access" hidden>
+    <div class="card">
+      <h2>Zugang zu GitHub</h2>
+      <p>Diese Seite steuert den Bot über die GitHub-API. Dafür braucht sie einen <strong>persönlichen Zugangsschlüssel</strong>, der nur in diesem Browser gespeichert wird (nie im Repository, nie auf einem Server).</p>
+      <ol class="compact">
+        <li>Öffne <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">github.com → Fine-grained token</a>.</li>
+        <li>Name z. B. „Campus-Bot Steuerung“, Ablauf nach Wunsch.</li>
+        <li><em>Repository access:</em> „Only select repositories“ → <code id="repo-name-hint">Campus-a-push</code>.</li>
+        <li><em>Permissions → Repository:</em> <strong>Actions</strong>: Read and write, <strong>Contents</strong>: Read and write, <strong>Variables</strong>: Read and write.</li>
+        <li>„Generate token“ und den Schlüssel hier einfügen.</li>
+      </ol>
+      <label for="token">Zugangsschlüssel</label>
+      <input id="token" type="password" autocomplete="off" placeholder="github_pat_…">
+      <label for="repo">Repository</label>
+      <input id="repo" type="text" placeholder="Besitzer/Repository">
+      <div class="actions">
+        <button class="primary" id="token-save">Speichern und testen</button>
+        <button class="secondary" id="token-clear">Schlüssel aus diesem Browser löschen</button>
+      </div>
+      <div class="msg" id="token-msg"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+(() => {
+  "use strict";
+  const $ = (sel) => document.querySelector(sel);
+  const $$ = (sel) => Array.from(document.querySelectorAll(sel));
+  const store = {
+    get(k) { try { return localStorage.getItem(k) || ""; } catch { return ""; } },
+    set(k, v) { try { v ? localStorage.setItem(k, v) : localStorage.removeItem(k); } catch { /* private mode */ } },
+  };
+
+  // ------------------------------------------------------------------ repository + API
+  function defaultRepo() {
+    const host = location.hostname;
+    const first = location.pathname.split("/").filter(Boolean)[0];
+    if (host.endsWith(".github.io") && first) return `${host.split(".")[0]}/${first}`;
+    return "PuffyBooy/Campus-a-push";
+  }
+  let repo = store.get("bot.repo") || defaultRepo();
+  let token = store.get("bot.token");
+
+  async function api(path, { method = "GET", body, raw = false, okStatuses = [] } = {}) {
+    if (!token) throw new Error("Kein Zugangsschlüssel gespeichert (Reiter „Zugang“).");
+    const res = await fetch(`https://api.github.com/repos/${repo}${path}`, {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: raw ? "application/vnd.github.raw+json" : "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+        ...(body ? { "Content-Type": "application/json" } : {}),
+      },
+      body: body ? JSON.stringify(body) : undefined,
+      cache: "no-store",
+    });
+    if (!res.ok && !okStatuses.includes(res.status)) {
+      let detail = "";
+      try { detail = (await res.json()).message || ""; } catch { /* no body */ }
+      const hints = {
+        401: "Zugangsschlüssel ungültig oder abgelaufen.",
+        403: "Der Zugangsschlüssel hat dafür keine Berechtigung (siehe „Zugang“).",
+        404: "Nicht gefunden – stimmt das Repository, hat der Schlüssel Zugriff?",
+      };
+      throw Object.assign(new Error(`${hints[res.status] || "GitHub-Fehler"} (${res.status}${detail ? ": " + detail : ""})`), { status: res.status });
+    }
+    if (res.status === 204 || okStatuses.includes(res.status)) return { status: res.status };
+    return raw ? res.text() : res.json();
+  }
+
+  function show(el, text, kind = "ok") {
+    const box = typeof el === "string" ? $(el) : el;
+    box.className = `msg show ${kind}`;
+    box.textContent = text;
+  }
+
+  // Base64 <-> UTF-8 text for the contents API.
+  const b64decode = (b64) => new TextDecoder().decode(Uint8Array.from(atob(b64.replace(/\n/g, "")), (c) => c.charCodeAt(0)));
+  function b64encode(text) {
+    const bytes = new TextEncoder().encode(text);
+    let bin = "";
+    for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+    return btoa(bin);
+  }
+
+  // ------------------------------------------------------------------ tabs
+  function openTab(name) {
+    $$("nav button").forEach((b) => b.setAttribute("aria-selected", String(b.dataset.tab === name)));
+    $$("main > section").forEach((s) => (s.hidden = s.id !== `tab-${name}`));
+    store.set("bot.tab", name);
+    if (name === "runs") loadRuns();
+    if (name === "switches") loadSwitches();
+    if (name === "files" && !$("#file-text").value) loadFile();
+  }
+  $$("nav button").forEach((b) => b.addEventListener("click", () => openTab(b.dataset.tab)));
+  $$("[data-goto]").forEach((a) => a.addEventListener("click", (e) => { e.preventDefault(); openTab(a.dataset.goto); }));
+
+  // ------------------------------------------------------------------ start runs
+  async function dispatch(workflow, inputs) {
+    await api(`/actions/workflows/${workflow}/dispatches`, { method: "POST", body: { ref: "main", inputs } });
+  }
+
+  async function loadTopics() {
+    try {
+      const text = await api("/contents/config/topics.yaml?ref=main", { raw: true });
+      const names = [...text.matchAll(/^\s*-\s*name:\s*(.+?)\s*$/gm)].map((m) => m[1].replace(/^["']|["']$/g, ""));
+      const select = $("#pub-topic");
+      for (const name of names) select.add(new Option(name, name));
+    } catch { /* topics are optional */ }
+  }
+
+  $("#pub-go").addEventListener("click", async () => {
+    const btn = $("#pub-go");
+    const dry = $("#pub-dry").checked;
+    btn.disabled = true;
+    try {
+      await dispatch("publish.yml", {
+        mode: $("#pub-mode").value,
+        dry_run: String(dry),
+        idea: $("#pub-idea").value.trim(),
+        topic: $("#pub-topic").value,
+        article_id: $("#pub-article").value.trim(),
+      });
+      show("#pub-msg", `Gestartet${dry ? " (Testlauf)" : ""}. Ein Lauf dauert meist 5–10 Minuten – unter „Läufe & Ergebnisse“ siehst du den Fortschritt.`);
+      setTimeout(() => openTab("runs"), 2500);
+    } catch (err) {
+      show("#pub-msg", err.message, "bad");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  $$("[data-dispatch]").forEach((btn) => btn.addEventListener("click", async () => {
+    btn.disabled = true;
+    try {
+      await dispatch(btn.dataset.dispatch, JSON.parse(btn.dataset.inputs));
+      show("#more-msg", `„${btn.textContent}“ gestartet. Den Fortschritt siehst du unter „Läufe & Ergebnisse“.`);
+    } catch (err) {
+      show("#more-msg", err.message, "bad");
+    } finally {
+      btn.disabled = false;
+    }
+  }));
+
+  // ------------------------------------------------------------------ runs + results
+  const WORKFLOW_NAMES = { Publish: "Artikel", Review: "Vorbereiten", Update: "Aktualisieren", Setup: "Einrichtung", CI: "Tests" };
+  let refreshTimer = null;
+
+  function runBadge(run) {
+    if (run.status !== "completed") return `<span class="badge b-warn">${run.status === "queued" ? "wartet" : "läuft"}</span>`;
+    const map = { success: ["b-ok", "fertig"], failure: ["b-bad", "Fehler"], cancelled: ["b-neutral", "abgebrochen"], skipped: ["b-neutral", "übersprungen"] };
+    const [cls, label] = map[run.conclusion] || ["b-neutral", run.conclusion || "?"];
+    return `<span class="badge ${cls}">${label}</span>`;
+  }
+
+  const fmtTime = (iso) => new Date(iso).toLocaleString("de-AT", { dateStyle: "short", timeStyle: "short" });
+  const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
+
+  async function loadRuns() {
+    const body = $("#runs-body");
+    clearTimeout(refreshTimer);
+    try {
+      const data = await api("/actions/runs?per_page=20&exclude_pull_requests=true");
+      const runs = data.workflow_runs.filter((r) => r.name !== "CI" && r.name !== "pages build and deployment" && r.name !== "Pages");
+      if (!runs.length) { body.innerHTML = `<tr><td colspan="4" class="muted">Noch keine Läufe.</td></tr>`; return; }
+      body.innerHTML = runs.map((r) => `
+        <tr>
+          <td><strong>${esc(WORKFLOW_NAMES[r.name] || r.name)}</strong> <span class="muted">#${r.run_number}</span><br>
+              <span class="hint">${r.event === "schedule" ? "Zeitplan" : "von Hand"}</span></td>
+          <td>${runBadge(r)}</td>
+          <td class="hide-sm">${fmtTime(r.created_at)}</td>
+          <td style="white-space:nowrap">
+            ${r.status === "completed" ? `<button class="secondary" data-result="${r.id}" data-label="${esc(WORKFLOW_NAMES[r.name] || r.name)} #${r.run_number}">Ergebnis</button>`
+              : `<button class="secondary" data-cancel="${r.id}">Abbrechen</button>`}
+            <a href="${esc(r.html_url)}" target="_blank" rel="noopener" class="hint">Log</a>
+          </td>
+        </tr>`).join("");
+      body.querySelectorAll("[data-result]").forEach((b) => b.addEventListener("click", () => loadResult(b.dataset.result, b.dataset.label)));
+      body.querySelectorAll("[data-cancel]").forEach((b) => b.addEventListener("click", async () => {
+        if (!confirm("Diesen Lauf abbrechen?")) return;
+        try { await api(`/actions/runs/${b.dataset.cancel}/cancel`, { method: "POST", okStatuses: [202] }); loadRuns(); }
+        catch (err) { alert(err.message); }
+      }));
+      const active = runs.some((r) => r.status !== "completed");
+      $("#runs-auto").textContent = active ? "Ein Lauf ist aktiv – die Liste aktualisiert sich alle 15 Sekunden." : "";
+      if (active && !$("#tab-runs").hidden) refreshTimer = setTimeout(loadRuns, 15000);
+    } catch (err) {
+      body.innerHTML = `<tr><td colspan="4" class="muted">${esc(err.message)}</td></tr>`;
+    }
+  }
+  $("#runs-refresh").addEventListener("click", loadRuns);
+
+  // Article HTML from the bot, reduced to harmless tags before it is shown.
+  const ALLOWED = new Set(["H2", "H3", "P", "UL", "OL", "LI", "STRONG", "EM", "B", "I", "A", "BLOCKQUOTE", "BR"]);
+  const DROPPED = new Set(["SCRIPT", "STYLE", "TEMPLATE", "IFRAME", "OBJECT", "EMBED", "NOSCRIPT"]);
+  function safeHtml(html) {
+    const doc = new DOMParser().parseFromString(`<div>${html || ""}</div>`, "text/html");
+    const out = document.createElement("div");
+    (function copy(from, to) {
+      for (const node of from.childNodes) {
+        if (node.nodeType === Node.TEXT_NODE) { to.append(node.textContent); continue; }
+        if (node.nodeType !== Node.ELEMENT_NODE) continue;
+        if (DROPPED.has(node.tagName)) continue;
+        if (!ALLOWED.has(node.tagName)) { copy(node, to); continue; }
+        const el = document.createElement(node.tagName);
+        if (node.tagName === "A") {
+          const href = node.getAttribute("href") || "";
+          if (/^https?:\/\//i.test(href)) { el.href = href; el.target = "_blank"; el.rel = "noopener"; }
+        }
+        copy(node, el);
+        to.append(el);
+      }
+    })(doc.body.firstChild, out);
+    return out;
+  }
+
+  const STATUS = {
+    draft: ["b-neutral", "geschrieben"], approved: ["b-ok", "geprüft"], rejected: ["b-bad", "abgelehnt"],
+    draft_saved: ["b-ok", "als Entwurf gespeichert"], published: ["b-ok", "veröffentlicht"],
+    publishing: ["b-warn", "wird gespeichert"], publish_failed: ["b-bad", "Speichern fehlgeschlagen"], updating: ["b-warn", "wird aktualisiert"],
+  };
+
+  function renderArticle(a) {
+    const c = a.content || {};
+    const review = (a.reviews || [])[0];
+    const [cls, label] = STATUS[a.status] || ["b-neutral", a.status];
+    const box = document.createElement("div");
+    box.className = "article";
+    box.innerHTML = `
+      <h3>${esc(c.title || a.id)}</h3>
+      <div><span class="badge ${cls}">${esc(label)}</span>
+        ${review ? `<span class="muted"> · Bewertung ${Number(review.weighted_score).toFixed(2)}</span>` : ""}
+        <span class="muted"> · Thema ${esc(a.topic)} · <code>${esc(a.id)}</code></span></div>
+      ${(a.rejected_reasons || []).length ? `<h3>Gründe für die Ablehnung</h3><ul class="compact">${a.rejected_reasons.map((r) => `<li>${esc(r)}</li>`).join("")}</ul>` : ""}
+      ${review && (review.author_todos || []).length ? `<h3>To-dos für dich</h3><ul class="compact">${review.author_todos.map((t) => `<li>${esc(t)}</li>`).join("")}</ul>` : ""}
+      ${review && review.summary ? `<p class="muted">${esc(review.summary)}</p>` : ""}
+      <details><summary>Text lesen</summary><div class="story"><p class="teaser">${esc(c.teaser)}</p></div>
+        ${(c.sources || []).length ? `<h3>Quellen</h3><ul class="compact">${c.sources.map((s) => `<li><a href="${esc(s.url)}" target="_blank" rel="noopener">${esc(s.title || s.url)}</a></li>`).join("")}</ul>` : ""}
+      </details>`;
+    box.querySelector(".story").append(safeHtml(c.body_html));
+    return box;
+  }
+
+  async function loadResult(runId, label) {
+    const card = $("#result-card");
+    const body = $("#result-body");
+    card.hidden = false;
+    $("#result-title").textContent = `Ergebnis: ${label}`;
+    body.textContent = "Lädt …";
+    card.scrollIntoView({ behavior: "smooth", block: "start" });
+    try {
+      const text = await api(`/contents/runs/${runId}.json?ref=bot-runs`, { raw: true });
+      const { summary: s, articles } = JSON.parse(text);
+      body.innerHTML = "";
+      const head = document.createElement("div");
+      const lines = [];
+      if (s.dry_run) lines.push(`<span class="badge b-warn">Testlauf</span> Nichts wurde auf campus a gespeichert.`);
+      for (const d of s.drafts || []) lines.push(`Als Entwurf gespeichert: <strong>${esc(d.title)}</strong> ${d.url ? `<a href="${esc(d.url)}" target="_blank" rel="noopener">öffnen</a>` : ""}`);
+      for (const f of s.failures || []) lines.push(`<span class="badge b-bad">Fehler</span> ${esc(f.article || "")} ${esc(f.stage)}: ${esc(f.error)}`);
+      for (const n of s.notes || []) lines.push(esc(n));
+      if (!articles.length && !lines.length) lines.push("In diesem Lauf wurde kein Artikel bearbeitet.");
+      head.innerHTML = lines.map((l) => `<p style="margin:4px 0">${l}</p>`).join("");
+      body.append(head);
+      for (const a of articles) body.append(renderArticle(a));
+    } catch (err) {
+      body.textContent = err.status === 404
+        ? "Für diesen Lauf ist kein Ergebnis gespeichert (ältere Läufe und Einrichtungs-Läufe haben keins). Details stehen im Log."
+        : err.message;
+    }
+  }
+
+  // ------------------------------------------------------------------ switches (repository variables)
+  async function readVar(name) {
+    const res = await api(`/actions/variables/${name}`, { okStatuses: [404] });
+    return res.status === 404 ? "" : (res.value || "");
+  }
+  const isTrue = (v) => ["1", "true", "yes", "on", "ja"].includes(String(v).trim().toLowerCase());
+
+  async function loadSwitches() {
+    for (const btn of $$("[data-var]")) {
+      try {
+        const on = isTrue(await readVar(btn.dataset.var));
+        btn.dataset.on = String(on);
+        btn.textContent = on ? "An – ausschalten" : "Aus – einschalten";
+        btn.className = on ? "primary" : "secondary";
+      } catch (err) {
+        btn.textContent = "?";
+        show("#switch-msg", err.message, "bad");
+      }
+    }
+  }
+
+  $$("[data-var]").forEach((btn) => btn.addEventListener("click", async () => {
+    const name = btn.dataset.var;
+    const value = btn.dataset.on === "true" ? "false" : "true";
+    if (name === "BOT_PUBLISHING_ENABLED" && value === "true" &&
+        !confirm("Ab jetzt speichert der Bot geprüfte Artikel als Entwurf auf campus a (nach Zeitplan und bei Läufen ohne Testlauf). Veröffentlichen musst du weiterhin selbst. Einschalten?")) return;
+    btn.disabled = true;
+    try {
+      const res = await api(`/actions/variables/${name}`, { method: "PATCH", body: { name, value }, okStatuses: [404] });
+      if (res.status === 404) await api("/actions/variables", { method: "POST", body: { name, value }, okStatuses: [201] });
+      show("#switch-msg", "Gespeichert. Gilt ab dem nächsten Lauf.");
+      await loadSwitches();
+    } catch (err) {
+      show("#switch-msg", err.message, "bad");
+    } finally {
+      btn.disabled = false;
+    }
+  }));
+
+  // ------------------------------------------------------------------ config files
+  let fileSha = "";
+  async function loadFile() {
+    const path = $("#file-pick").value;
+    $("#file-text").value = "Lädt …";
+    try {
+      const data = await api(`/contents/${path}?ref=main`);
+      fileSha = data.sha;
+      $("#file-text").value = b64decode(data.content);
+      $("#file-msg").className = "msg";
+    } catch (err) {
+      $("#file-text").value = "";
+      show("#file-msg", err.message, "bad");
+    }
+  }
+  $("#file-pick").addEventListener("change", loadFile);
+  $("#file-reload").addEventListener("click", loadFile);
+  $("#file-save").addEventListener("click", async () => {
+    const path = $("#file-pick").value;
+    const btn = $("#file-save");
+    btn.disabled = true;
+    try {
+      const res = await api(`/contents/${path}`, {
+        method: "PUT",
+        body: { message: `Update ${path} (Steuerseite)`, content: b64encode($("#file-text").value), sha: fileSha, branch: "main" },
+      });
+      fileSha = res.content.sha;
+      show("#file-msg", "Gespeichert. Der nächste Lauf verwendet die neue Version.");
+    } catch (err) {
+      show("#file-msg", err.status === 409 ? "Die Datei wurde inzwischen woanders geändert. Bitte neu laden und erneut ändern." : err.message, "bad");
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  // ------------------------------------------------------------------ access
+  function refreshAccessUi() {
+    $("#token").value = token;
+    $("#repo").value = repo;
+    $("#repo-name-hint").textContent = repo.split("/")[1] || repo;
+    $("#no-token").classList.toggle("show", !token);
+  }
+  $("#token-save").addEventListener("click", async () => {
+    token = $("#token").value.trim();
+    repo = $("#repo").value.trim() || defaultRepo();
+    store.set("bot.token", token);
+    store.set("bot.repo", repo);
+    refreshAccessUi();
+    try {
+      await api("/actions/workflows");
+      show("#token-msg", "Verbindung klappt. Der Schlüssel ist in diesem Browser gespeichert.");
+      loadTopics();
+    } catch (err) {
+      show("#token-msg", err.message, "bad");
+    }
+  });
+  $("#token-clear").addEventListener("click", () => {
+    token = "";
+    store.set("bot.token", "");
+    refreshAccessUi();
+    show("#token-msg", "Schlüssel gelöscht.", "warn");
+  });
+
+  // ------------------------------------------------------------------ init
+  refreshAccessUi();
+  if (token) loadTopics();
+  openTab(token ? (store.get("bot.tab") || "start") : "access");
+})();
+</script>
+</body>
+</html>
