@@ -66,6 +66,7 @@ llm:
   rate_limit_retries: 8
   rate_limit_max_wait_seconds: 120
   rate_limit_default_wait_seconds: 20
+  rate_limit_switch_after: 3  # after 3 rate-limit answers in a row, try the next fallback model
 
 editorial:
   prompt_file: config/editorial_prompt.md

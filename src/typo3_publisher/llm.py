@@ -23,6 +23,10 @@ class LLMQuotaError(RuntimeError):
     """The provider's limit needs a longer wait than llm.rate_limit_max_wait_seconds (e.g. a daily limit)."""
 
 
+class LLMModelBusyError(RuntimeError):
+    """A model keeps answering 429 although another model is configured to take over."""
+
+
 class LLMRequestTooLargeError(LLMQuotaError):
     """This one request exceeds the provider's per-minute token limit; waiting does not help."""
 
@@ -102,6 +106,7 @@ class OpenAIClient:
         self.settings = settings
         self.retry = retry
         self.unavailable: set[str] = set()  # models the account may not use (e.g. not in a free tier)
+        self._next_model: str | None = None  # set while a fallback model could take over
 
     def _unavailable_model(self, exc: Exception) -> bool:
         """403 'not available in your subscription tier' (Mistral free mode) or 404 for an unknown model."""
@@ -124,6 +129,7 @@ class OpenAIClient:
         """Ask ``model``; if the account may not use it, the next of ``llm.fallback_models``."""
         candidates = [m for m in dict.fromkeys([model, *self.settings.fallback_models]) if m not in self.unavailable]
         for i, candidate in enumerate(candidates):
+            self._next_model = candidates[i + 1] if i + 1 < len(candidates) else None
             try:
                 return self._complete_json(
                     system=system,
@@ -133,6 +139,12 @@ class OpenAIClient:
                     purpose=purpose,
                     images=images,
                 )
+            except LLMModelBusyError as exc:
+                self.unavailable.add(candidate)
+                log.warning(
+                    "model %s keeps refusing with rate limits (%s); switching to %s", candidate, exc, candidates[i + 1]
+                )
+                continue
             except (self._openai.PermissionDeniedError, self._openai.NotFoundError) as exc:
                 if not self._unavailable_model(exc) or i == len(candidates) - 1:
                     raise
@@ -224,6 +236,9 @@ class OpenAIClient:
                     ) from exc
                 if attempt >= s.rate_limit_retries:
                     raise
+                if self._next_model and attempt + 1 >= s.rate_limit_switch_after:
+                    # A free tier may allow a model in name only; another model may answer at once.
+                    raise LLMModelBusyError(f"{attempt + 1} rate-limit answers in a row") from exc
                 log.warning(
                     "LLM %s: %s rate limit, waiting %.0fs as requested (%d/%d)",
                     purpose,

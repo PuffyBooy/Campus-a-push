@@ -227,3 +227,26 @@ def test_without_fallbacks_the_tier_error_is_raised():
     client, _fake = client_with(tier_not_allowed(), provider="mistral")
     with pytest.raises(openai.PermissionDeniedError):
         call(client)
+
+
+def test_a_model_that_keeps_rate_limiting_hands_over_to_the_next(monkeypatch):
+    waits = []
+    monkeypatch.setattr("typo3_publisher.retry.sleep", waits.append)
+    busy = [rate_limited("Rate limit exceeded") for _ in range(3)]
+    client, fake = client_with(*busy, answer('{"ok": 7}'), answer('{"ok": 8}'), provider="mistral")
+    client.settings.fallback_models = ["mistral-small-latest"]
+    assert client.complete_json(system="s", user="u", model="mistral-medium-latest", temperature=0.2, purpose="t") == {
+        "ok": 7
+    }
+    assert [r["model"] for r in fake.requests] == ["mistral-medium-latest"] * 3 + ["mistral-small-latest"]
+    assert len(waits) == 2  # two waits, then the switch instead of a third
+    client.complete_json(system="s", user="u", model="mistral-medium-latest", temperature=0.2, purpose="t")
+    assert fake.requests[-1]["model"] == "mistral-small-latest"
+
+
+def test_the_last_model_keeps_waiting_instead_of_switching(monkeypatch):
+    monkeypatch.setattr("typo3_publisher.retry.sleep", lambda s: None)
+    busy = [rate_limited("Rate limit exceeded") for _ in range(4)]
+    client, fake = client_with(*busy, answer('{"ok": 9}'), provider="mistral")
+    assert call(client) == {"ok": 9}
+    assert len(fake.requests) == 5
