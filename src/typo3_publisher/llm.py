@@ -85,9 +85,13 @@ PROVIDERS: dict[str, dict[str, str]] = {
     "openai": {"base_url": "", "key_env": "OPENAI_API_KEY"},
     "groq": {"base_url": "https://api.groq.com/openai/v1", "key_env": "GROQ_API_KEY"},
     "mistral": {"base_url": "https://api.mistral.ai/v1", "key_env": "MISTRAL_API_KEY"},
+    "deepseek": {"base_url": "https://api.deepseek.com", "key_env": "DEEPSEEK_API_KEY"},
     # Not OpenAI-compatible: served by anthropic_llm.AnthropicClient.
     "anthropic": {"base_url": "", "key_env": "ANTHROPIC_API_KEY"},
 }
+
+
+MAX_TOKENS_PROVIDERS = {"mistral", "deepseek"}
 
 
 def api_key_env(settings: LLMSettings) -> str:
@@ -180,8 +184,8 @@ class OpenAIClient:
                 "model": model,
                 "messages": [{"role": "system", "content": system}, {"role": "user", "content": user_content}],
                 "response_format": {"type": "json_object"},
-                # Mistral's chat completions know only max_tokens; OpenAI deprecated it for reasoning models.
-                ("max_tokens" if self.settings.provider == "mistral" else "max_completion_tokens"): (
+                # Mistral and DeepSeek know only max_tokens; OpenAI deprecated it for reasoning models.
+                ("max_tokens" if self.settings.provider in MAX_TOKENS_PROVIDERS else "max_completion_tokens"): (
                     self.settings.max_output_tokens
                 ),
             }

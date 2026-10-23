@@ -170,6 +170,20 @@
       </div>
       <div class="msg" id="switch-msg"></div>
     </div>
+    <div class="card">
+      <h2>KI-Modell</h2>
+      <label for="model-pick">Wer schreibt und prüft die Artikel?</label>
+      <select id="model-pick">
+        <option value="claude-sonnet">Claude Sonnet 5.5 (empfohlen, ca. 0,40 $ pro Artikel)</option>
+        <option value="claude-opus">Claude Opus 5.5 (gründlicher, etwa doppelt so teuer)</option>
+        <option value="deepseek-pro">DeepSeek V4 Pro</option>
+        <option value="deepseek-flash">DeepSeek Flash (am günstigsten)</option>
+      </select>
+      <p class="hint" id="model-current"></p>
+      <p class="hint">Braucht den passenden Schlüssel als Repository-Secret: <code>ANTHROPIC_API_KEY</code> für Claude, <code>DEEPSEEK_API_KEY</code> für DeepSeek. DeepSeek sieht keine Bilder – Bildtext und Bildbeschreibung entstehen dann aus den Pixabay-Stichwörtern.</p>
+      <div class="actions"><button class="primary" id="model-save">Übernehmen</button></div>
+      <div class="msg" id="model-msg"></div>
+    </div>
   </section>
 
   <!-- ============================================================ Dateien -->
@@ -287,7 +301,7 @@
     $$("main > section").forEach((s) => (s.hidden = s.id !== `tab-${name}`));
     store.set("bot.tab", name);
     if (name === "runs") loadRuns();
-    if (name === "switches") loadSwitches();
+    if (name === "switches") { loadSwitches(); loadModel(); }
     if (name === "files" && !$("#file-text").value) loadFile();
   }
   $$("nav button").forEach((b) => b.addEventListener("click", () => openTab(b.dataset.tab)));
@@ -505,6 +519,80 @@
       btn.disabled = false;
     }
   }));
+
+  // ------------------------------------------------------------------ AI model (lines in config/settings.yaml)
+  const MODELS = {
+    "claude-sonnet": { provider: "anthropic", model: "claude-sonnet-5-5", vision: true },
+    "claude-opus": { provider: "anthropic", model: "claude-opus-5-5", vision: true },
+    "deepseek-pro": { provider: "deepseek", model: "deepseek-v4-pro", vision: false },
+    "deepseek-flash": { provider: "deepseek", model: "deepseek-flash", vision: false },
+  };
+
+  // Replaces "key: value" (keeping any comment) inside the block that starts at blockStart (a regex
+  // matching the block's first line) and ends before the next line with the same or less indentation.
+  function setKey(text, blockStart, key, value) {
+    const m = blockStart.exec(text);
+    if (!m) throw new Error(`Abschnitt ${blockStart} nicht gefunden`);
+    const indent = m[1].length;
+    const start = m.index + m[0].length;
+    const rest = text.slice(start);
+    const end = rest.search(new RegExp(`\\n {0,${indent}}\\S`));
+    const block = end === -1 ? rest : rest.slice(0, end);
+    const line = new RegExp(`^(\\s+${key}:\\s*)[^#\\n]*?(\\s*(#.*)?)$`, "m");
+    if (!line.test(block)) throw new Error(`${key} nicht gefunden`);
+    return text.slice(0, start) + block.replace(line, `$1${value}$2`) + rest.slice(block.length);
+  }
+
+  function readKey(text, blockStart, key) {
+    const m = blockStart.exec(text);
+    if (!m) return "";
+    const after = text.slice(m.index + m[0].length);
+    const hit = new RegExp(`^\\s+${key}:\\s*([^#\\n]*?)\\s*(#.*)?$`, "m").exec(after);
+    return hit ? hit[1] : "";
+  }
+
+  const LLM = /^()llm:[^\n]*$/m;
+  const IMAGE_TEXT = /^( {2})text:[^\n]*$/m;
+  let settingsFile = { sha: "", text: "" };
+
+  async function loadModel() {
+    try {
+      const data = await api("/contents/config/settings.yaml?ref=main");
+      settingsFile = { sha: data.sha, text: b64decode(data.content) };
+      const provider = readKey(settingsFile.text, LLM, "provider");
+      const model = readKey(settingsFile.text, LLM, "writer_model");
+      const key = Object.keys(MODELS).find((k) => MODELS[k].provider === provider && MODELS[k].model === model);
+      if (key) $("#model-pick").value = key;
+      $("#model-current").textContent = `Aktuell eingestellt: ${provider} / ${model}`;
+    } catch (err) {
+      show("#model-msg", err.message, "bad");
+    }
+  }
+
+  $("#model-save").addEventListener("click", async () => {
+    const choice = MODELS[$("#model-pick").value];
+    const btn = $("#model-save");
+    btn.disabled = true;
+    try {
+      let text = settingsFile.text;
+      text = setKey(text, LLM, "provider", choice.provider);
+      text = setKey(text, LLM, "writer_model", choice.model);
+      text = setKey(text, LLM, "editor_model", choice.model);
+      text = setKey(text, IMAGE_TEXT, "mode", choice.vision ? "vision" : "tags");
+      if (choice.vision) text = setKey(text, IMAGE_TEXT, "model", choice.model);
+      const res = await api("/contents/config/settings.yaml", {
+        method: "PUT",
+        body: { message: `Use ${choice.model} (Steuerseite)`, content: b64encode(text), sha: settingsFile.sha, branch: "main" },
+      });
+      settingsFile = { sha: res.content.sha, text };
+      $("#model-current").textContent = `Aktuell eingestellt: ${choice.provider} / ${choice.model}`;
+      show("#model-msg", "Gespeichert. Der nächste Lauf verwendet dieses Modell.");
+    } catch (err) {
+      show("#model-msg", err.status === 409 ? "settings.yaml wurde inzwischen geändert. Bitte den Reiter neu öffnen." : err.message, "bad");
+    } finally {
+      btn.disabled = false;
+    }
+  });
 
   // ------------------------------------------------------------------ config files
   let fileSha = "";
