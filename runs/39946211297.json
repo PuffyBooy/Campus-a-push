@@ -1,0 +1,22 @@
+{
+ "summary": {
+  "run_id": "gh-39946211297-1",
+  "mode": "scheduled",
+  "dry_run": false,
+  "started_at": "2026-10-23T11:35:50.826+00:00",
+  "finished_at": "2026-10-23T11:35:52.911+00:00",
+  "slot": "",
+  "generated": [],
+  "approved": [],
+  "rejected": [],
+  "published": [],
+  "drafts": [],
+  "updated": [],
+  "failures": [],
+  "notes": [
+   "publishing is disabled (publishing.enabled=false or BOT_PAUSED) - nothing to do"
+  ],
+  "needs_human": false
+ },
+ "articles": []
+}
