@@ -179,6 +179,7 @@ In GitHub Actions the composite action `.github/actions/setup-bot` does the same
 | `GROQ_API_KEY` | Groq API key (https://console.groq.com/keys), used with `llm.provider: groq`, the default |
 | `OPENAI_API_KEY` | *only with `llm.provider: openai`*: OpenAI API key |
 | `ANTHROPIC_API_KEY` | *only with `llm.provider: anthropic`*: Claude API key (https://platform.claude.com/settings/keys) |
+| `DEEPSEEK_API_KEY` | *only with `llm.provider: deepseek`*: DeepSeek API key (https://platform.deepseek.com/api_keys) |
 | `PIXABAY_API_KEY` | Pixabay API key (https://pixabay.com/api/docs/) |
 | `WEBSITE_BASE_URL` | Public site URL, e.g. `https://www.example.org` |
 | `NOTIFY_WEBHOOK_URL` | *optional* Slack/Teams/generic webhook |

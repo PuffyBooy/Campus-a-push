@@ -49,10 +49,12 @@ llm:
   # mistral: Mistral API (key in the MISTRAL_API_KEY secret). Models: https://docs.mistral.ai/models
   # groq:    Groq (GROQ_API_KEY), e.g. writer/editor openai/gpt-oss-120b with reasoning_effort: low,
   #          image model qwen/qwen3.8-27b. Free tier: only 8000 tokens per minute, 200000 per day.
+  # deepseek: DeepSeek (DEEPSEEK_API_KEY), writer/editor deepseek-v4-pro or deepseek-flash (cheaper).
+  #          No image input: set images.text.mode to tags. The control panel switches all of this at once.
   # openai:  OpenAI (OPENAI_API_KEY)
   provider: anthropic
   base_url: ""              # empty = provider default
-  api_key_env: ""           # empty = ANTHROPIC_API_KEY / MISTRAL_API_KEY / GROQ_API_KEY / OPENAI_API_KEY
+  api_key_env: ""           # empty = ANTHROPIC_API_KEY / DEEPSEEK_API_KEY / MISTRAL_API_KEY / GROQ_API_KEY / OPENAI_API_KEY
   writer_model: claude-sonnet-5-5
   editor_model: claude-sonnet-5-5
   # Mistral only: used in this order when your plan does not include a model ("not available in your
@@ -62,7 +64,7 @@ llm:
   editor_temperature: 0.2   # set to null for models that do not accept a temperature
   max_output_tokens: 32000  # Claude's thinking counts towards this
   timeout_seconds: 180
-  reasoning_effort: medium  # Claude: low..max; gpt-oss: low | medium | high; Mistral: empty
+  reasoning_effort: medium  # Claude: low..max; gpt-oss, DeepSeek: low | medium | high; Mistral: empty
   # Rate limits (HTTP 429): wait as long as the provider asks (or rate_limit_default_wait_seconds if it
   # does not say). A longer wait than rate_limit_max_wait_seconds (e.g. a daily limit) ends the run.
   rate_limit_retries: 8
@@ -153,7 +155,7 @@ images:
   max_file_mb: 15
   text:                     # caption (Bildtext) + description/alt text (Bildbeschreibung)
     mode: vision            # vision: the model looks at the downloaded image | tags: templates only
-    # Must accept image input. Mistral Large is multimodal; on Groq use qwen/qwen3.8-27b.
+    # Must accept image input (Claude, Mistral Large; on Groq qwen/qwen3.8-27b). DeepSeek: use mode tags.
     # Empty = llm.writer_model.
     model: claude-sonnet-5-5
     caption_max_chars: 200

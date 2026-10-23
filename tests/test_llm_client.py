@@ -250,3 +250,13 @@ def test_the_last_model_keeps_waiting_instead_of_switching(monkeypatch):
     client, fake = client_with(*busy, answer('{"ok": 9}'), provider="mistral")
     assert call(client) == {"ok": 9}
     assert len(fake.requests) == 5
+
+
+def test_deepseek_uses_its_endpoint_key_and_max_tokens():
+    settings = LLMSettings(provider="deepseek")
+    assert api_key_env(settings) == "DEEPSEEK_API_KEY"
+    client = create_llm(settings, RETRY, "sk-" + "d" * 30)
+    assert str(client._client.base_url).startswith("https://api.deepseek.com")
+    client, fake = client_with(answer('{"ok": 1}'), provider="deepseek")
+    assert call(client) == {"ok": 1}
+    assert "max_tokens" in fake.requests[0] and "max_completion_tokens" not in fake.requests[0]
