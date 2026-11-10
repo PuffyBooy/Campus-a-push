@@ -1,0 +1,22 @@
+{
+ "summary": {
+  "run_id": "gh-42861384466-1",
+  "mode": "update",
+  "dry_run": false,
+  "started_at": "2026-11-10T17:06:51.359+00:00",
+  "finished_at": "2026-11-10T17:06:52.875+00:00",
+  "slot": "",
+  "generated": [],
+  "approved": [],
+  "rejected": [],
+  "published": [],
+  "drafts": [],
+  "updated": [],
+  "failures": [],
+  "notes": [
+   "updates.enabled is false - the update workflow must be enabled explicitly"
+  ],
+  "needs_human": false
+ },
+ "articles": []
+}
